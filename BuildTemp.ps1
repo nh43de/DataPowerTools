@@ -67,4 +67,4 @@ $versionSuffix = @{ $true = "--version-suffix=$($suffix)"; $false = ""}[$suffix 
 
 exec { & dotnet test .\DataPowerTools.Tests\DataPowerTools.Tests.csproj -c Release }
 
-exec { & dotnet pack .\DataPowerTools\DataPowerTools.csproj -c Release -o .\artifacts $versionSuffix }  
+exec { & dotnet pack .\DataPowerTools\DataPowerTools.csproj -c Release -o ..\artifacts $versionSuffix }  
