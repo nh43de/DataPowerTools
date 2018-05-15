@@ -11,9 +11,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".NuGetPack", ".NuGetPack", 
 		.NuGetPack\NuGetPack.exe = .NuGetPack\NuGetPack.exe
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataPowerTools.Tests", "DataPowerTools.Tests\DataPowerTools.Tests.csproj", "{CDCB3DFD-282D-473F-A976-F55F48E1A0D9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DataPowerTools.Tests", "DataPowerTools.Tests\DataPowerTools.Tests.csproj", "{CDCB3DFD-282D-473F-A976-F55F48E1A0D9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataPowerTools", "DataPowerTools\DataPowerTools.csproj", "{3D358DF7-BD69-4626-86B8-B5B361FAA62B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DataPowerTools", "DataPowerTools\DataPowerTools.csproj", "{3D358DF7-BD69-4626-86B8-B5B361FAA62B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
