@@ -12,7 +12,7 @@ artifacts:
   name: NuGet
 deploy:
 - provider: NuGet
-  server: https://www.myget.org/F/datapowertools/api/v3/index.json
+  server: https://www.myget.org/F/datapowertools/api/v2/package
   api_key:
     secure: 1uDzEme3hOBW5Od0oJ8qxVK51TK2HMGW6ocZJZqu5D6Cp9tdfhDluxgkkpFBELaA
   skip_symbols: true
