@@ -33,13 +33,8 @@ $commitHash = $(git rev-parse --short HEAD)
 $buildSuffix = @{ $true = "$($suffix)-$($commitHash)"; $false = "$($branch)-$($commitHash)" }[$suffix -ne ""]
 $versionSuffix = @{ $true = "--version-suffix=$($env:APPVEYOR_BUILD_VERSION)"; $false = ""}[$suffix -ne ""]
 
-echo "------------------------------------------"
-echo "build: Package version suffix is [$suffix]"
-echo "build: Build version suffix is [$buildSuffix]"
-echo "build: APPVEYOR_BUILD_VERSION is [$env:APPVEYOR_BUILD_VERSION]"
-echo "------------------------------------------"
+$version = 1.0.$env:APPVEYOR_BUILD_VERSION
 
+exec { & dotnet build .\DataPowerTools.sln -c Release --version-suffix=$env:APPVEYOR_BUILD_VERSION }
 
-exec { & dotnet build .\DataPowerTools.sln -c Release --version-suffix=$buildSuffix }
-
-exec { & dotnet pack .\DataPowerTools\DataPowerTools.csproj -c Release -o ..\artifacts --include-symbols --no-build /p:Version=1.0.$env:APPVEYOR_BUILD_VERSION }
+exec { & dotnet pack .\DataPowerTools\DataPowerTools.csproj -c Release -o ..\artifacts --include-symbols --no-build /p:Version=$version }
