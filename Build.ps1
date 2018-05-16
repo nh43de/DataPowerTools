@@ -37,11 +37,12 @@ echo "------------------------------------------"
 echo "build: Package version suffix is [$suffix]"
 echo "build: Build version suffix is [$buildSuffix]"
 echo "build: Build version suffix is [$env:APPVEYOR_BUILD_VERSION]"
+echo "build: Build version suffix is [$env:APPVEYOR_BUILD_NUMBER]"
 echo "------------------------------------------"
 
 
-exec { & dotnet build .\DataPowerTools.sln -c Release --version-suffix=$buildSuffix }
+#exec { & dotnet build .\DataPowerTools.sln -c Release --version-suffix=$buildSuffix }
 
 #Pop-Location
 
-exec { & dotnet pack .\DataPowerTools\DataPowerTools.csproj -c Release -o ..\artifacts --include-symbols --no-build $versionSuffix }
+#exec { & dotnet pack .\DataPowerTools\DataPowerTools.csproj -c Release -o ..\artifacts --include-symbols --no-build $versionSuffix }
