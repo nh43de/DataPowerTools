@@ -32,7 +32,7 @@ $suffix = @{ $true = ""; $false = "$($branch.Substring(0, [math]::Min(10,$branch
 $commitHash = $(git rev-parse --short HEAD)
 $buildSuffix = @{ $true = "$($suffix)-$($commitHash)"; $false = "$($branch)-$($commitHash)" }[$suffix -ne ""]
 
+
 exec { & dotnet build .\DataPowerTools.sln -c Release --version-suffix=$buildSuffix }
 
-$version = 1.0.$env:APPVEYOR_BUILD_VERSION
-exec { & dotnet pack .\DataPowerTools\DataPowerTools.csproj -c Release -o ..\artifacts --include-symbols --no-build /p:Version=$version }
+exec { & dotnet pack .\DataPowerTools\DataPowerTools.csproj -c Release -o ..\artifacts --include-symbols --no-build /p:Version=1.0.$env:APPVEYOR_BUILD_VERSION }
