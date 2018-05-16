@@ -9,6 +9,9 @@
     <PackageReleaseNotes>Summary of changes made in this release of the package.</PackageReleaseNotes>
     <RepositoryUrl>https://github.com/nh43de/DataPowerTools</RepositoryUrl>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net45|AnyCPU'">
+    <DocumentationFile>bin\Release\DataPowerTools.xml</DocumentationFile>
+  </PropertyGroup>
   <ItemGroup Condition=" '$(TargetFramework)' == 'net45' ">
     <Reference Include="System" />
     <Reference Include="Microsoft.CSharp" />
