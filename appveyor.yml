@@ -17,4 +17,4 @@ deploy:
     secure: gC/4Js2Jt5OCIZRYqeF+k0prp5Y3UjguEWdBgYWfiPlt5IQSg5geHsK7syfiJmju
   skip_symbols: true
   on:
-    branch: master
+    branch: releases
