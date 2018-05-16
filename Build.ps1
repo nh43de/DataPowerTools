@@ -31,10 +31,8 @@ $revision = @{ $true = "{0:00000}" -f [convert]::ToInt32("0" + $env:APPVEYOR_BUI
 $suffix = @{ $true = ""; $false = "$($branch.Substring(0, [math]::Min(10,$branch.Length)))-$revision"}[$branch -eq "master" -and $revision -ne "local"]
 $commitHash = $(git rev-parse --short HEAD)
 $buildSuffix = @{ $true = "$($suffix)-$($commitHash)"; $false = "$($branch)-$($commitHash)" }[$suffix -ne ""]
-$versionSuffix = @{ $true = "--version-suffix=$($env:APPVEYOR_BUILD_VERSION)"; $false = ""}[$suffix -ne ""]
+
+exec { & dotnet build .\DataPowerTools.sln -c Release --version-suffix=$buildSuffix }
 
 $version = 1.0.$env:APPVEYOR_BUILD_VERSION
-
-exec { & dotnet build .\DataPowerTools.sln -c Release --version-suffix=$env:APPVEYOR_BUILD_VERSION }
-
 exec { & dotnet pack .\DataPowerTools\DataPowerTools.csproj -c Release -o ..\artifacts --include-symbols --no-build /p:Version=$version }
