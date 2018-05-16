@@ -5,6 +5,7 @@
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageProjectUrl>https://github.com/nh43de/DataPowerTools</PackageProjectUrl>
     <Authors>ALM First</Authors>
+    <Description>DataPowerTools for ALM First</Description>
     <PackageReleaseNotes>Summary of changes made in this release of the package.</PackageReleaseNotes>
     <RepositoryUrl>https://github.com/nh43de/DataPowerTools</RepositoryUrl>
   </PropertyGroup>
