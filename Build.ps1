@@ -38,10 +38,6 @@ echo "build: Build version suffix is $buildSuffix"
 
 exec { & dotnet build .\DataPowerTools.sln -c Release --version-suffix=$buildSuffix }
 
-Push-Location -Path .\test\MediatR.Tests
-
-exec { & dotnet xunit -configuration Release --no-build }
-
 #Pop-Location
 
 exec { & dotnet pack .\DataPowerTools\DataPowerTools.csproj -c Release -o ..\artifacts --include-symbols --no-build $versionSuffix }
