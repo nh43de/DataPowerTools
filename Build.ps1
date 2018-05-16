@@ -36,13 +36,10 @@ $versionSuffix = @{ $true = "--version-suffix=$($suffix)"; $false = ""}[$suffix 
 echo "------------------------------------------"
 echo "build: Package version suffix is [$suffix]"
 echo "build: Build version suffix is [$buildSuffix]"
-echo "build: Build version suffix is [$env:APPVEYOR_BUILD_VERSION]"
-echo "build: Build version suffix is [$env:APPVEYOR_BUILD_NUMBER]"
+echo "build: APPVEYOR_BUILD_VERSION is [$env:APPVEYOR_BUILD_VERSION]"
 echo "------------------------------------------"
 
 
-#exec { & dotnet build .\DataPowerTools.sln -c Release --version-suffix=$buildSuffix }
+exec { & dotnet build .\DataPowerTools.sln -c Release --version-suffix=$env:APPVEYOR_BUILD_VERSION }
 
-#Pop-Location
-
-#exec { & dotnet pack .\DataPowerTools\DataPowerTools.csproj -c Release -o ..\artifacts --include-symbols --no-build $versionSuffix }
+exec { & dotnet pack .\DataPowerTools\DataPowerTools.csproj -c Release -o ..\artifacts --include-symbols --no-build $env:APPVEYOR_BUILD_VERSION }
