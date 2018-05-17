@@ -2,11 +2,17 @@
   <PropertyGroup>
     <TargetFrameworks>net45;netstandard2.0</TargetFrameworks>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
-    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <PackageId>DataPowerTools</PackageId>
+    <AssemblyName>DataPowerTools</AssemblyName>
+    <Authors>Nathan Hollis</Authors>
+    <Description>Power Tools for In-Memory Data Processing</Description>
     <PackageProjectUrl>https://github.com/nh43de/DataPowerTools</PackageProjectUrl>
-    <Authors>ALM First</Authors>
-    <Description>DataPowerTools for ALM First</Description>
-    <PackageReleaseNotes>Summary of changes made in this release of the package.</PackageReleaseNotes>
+    <PackageTags>tools;helpers</PackageTags>
+    <PackageIconUrl></PackageIconUrl>
+    <PackageReleaseNotes></PackageReleaseNotes>
+    <Copyright>Copyright 2017</Copyright>
+    <RepositoryType>git</RepositoryType>
+    <version>1.0.27</version>
     <RepositoryUrl>https://github.com/nh43de/DataPowerTools</RepositoryUrl>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net45|AnyCPU'">
