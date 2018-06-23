@@ -4,9 +4,8 @@
     <id>DataPowerTools</id>
     <version>$version$</version>
     <title>DataPowerTools</title>
-    <authors>Nathan Hollis</authors>
-    <owners>Nathan Hollis</owners>
-    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <authors>Nathan Hollis;</authors>
+    <owners>Nathan Hollis; Artiom Kuchiuk</owners>
     <description>DataPowerTools</description>
     <releaseNotes>Summary of changes made in this release of the package.</releaseNotes>
     <copyright>Copyright 2018</copyright>

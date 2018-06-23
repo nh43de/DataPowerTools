@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System;
+using System.Text;
 using System.Text.RegularExpressions;
 using DataPowerTools.Strings;
 
@@ -123,5 +124,70 @@ namespace DataPowerTools.Extensions
         {
             return str.Append("\r\n", newlineCount);
         }
+
+        /// <summary>
+        /// Provides a very loose interpretation of boolean (case ignored and string trimmed):
+        /// 0) null or empty string -> false
+        /// 1) "True" (String) = true
+        /// 2) "False" (String) = false
+        /// 3) "0" (String) = false
+        /// 4) Any other string = true
+        /// </summary>
+        /// <param name="str"></param>
+        /// <returns></returns>
+        public static bool ToBoolean2(this string str)
+        {
+            if (string.IsNullOrWhiteSpace(str))
+                return false;
+
+            var cleanStr = (str ?? "").Trim();
+            
+            if (string.Equals(cleanStr, bool.FalseString, StringComparison.OrdinalIgnoreCase))
+                return false;
+
+            if (string.Equals(cleanStr, bool.TrueString, StringComparison.OrdinalIgnoreCase))
+                return true;
+
+            if (int.TryParse(cleanStr, out var i))
+            {
+                return Convert.ToBoolean(i);
+            }
+
+            return true;
+        }
+
+        /// <summary>
+        /// Provides a very loose interpretation of Boolean (case ignored and string trimmed):
+        /// 0) null or empty string -> false
+        /// 1) "True" (string) = true
+        /// 2) "False" (string) = false
+        /// 3) "0" (string) = false
+        /// 4) non-zero numeric (or string) = true
+        /// 5) Any other string throws exception
+        /// </summary>
+        /// <param name="str"></param>
+        /// <returns></returns>
+        public static bool ToBoolean3(this string str)
+        {
+            if (string.IsNullOrWhiteSpace(str))
+                return false;
+
+            var cleanStr = (str ?? "").Trim();
+
+            if (bool.TryParse(cleanStr, out var r))
+            {
+                return r;
+            }
+
+            if (int.TryParse(cleanStr, out var i))
+            {
+                return Convert.ToBoolean(i);
+            }
+            else
+            {
+                throw new Exception("Boolean was not in proper format");
+            }
+        }
+
     }
 }
