@@ -37,9 +37,5 @@ $buildSuffix = @{ $true = "$($suffix)-$($commitHash)"; $false = "$($branch)-$($c
 #
 #exec { & dotnet pack .\DataPowerTools\DataPowerTools.csproj -c Release -o ..\artifacts --include-symbols --no-build}
 echo "------------------------------------------"
-echo "build: Package version suffix is [$suffix]"
-echo "build: Build version suffix is [$revision]"
-echo "build: Build version suffix is [$env:BuildVersion]"
-echo "build: Build version suffix is [$env:APPVEYOR_BUILD_VERSION]"
-echo "build: Build version suffix is [$env:APPVEYOR_BUILD_NUMBER]"
+echo "build: Build version suffix is [$env:MajorVersion.$env:MinorVersion.$env:APPVEYOR_BUILD_NUMBER]"
 echo "------------------------------------------"
