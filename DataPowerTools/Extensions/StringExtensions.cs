@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Security;
 using System.Text;
 using System.Text.RegularExpressions;
 using DataPowerTools.Strings;
@@ -188,6 +189,19 @@ namespace DataPowerTools.Extensions
                 throw new Exception("Boolean was not in proper format");
             }
         }
+
+        public static SecureString ToSecureString(this string str)
+        {
+            var knox = new SecureString();
+            var chars = str.ToCharArray();
+            foreach (var c in chars)
+            {
+                knox.AppendChar(c);
+            }
+            return knox;
+        }
+
+
 
     }
 }
