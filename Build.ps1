@@ -34,9 +34,9 @@ $buildSuffix = @{ $true = "$($suffix)-$($commitHash)"; $false = "$($branch)-$($c
 
 $version="$env:MajorVersion.$env:MinorVersion.$env:APPVEYOR_BUILD_NUMBER";
 #
-exec { & dotnet build .\DataPowerTools.sln -c Release --version-suffix=$version }
+exec { & dotnet build .\DataPowerTools.sln -c Release --version-suffix $version }
 #
-exec { & dotnet pack .\DataPowerTools\DataPowerTools.csproj -c Release -o ..\artifacts --include-symbols --version-suffix=$version --no-build }
+exec { & dotnet pack .\DataPowerTools\DataPowerTools.csproj -c Release -o ..\artifacts --include-symbols --version-suffix $version --no-build }
 echo "------------------------------------------"
 echo "build: Build version suffix is [$version]"
 echo "------------------------------------------"
