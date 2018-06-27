@@ -24,7 +24,7 @@ function Exec
 
 if(Test-Path .\artifacts) { Remove-Item .\artifacts -Force -Recurse }
 
-exec { & dotnet restore }
+#exec { & dotnet restore }
 
 $branch = @{ $true = $env:APPVEYOR_REPO_BRANCH; $false = $(git symbolic-ref --short -q HEAD) }[$env:APPVEYOR_REPO_BRANCH -ne $NULL];
 $revision = @{ $true = "{0:00000}" -f [convert]::ToInt32("0" + $env:APPVEYOR_BUILD_NUMBER, 10); $false = "local" }[$env:APPVEYOR_BUILD_NUMBER -ne $NULL];
@@ -38,7 +38,8 @@ $buildSuffix = @{ $true = "$($suffix)-$($commitHash)"; $false = "$($branch)-$($c
 #exec { & dotnet pack .\DataPowerTools\DataPowerTools.csproj -c Release -o ..\artifacts --include-symbols --no-build}
 echo "------------------------------------------"
 echo "build: Package version suffix is [$suffix]"
-echo "build: Build version suffix is [$buildSuffix]"
+echo "build: Build version suffix is [$revision]"
+echo "build: Build version suffix is [$env:BuildVersion]"
 echo "build: Build version suffix is [$env:APPVEYOR_BUILD_VERSION]"
 echo "build: Build version suffix is [$env:APPVEYOR_BUILD_NUMBER]"
 echo "------------------------------------------"
