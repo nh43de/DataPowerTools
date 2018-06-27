@@ -202,6 +202,30 @@ namespace DataPowerTools.Extensions
         }
 
 
+        /// <summary>
+        /// Returns a new string that has the first character to lower invariant.
+        /// </summary>
+        /// <param name="str"></param>
+        /// <returns></returns>
+        public static string FirstCharacterToLower(this string str)
+        {
+            if (string.IsNullOrEmpty(str) || char.IsLower(str, 0))
+                return str;
+
+            return char.ToLowerInvariant(str[0]) + str.Substring(1);
+        }
+
+        /// <summary>
+        /// Tries to convert the string to an int. If it fails then returns a null.
+        /// </summary>
+        /// <param name="str"></param>
+        /// <returns></returns>
+        public static int? ToNullableInteger(this string str)
+        {
+            return int.TryParse(str, out var strInt)
+                ? strInt
+                : (int?)null;
+        }
 
     }
 }
