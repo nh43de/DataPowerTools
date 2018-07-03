@@ -21,9 +21,9 @@
 //        private int _defaultCopyTimeout = 30; // seconds
 //        private SqliteConnection _cn;
 //        private string _tableNm;
-//        private Dictionary<string, SqliteColumnTypesExtended> _columns = null;
+//        private Dictionary<string, SqlBasicColumnTypes> _columns = null;
 
-//        public Dictionary<string, SqliteColumnTypesExtended> ColumnMappings
+//        public Dictionary<string, SqlBasicColumnTypes> ColumnNameToTypeDictionary
 //        {
 //            get
 //            {
@@ -102,7 +102,7 @@
 //        /// <summary>
 //        /// Defines the mapping between a column in a SqliteBulkCopy instance's data source and a column in the instance's destination table.
 //        /// </summary>
-//        public enum SqliteColumnTypesExtended
+//        public enum SqlBasicColumnTypes
 //        {
 //            //
 //            // Summary:
@@ -138,7 +138,7 @@
 //        {
 //            if (!string.IsNullOrEmpty(this.DestinationTableName))
 //            {
-//                _columns = new Dictionary<string, SqliteColumnTypesExtended>();
+//                _columns = new Dictionary<string, SqlBasicColumnTypes>();
 //                var sql = $"pragma table_info('{this.DestinationTableName}')";
 //                using (var cmd = new SqliteCommand(sql, _cn) { CommandType = CommandType.Text })
 //                {
@@ -147,7 +147,7 @@
 //                        while (dr.Read())
 //                        {
 //                            var key = dr["name"].ToString();
-//                            var typ = new SqliteColumnTypesExtended();
+//                            var typ = new SqlBasicColumnTypes();
 //                            // data types found @ http://www.tutorialspoint.com/sqlite/sqlite_data_types.htm
 //                            var columnType = dr["type"].ToString().ToUpper();
 //                            switch (columnType)
@@ -161,48 +161,48 @@
 //                                case "INT2":
 //                                case "INT8":
 //                                case "INT":
-//                                    typ = SqliteColumnTypesExtended.Integer;
+//                                    typ = SqlBasicColumnTypes.Integer;
 //                                    break;
 //                                case "CLOB":
 //                                case "TEXT":
-//                                    typ = SqliteColumnTypesExtended.Text;
+//                                    typ = SqlBasicColumnTypes.Text;
 //                                    break;
 //                                case "BLOB":
-//                                    typ = SqliteColumnTypesExtended.Blob;
+//                                    typ = SqlBasicColumnTypes.Blob;
 //                                    break;
 //                                case "REAL":
 //                                case "DOUBLE":
 //                                case "DOUBLE PRECISION":
 //                                case "FLOAT":
-//                                    typ = SqliteColumnTypesExtended.Real;
+//                                    typ = SqlBasicColumnTypes.Real;
 //                                    break;
 //                                case "NUMERIC":
-//                                    typ = SqliteColumnTypesExtended.Numeric;
+//                                    typ = SqlBasicColumnTypes.Numeric;
 //                                    break;
 //                                case "BOOLEAN":
-//                                    typ = SqliteColumnTypesExtended.Boolean;
+//                                    typ = SqlBasicColumnTypes.Boolean;
 //                                    break;
 //                                case "DATE":
 //                                case "DATETIME":
-//                                    typ = SqliteColumnTypesExtended.Date;
+//                                    typ = SqlBasicColumnTypes.Date;
 //                                    break;
 //                                default: // look for fringe cases that need logic
 //                                    if (columnType.StartsWith("CHARACTER"))
-//                                        typ = SqliteColumnTypesExtended.Text;
+//                                        typ = SqlBasicColumnTypes.Text;
 //                                    if (columnType.StartsWith("VARCHAR"))
-//                                        typ = SqliteColumnTypesExtended.Text;
+//                                        typ = SqlBasicColumnTypes.Text;
 //                                    if (columnType.StartsWith("VARYING CHARACTER"))
-//                                        typ = SqliteColumnTypesExtended.Text;
+//                                        typ = SqlBasicColumnTypes.Text;
 //                                    if (columnType.StartsWith("NCHAR"))
-//                                        typ = SqliteColumnTypesExtended.Text;
+//                                        typ = SqlBasicColumnTypes.Text;
 //                                    if (columnType.StartsWith("NATIVE CHARACTER"))
-//                                        typ = SqliteColumnTypesExtended.Text;
+//                                        typ = SqlBasicColumnTypes.Text;
 //                                    if (columnType.StartsWith("NVARCHAR"))
-//                                        typ = SqliteColumnTypesExtended.Text;
+//                                        typ = SqlBasicColumnTypes.Text;
 //                                    if (columnType.StartsWith("NVARCHAR"))
-//                                        typ = SqliteColumnTypesExtended.Text;
+//                                        typ = SqlBasicColumnTypes.Text;
 //                                    if (columnType.StartsWith("DECIMAL"))
-//                                        typ = SqliteColumnTypesExtended.Numeric;
+//                                        typ = SqlBasicColumnTypes.Numeric;
 //                                    break;
 //                            }
 //                            _columns.Add(key, typ);
@@ -237,7 +237,7 @@
 //            var insertClause = new StringBuilder();
 //            insertClause.Append($"INSERT INTO {this.DestinationTableName} (");
 //            var first = true;
-//            foreach (var c in this.ColumnMappings)
+//            foreach (var c in this.ColumnNameToTypeDictionary)
 //            {
 //                if (first)
 //                {
@@ -259,7 +259,7 @@
 //                    valuesClause.Append(",");
 //                valuesClause.Append("(");
 //                var colFirst = true;
-//                foreach (var c in this.ColumnMappings)
+//                foreach (var c in this.ColumnNameToTypeDictionary)
 //                {
 //                    if (!colFirst)
 //                        valuesClause.Append(",");
@@ -272,7 +272,7 @@
 //                    {
 //                        switch (c.Value)
 //                        {
-//                            case SqliteColumnTypesExtended.Date:
+//                            case SqlBasicColumnTypes.Date:
 //                                try
 //                                {
 //                                    valuesClause.Append($"'{ DateTime.Parse(columnValue).ToString("yyyy-MM-dd HH:mm:ss") }'");
@@ -282,12 +282,12 @@
 //                                    throw new Exception($"Invalid Cast when loading date column [{ c.Key }] in table [{ this.DestinationTableName}] in Sqlite DB with data; value being casted '{ columnValue}', incoming values must be of data format consumable by .NET; error:\n {exp.Message}");
 //                                }
 //                                break;
-//                            case SqliteColumnTypesExtended.Integer:
-//                            case SqliteColumnTypesExtended.Numeric:
-//                            case SqliteColumnTypesExtended.Real:
+//                            case SqlBasicColumnTypes.Integer:
+//                            case SqlBasicColumnTypes.Numeric:
+//                            case SqlBasicColumnTypes.Real:
 //                                valuesClause.Append(columnValue);
 //                                break;
-//                            case SqliteColumnTypesExtended.Boolean:
+//                            case SqlBasicColumnTypes.Boolean:
 //                                var out_value = -1;
 //                                if (columnValue.ToUpper() == "TRUE")
 //                                    valuesClause.Append("1");
@@ -303,7 +303,7 @@
 //                                else // no valid boolean types throw exception
 //                                    throw new Exception($"Invalid Cast when loading boolean column [{ c.Key }] in table [{ this.DestinationTableName}] in Sqlite DB with data; value being casted '{ columnValue}', incoming values can only be True or False (case does not matter), 1 (true) or 0 (false), or NULL");
 //                                break;
-//                            case SqliteColumnTypesExtended.Text:
+//                            case SqlBasicColumnTypes.Text:
 //                            default:
 //                                valuesClause.Append($"'{columnValue.Replace("'", "''")}'");
 //                                break;

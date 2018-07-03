@@ -23,7 +23,7 @@ namespace DataPowerTools.Extensions
         /// <param name="destinationTable"></param>
         /// <param name="bulkInsertOptions"></param>
         /// <param name="members"></param>
-        public static void BulkUpload<T>(
+        public static void BulkUploadMySql<T>(
             this IEnumerable<T> items,
             string destinationServer,
             string destinationDatabase,
@@ -33,7 +33,30 @@ namespace DataPowerTools.Extensions
         {
             var cs = Database.GetConnectionString(destinationDatabase, destinationServer);
 
-            BulkUpload(items, cs, destinationTable, bulkInsertOptions, members);
+            BulkUploadSqlServer(items, cs, destinationTable, bulkInsertOptions, members);
+        }
+
+        /// <summary>
+        /// Bulk upload enumerable using a server/database name.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="items"></param>
+        /// <param name="destinationServer"></param>
+        /// <param name="destinationDatabase"></param>
+        /// <param name="destinationTable"></param>
+        /// <param name="bulkInsertOptions"></param>
+        /// <param name="members"></param>
+        public static void BulkUploadSqlServer<T>(
+            this IEnumerable<T> items,
+            string destinationServer,
+            string destinationDatabase,
+            string destinationTable,
+            BulkInsertOptions bulkInsertOptions = null,
+            IEnumerable<string> members = null)
+        {
+            var cs = Database.GetConnectionString(destinationDatabase, destinationServer);
+
+            BulkUploadSqlServer(items, cs, destinationTable, bulkInsertOptions, members);
         }
         
         /// <summary>
@@ -45,7 +68,7 @@ namespace DataPowerTools.Extensions
         /// <param name="destinationTable"></param>
         /// <param name="bulkInsertOptions"></param>
         /// <param name="members"></param>
-        public static void BulkUpload<T>(
+        public static void BulkUploadSqlServer<T>(
             this IEnumerable<T> items,
             string connectionString,
             string destinationTable,
@@ -60,7 +83,7 @@ namespace DataPowerTools.Extensions
             
             var uploadReader = items.ToDataReader(members?.ToArray());
 
-            uploadReader.BulkInsert(connectionString, destinationTable, bulkInsertOptions ?? new BulkInsertOptions());
+            uploadReader.BulkInsertSqlServer(connectionString, destinationTable, bulkInsertOptions ?? new BulkInsertOptions());
         }
         
         /// <summary>

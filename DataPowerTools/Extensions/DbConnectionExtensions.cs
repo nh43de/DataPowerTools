@@ -1,5 +1,7 @@
-﻿using System.Data.Common;
+﻿using System.Data;
+using System.Data.Common;
 using System.Reflection;
+using DataPowerTools.PowerTools;
 
 namespace DataPowerTools.Extensions
 {
@@ -21,6 +23,17 @@ namespace DataPowerTools.Extensions
             // DbProviderFactory dbProviderFactory = DbProviderFactories.GetFactory( databaseCommand.DbCommand.Connection );
 
             return (DbProviderFactory)ProviderFactoryPropertyInfo.GetValue(dbConnection, null);
+        }
+
+        /// <summary>
+        /// Gets a blank table that is configured as the specified table. It uses SqlDataAdapter.FillSchema to accomplish this.
+        /// </summary>
+        /// <param name="tableName"></param>
+        /// <param name="connection"></param>
+        /// <returns></returns>
+        public static DataTable GetDataSchema(this DbConnection connection, string tableName)
+        {
+            return Database.GetDataSchema(tableName, connection);
         }
     }
 }

@@ -638,7 +638,7 @@ SELECT SCOPE_IDENTITY() AS [LastInsertedId];
         }
 
         /// <summary>
-        /// Generates a parameterized SQL Server INSERT statement from the given object and adds it to the
+        /// Generates a parameterized SQL INSERT statement from the given object and adds it to the
         /// <see cref="DbCommand" />.
         /// </summary>
         /// <param name="dbCommand"><see cref="DbCommand" /> instance.</param>
