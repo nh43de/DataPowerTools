@@ -53,16 +53,34 @@ namespace DataPowerTools.Extensions
         /// <param name="sql"></param>
         /// <param name="transaction"></param>
         /// <returns></returns>
-        public static DbCommand CreateSqlCommand(this DbConnection sqlc, string sql, DbTransaction transaction = null)
+        public static TCommand CreateSqlCommand<TCommand, TConnection>(this TConnection sqlc, string sql, DbTransaction transaction = null)
+        where TCommand : DbCommand
+        where TConnection : DbConnection
         {
             var c = sqlc.CreateCommand();
 
             c.CommandText = sql;
-            c.Transaction = transaction;
+
+            if(transaction != null)
+                c.Transaction = transaction;
+
             c.CommandType = CommandType.Text;
 
-            return c;
+            return (TCommand)c;
         }
+
+        /// <summary>
+        /// Creates sql command from sql connection.
+        /// </summary>
+        /// <param name="sqlc"></param>
+        /// <param name="sql"></param>
+        /// <param name="transaction"></param>
+        /// <returns></returns>
+        public static DbCommand CreateSqlCommand(this DbConnection sqlc, string sql, DbTransaction transaction = null)
+        {
+            return sqlc.CreateSqlCommand<DbCommand, DbConnection>(sql, transaction);
+        }
+
 
         #endregion
 
@@ -228,17 +246,16 @@ namespace DataPowerTools.Extensions
         /// <summary>
         /// Executes to data set
         /// </summary>
-        /// <typeparam name="T"></typeparam>
         /// <param name="sqlc"></param>
         /// <param name="sql"></param>
         /// <param name="dataSetName"></param>
         /// <param name="dataTableNames">The names to assign to the datatables.</param>
         /// <returns></returns>
-        public static DataSet ExecuteToDataSet<T>(this DbConnection sqlc, string sql, string dataSetName = null, string[] dataTableNames = null)
+        public static DataSet ExecuteToDataSet(this DbConnection sqlc, string sql, string dataSetName = null, string[] dataTableNames = null)
         {
             using (var cmd = sqlc.CreateSqlCommand(sql))
             {
-                return cmd.ExecuteToDataSet<T>(dataSetName, dataTableNames);
+                return cmd.ExecuteToDataSet(dataSetName, dataTableNames);
             }
         }
 
@@ -250,7 +267,7 @@ namespace DataPowerTools.Extensions
         /// <param name="dataSetName"></param>
         /// <param name="dataTableNames">The names to assign to the datatables.</param>
         /// <returns></returns>
-        public static DataSet ExecuteToDataSet<T>(this DbCommand cmd, string dataSetName = null, string[] dataTableNames = null)
+        public static DataSet ExecuteToDataSet(this DbCommand cmd, string dataSetName = null, string[] dataTableNames = null)
         {
             using (var r = cmd.ExecuteReader())
             {

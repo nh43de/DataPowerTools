@@ -833,20 +833,19 @@ namespace DataPowerTools.Extensions
         {
             var ds = string.IsNullOrWhiteSpace(dataSetName) ? new DataSet() : new DataSet(dataSetName);
 
-            Func<int, string> getTableName = n =>
+            string GetTableName(int n)
             {
-                if ((dataTableNames != null) && (n < dataTableNames.Length))
-                    return dataTableNames[n];
+                if ((dataTableNames != null) && (n < dataTableNames.Length)) return dataTableNames[n];
                 return null;
-            };
+            }
 
             var i = 0;
-            ds.Tables.Add(dr.ToDataTable(null, getTableName(i)));
+            ds.Tables.Add(dr.ToDataTable(null, GetTableName(i)));
 
             while (dr.NextResult())
             {
                 i++;
-                ds.Tables.Add(dr.ToDataTable(null, getTableName(i)));
+                ds.Tables.Add(dr.ToDataTable(null, GetTableName(i)));
             }
             return ds;
         }

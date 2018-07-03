@@ -139,7 +139,7 @@ namespace DataPowerTools.Extensions
         {
             bulkInsertOptions = bulkInsertOptions ?? new AsyncBulkInsertOptions();
             var bulkCopy = GetSqlBulkCopy(dataReader, destinationTableName, connection, bulkInsertOptions);
-
+            
             using (bulkCopy)
             {
                 try

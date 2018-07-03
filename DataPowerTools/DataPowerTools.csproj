@@ -30,4 +30,7 @@
     <PackageReference Include="System.Reflection.Emit" Version="4.0.1" />
     <PackageReference Include="System.Reflection.Emit.Lightweight" Version="4.0.1" />
   </ItemGroup>
+  <ItemGroup>
+    <Folder Include="temp\" />
+  </ItemGroup>
 </Project>

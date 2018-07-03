@@ -12,4 +12,11 @@ namespace DataPowerTools.Extensions
         /// </summary>
         public string DisplayName { get; set; }
     }
+
+
+}
+
+ 
+namespace Microsoft.Data.Sqlite.Extensions
+{
 }
