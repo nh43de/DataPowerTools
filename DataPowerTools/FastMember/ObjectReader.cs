@@ -72,7 +72,7 @@ namespace DataPowerTools.FastMember
             source = _enumerableSource.GetEnumerator();
             if (enumerableSource == null) throw new ArgumentOutOfRangeException(nameof(enumerableSource));
         }
-        
+
         /// <summary>
         ///     Creates a new ObjectReader instance for reading the supplied data
         /// </summary>

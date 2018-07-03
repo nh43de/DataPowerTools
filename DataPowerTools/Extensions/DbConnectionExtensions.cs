@@ -1,6 +1,9 @@
-﻿using System.Data;
+﻿using System;
+using System.Collections.Generic;
+using System.Data;
 using System.Data.Common;
 using System.Reflection;
+using System.Threading.Tasks;
 using DataPowerTools.PowerTools;
 
 namespace DataPowerTools.Extensions
@@ -44,6 +47,61 @@ namespace DataPowerTools.Extensions
             dbConnection.Close();
 
             dbConnection.Dispose();
+        }
+
+        /// <summary>
+        /// Generates a create table statement for the enumerable by fitting the data to a best fit table.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="connection"></param>
+        /// <param name="enumerable"></param>
+        /// <param name="outputTableName"></param>
+        /// <param name="ignoreNonStringReferenceTypes"></param>
+        /// <returns></returns>
+        public static Task CreateTableFor<T>(this DbConnection connection, IEnumerable<T> enumerable, string outputTableName, bool ignoreNonStringReferenceTypes = true)
+        {
+            var sql = enumerable.FitToCreateTableStatement(outputTableName, null, ignoreNonStringReferenceTypes);
+
+            var cmd = connection.CreateSqlCommand(sql);
+
+            return cmd.ExecuteNonQueryAsync();
+        }
+
+        /// <summary>
+        /// Inserts records into the database by generating insert statements.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="connection"></param>
+        /// <param name="enumerable"></param>
+        /// <param name="tableName"></param>
+        /// <param name="databaseEngine">The database engine.</param>
+        /// <returns></returns>
+        public static async Task<int> InsertRecords<T>(this DbConnection connection, IEnumerable<T> enumerable, string tableName, DatabaseEngine databaseEngine)
+        {
+            var cmd = connection.CreateSqlCommand();
+
+            using (cmd)
+            {
+                switch (databaseEngine)
+                {
+                    case DatabaseEngine.MySql:
+                        cmd.AppendInsertsForMySql(enumerable, tableName);
+                        break;
+                    case DatabaseEngine.Postgre:
+                        cmd.AppendInsertsForPostgreSql(enumerable, tableName);
+                        break;
+                    case DatabaseEngine.Sqlite:
+                        cmd.AppendInsertsForSQLite(enumerable, tableName);
+                        break;
+                    case DatabaseEngine.SqlServer:
+                        cmd.AppendInsertsForSqlServer(enumerable, tableName);
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException(nameof(databaseEngine), databaseEngine, null);
+                }
+
+                return await cmd.ExecuteNonQueryAsync();
+            }
         }
     }
 }

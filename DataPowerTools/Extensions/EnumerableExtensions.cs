@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Data;
@@ -13,28 +14,31 @@ namespace DataPowerTools.Extensions
 {
     public static class EnumerableExtensions
     {
-        /// <summary>
-        /// Bulk upload enumerable using a server/database name.
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="items"></param>
-        /// <param name="destinationServer"></param>
-        /// <param name="destinationDatabase"></param>
-        /// <param name="destinationTable"></param>
-        /// <param name="bulkInsertOptions"></param>
-        /// <param name="members"></param>
-        public static void BulkUploadMySql<T>(
-            this IEnumerable<T> items,
-            string destinationServer,
-            string destinationDatabase,
-            string destinationTable,
-            BulkInsertOptions bulkInsertOptions = null,
-            IEnumerable<string> members = null)
-        {
-            var cs = Database.GetConnectionString(destinationDatabase, destinationServer);
+        //TODO: implement bulk upload for mysql
+        ///// <summary>
+        ///// Bulk upload enumerable using a server/database name.
+        ///// </summary>
+        ///// <typeparam name="T"></typeparam>
+        ///// <param name="items"></param>
+        ///// <param name="destinationServer"></param>
+        ///// <param name="destinationDatabase"></param>
+        ///// <param name="destinationTable"></param>
+        ///// <param name="bulkInsertOptions"></param>
+        ///// <param name="members"></param>
+        //public static void BulkUploadMySql<T>(
+        //    this IEnumerable<T> items,
+        //    string destinationServer,
+        //    string destinationDatabase,
+        //    string destinationTable,
+        //    BulkInsertOptions bulkInsertOptions = null,
+        //    IEnumerable<string> members = null)
+        //{
+        //    var cs = Database.GetConnectionString(destinationDatabase, destinationServer);
 
-            BulkUploadSqlServer(items, cs, destinationTable, bulkInsertOptions, members);
-        }
+        //    BulkUploadSqlServer(items, cs, destinationTable, bulkInsertOptions, members);
+        //}
+
+
 
         /// <summary>
         /// Bulk upload enumerable using a server/database name.
@@ -611,7 +615,6 @@ namespace DataPowerTools.Extensions
         /// <typeparam name="T"></typeparam>
         /// <param name="enumerable"></param>
         /// <returns></returns>
-        [Obsolete]
         public static Type GetEnumerableType<T>(this IEnumerable<T> enumerable)
         {
             var t = enumerable?.GetType().GetInterface(typeof(IEnumerable<>).Name).GetGenericArguments()[0] ?? typeof(T);
@@ -673,5 +676,28 @@ namespace DataPowerTools.Extensions
                 foreach (var item in items)
                     action(item);
         }
+
+
+        /// <summary>
+        /// Fits the data in the enumerable to a create table statement.
+        /// </summary>
+        /// <param name="enumerable"></param>
+        /// <param name="outputTableName"></param>
+        /// <param name="numberOfRowsToExamine"></param>
+        /// <param name="ignoreNonStringReferenceTypes"></param>
+        /// <returns></returns>
+        public static string FitToCreateTableStatement<T>(this IEnumerable<T> enumerable, string outputTableName, 
+            int? numberOfRowsToExamine = null, 
+            bool ignoreNonStringReferenceTypes = true)
+        {
+            var r = CreateTableSql.FromDataReader_Smart(outputTableName, enumerable.ToDataReader(ignoreNonStringReferenceTypes),
+                numberOfRowsToExamine);
+
+            return r;
+        }
+
+
+
+
     }
 }

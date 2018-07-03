@@ -468,8 +468,7 @@ namespace DataPowerTools.Extensions
         {
             return InsertSqlBuilder.AppendInsertForSqlServer(dbCommand, obj, tableName);
         }
-
-
+        
         /// <summary>
         /// Generates a list of concatenated parameterized MySQL INSERT statements from the given list of objects and adds it to
         /// the <see cref="DbCommand" />.
@@ -498,8 +497,7 @@ namespace DataPowerTools.Extensions
 
             return dbCommand;
         }
-
-
+        
         /// <summary>
         /// Generates a list of concatenated parameterized PostgreSQL INSERT statements from the given list of objects and adds it to
         /// the <see cref="DbCommand" />.
@@ -528,8 +526,7 @@ namespace DataPowerTools.Extensions
 
             return dbCommand;
         }
-
-
+        
         /// <summary>
         /// Generates a list of concatenated parameterized SQLite INSERT statements from the given list of objects and adds it to
         /// the <see cref="DbCommand" />.
@@ -559,7 +556,6 @@ namespace DataPowerTools.Extensions
 
             return dbCommand;
         }
-
 
         /// <summary>
         /// Generates a list of concatenated parameterized SQL Server INSERT statements from the given list of objects and adds it

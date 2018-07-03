@@ -415,7 +415,7 @@ namespace Sqlite.Extensions
             // if any records remain after the read loop has completed then write them to the DB
             if (currentBatch > 0)
             {
-                var dml = $"BEGIN;\n{insertClause.ToString()} VALUES {valuesClause.ToString()};\nCOMMIT;";
+                var dml = $"BEGIN;\n{insertClause} VALUES {valuesClause};\nCOMMIT;";
 
                 var cmd = GetDbCommand(dml);
 

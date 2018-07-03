@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Data;
 using System.Data.Common;
 using System.Data.SqlClient;
@@ -19,10 +20,10 @@ namespace ExcelDataReader.Tests
     public class DbBulkInsertTests
     {
         [TestMethod]
-        public void TestBulkInsert()
+        public async Task TestBulkInsert()
         {
-            var d = new SQLiteConnection("Data Source=:memory:");
-            d.Open();
+            var conn = new SQLiteConnection("Data Source=:memory:");
+            conn.Open();
 
             var r = new[]
             {
@@ -32,12 +33,13 @@ namespace ExcelDataReader.Tests
                     Col2 = 20,
                     Col3 = "abc",
                 }
-            }.ToDataReader();
+            };
+            
+            await conn.CreateTableFor(r, "DestinationTable");
 
-            var s = r.GetSchemaTable();
+            await conn.InsertRecords(r, "DestinationTable", DatabaseEngine.Sqlite);
 
-            d.Close();
-            d.Dispose();
+            conn.CloseAndDispose();
         }
 
         ///// <summary>

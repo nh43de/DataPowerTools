@@ -1,10 +1,12 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Data.Common;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using DataPowerTools.Extensions.MiscUtil.Reflection;
+using DataPowerTools.PowerTools;
 
 namespace DataPowerTools.Extensions
 {
@@ -342,6 +344,34 @@ namespace DataPowerTools.Extensions
                 return false;
 
             return obj.GetType().Namespace == null;
+        }
+
+        /// <summary>
+        /// Appends an insert statement to the dbCommand that is specified.
+        /// </summary>
+        /// <param name="obj">The object to be inserted.</param>
+        /// <param name="dbCommand"></param>
+        /// <param name="destinationTableName"></param>
+        /// <param name="databaseEngine"></param>
+        public static void AppendInsertStatement(this object obj, DbCommand dbCommand, string destinationTableName, DatabaseEngine databaseEngine)
+        {
+            switch (databaseEngine)
+            {
+                case DatabaseEngine.MySql:
+                    dbCommand.AppendInsertForMySql(obj, destinationTableName);
+                    break;
+                case DatabaseEngine.Postgre:
+                    dbCommand.AppendInsertForPostgreSql(obj, destinationTableName);
+                    break;
+                case DatabaseEngine.Sqlite:
+                    dbCommand.AppendInsertForSQLite(obj, destinationTableName);
+                    break;
+                case DatabaseEngine.SqlServer:
+                    dbCommand.AppendInsertForSqlServer(obj, destinationTableName);
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(databaseEngine), databaseEngine, null);
+            }
         }
     }
 

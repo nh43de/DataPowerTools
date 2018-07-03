@@ -41,7 +41,7 @@ namespace DataPowerTools.Extensions
         /// <param name="sql"></param>
         /// <param name="transaction"></param>
         /// <returns></returns>
-        public static SqlCommand CreateSqlCommand(this SqlConnection sqlc, string sql, SqlTransaction transaction = null)
+        public static SqlCommand CreateSqlCommand(this SqlConnection sqlc, string sql = null, SqlTransaction transaction = null)
         {
             return new SqlCommand(sql, sqlc, transaction);
         }
@@ -53,13 +53,14 @@ namespace DataPowerTools.Extensions
         /// <param name="sql"></param>
         /// <param name="transaction"></param>
         /// <returns></returns>
-        public static TCommand CreateSqlCommand<TCommand, TConnection>(this TConnection sqlc, string sql, DbTransaction transaction = null)
+        public static TCommand CreateSqlCommand<TCommand, TConnection>(this TConnection sqlc, string sql = null, DbTransaction transaction = null)
         where TCommand : DbCommand
         where TConnection : DbConnection
         {
             var c = sqlc.CreateCommand();
 
-            c.CommandText = sql;
+            if(sql != null)
+                c.CommandText = sql;
 
             if(transaction != null)
                 c.Transaction = transaction;
@@ -76,7 +77,7 @@ namespace DataPowerTools.Extensions
         /// <param name="sql"></param>
         /// <param name="transaction"></param>
         /// <returns></returns>
-        public static DbCommand CreateSqlCommand(this DbConnection sqlc, string sql, DbTransaction transaction = null)
+        public static DbCommand CreateSqlCommand(this DbConnection sqlc, string sql = null, DbTransaction transaction = null)
         {
             return sqlc.CreateSqlCommand<DbCommand, DbConnection>(sql, transaction);
         }

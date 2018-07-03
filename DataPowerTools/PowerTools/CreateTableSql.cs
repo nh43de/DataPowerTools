@@ -158,7 +158,7 @@ namespace DataPowerTools.PowerTools
         }
 
         public static string FromDataReader_Smart(string outputTableName, IEnumerable<Func<DataReaderInfo>> dataReaders,
-            int numberOfRowsToExamine = -1)
+            int? numberOfRowsToExamine = null)
         {
             //maps column names to hashset of unique values present for those columns
             var uniqueValList = new ConcurrentDictionary<string, ConcurrentHashSet<string>>();
@@ -219,7 +219,7 @@ namespace DataPowerTools.PowerTools
                         }
 
                     //collect unique row values by column
-                    while (dataReader.Read() && ((numRows < numberOfRowsToExamine) || (numberOfRowsToExamine == -1)))
+                    while (dataReader.Read() && ((numRows < numberOfRowsToExamine) || (numberOfRowsToExamine == null)))
                     {
                         foreach (var col in readerFieldNames)
                         {
@@ -250,7 +250,7 @@ namespace DataPowerTools.PowerTools
         /// <param name="dataReader">Data reader implmementation.</param>
         /// <param name="numberOfRowsToExamine">Examine the first n rows for data type determination.</param>
         /// <returns></returns>
-        public static string FromDataReader_Smart(string outputTableName, IDataReader dataReader, int numberOfRowsToExamine = -1)
+        public static string FromDataReader_Smart(string outputTableName, IDataReader dataReader, int? numberOfRowsToExamine = null)
         {
             var drFac =
                 new Func<DataReaderInfo>(() => new DataReaderInfo {DataReader = dataReader});

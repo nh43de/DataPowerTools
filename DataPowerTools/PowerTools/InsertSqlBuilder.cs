@@ -25,13 +25,6 @@ namespace DataPowerTools.PowerTools
             Backtick = 3
         }
 
-        public enum DatabaseEngine
-        {
-            MySql,
-            Postgre,
-            Sqlite,
-            SqlServer
-        }
         
         /// <summary>
         /// Generates a parameterized MySQL INSERT statement from the given object and adds it to the <see cref="DbCommand" />
