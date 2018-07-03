@@ -137,35 +137,31 @@ namespace DataPowerTools.Extensions
         /// <returns>Dictionary containing property and field names and values.</returns>
         public static IDictionary<string, object> GetPropertyAndFieldNamesAndValues(this object obj)
         {
-            // Support dynamic objects backed by a dictionary of string object.
-
+            //TODO: replace with fastmember
             if (obj is IDictionary<string, object> objectAsDictionary)
                 return objectAsDictionary;
 
             var type = obj.GetType();
 
-            var orderedDictionary = TypeCacher.GetPropertiesAndFields(type);
+            var orderedDictionary = type.GetPropertiesAndFields();
 
             var dictionary = new Dictionary<string, object>();
 
-            foreach (DictionaryEntry entry in orderedDictionary)
+            foreach (var entry in orderedDictionary)
             {
                 object value = null;
 
-                if (entry.Value is FieldInfo)
+                switch (entry.Value)
                 {
-                    var fieldInfo = entry.Value as FieldInfo;
-
-                    value = fieldInfo.GetValue(obj);
-                }
-                else if (entry.Value is PropertyInfo)
-                {
-                    var propertyInfo = entry.Value as PropertyInfo;
-
-                    value = propertyInfo.GetValue(obj, null);
+                    case FieldInfo fieldInfo:
+                        value = fieldInfo.GetValue(obj);
+                        break;
+                    case PropertyInfo propertyInfo:
+                        value = propertyInfo.GetValue(obj, null);
+                        break;
                 }
 
-                dictionary.Add(entry.Key.ToString(), value);
+                dictionary.Add(entry.Key, value);
             }
 
             return dictionary;

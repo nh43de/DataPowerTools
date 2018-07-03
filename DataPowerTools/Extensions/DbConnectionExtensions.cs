@@ -20,7 +20,7 @@ namespace DataPowerTools.Extensions
         public static DbProviderFactory GetDbProviderFactory(this DbConnection dbConnection)
         {
             // Note that in .NET v4.5 we could use this new method instead which would avoid the reflection:
-            // DbProviderFactory dbProviderFactory = DbProviderFactories.GetFactory( databaseCommand.DbCommand.Connection );
+            // DbProviderFactory dbProviderFactory = DbProviderFactories.GetFactory( databaseCommand.DbCommand.dbConnection );
 
             return (DbProviderFactory)ProviderFactoryPropertyInfo.GetValue(dbConnection, null);
         }
@@ -34,6 +34,16 @@ namespace DataPowerTools.Extensions
         public static DataTable GetDataSchema(this DbConnection connection, string tableName)
         {
             return Database.GetDataSchema(tableName, connection);
+        }
+
+        /// <summary>
+        /// Closes and disposes the connection and the command itself.
+        /// </summary>
+        public static void CloseAndDispose(this DbConnection dbConnection)
+        {
+            dbConnection.Close();
+
+            dbConnection.Dispose();
         }
     }
 }

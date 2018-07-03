@@ -44,7 +44,7 @@ namespace DataPowerTools.Extensions
         }
 
         /// <summary>
-        /// Indent using tabs.
+        /// Indent each line using tabs.
         /// </summary>
         /// <param name="str"></param>
         /// <param name="tabs"></param>
@@ -55,7 +55,7 @@ namespace DataPowerTools.Extensions
         }
 
         /// <summary>
-        /// Indent using string.
+        /// Indent each line using tabs.
         /// </summary>
         /// <param name="str"></param>
         /// <param name="indentionStr"></param>

@@ -4,8 +4,9 @@ using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
+using DataPowerTools.DataReaderExtensibility.Columns;
+using DataPowerTools.DataStructures;
 using DataPowerTools.Extensions;
 
 
@@ -41,38 +42,115 @@ namespace DataPowerTools.PowerTools
         {
             AtomicDataType.String
         };
+        
+        private static Dictionary<Type, string> DataMapper => new Dictionary<Type, string>
+        {
+            {typeof(int), "BIGINT"},
+            {typeof(string), "NVARCHAR(500)"},
+            {typeof(bool), "BIT"},
+            {typeof(DateTime), "DATETIME"},
+            {typeof(float), "FLOAT"},
+            {typeof(decimal), "DECIMAL"},
+            {typeof(Guid), "UNIQUEIDENTIFIER"}
+        };
 
+        
+        /// <summary>
+        /// Generates a CREATE TABLE statement from a type definition, where the 
+        /// </summary>
+        /// <param name="t"></param>
+        /// <param name="outputTableName">Output table name, default will be class name.</param>
+        /// <returns></returns>
+        public static string GenerateCreateTableScriptFromType(Type t, string outputTableName = null)
+        {
+            var className = outputTableName ?? t.Name;
+
+            var fields = t.GetPropertyAndFieldInfo();
+
+            return GenerateCreateTableScriptFromType(fields, className);
+        }
+
+        /// <summary>
+        /// Generates a create table script from basic field information.
+        /// </summary>
+        /// <param name="fields"></param>
+        /// <param name="outputTableName"></param>
+        /// <returns></returns>
+        public static string GenerateCreateTableScriptFromType(IEnumerable<BasicDataFieldInfo> fields,
+            string outputTableName = null)
+        {
+            return GenerateCreateTableScriptFromType(new BasicTableDefinition
+            {
+                Fields = fields,
+                TableName = outputTableName
+            });
+        }
+
+
+        /// <summary>
+        /// Creates a create table script from basic table definition.
+        /// </summary>
+        /// <param name="tableDef"></param>
+        /// <returns></returns>
+        public static string GenerateCreateTableScriptFromType(BasicTableDefinition tableDef)
+        {
+            var script = new StringBuilder();
+
+            script.AppendLine("CREATE TABLE " + tableDef.TableName);
+            script.AppendLine("(");
+
+            var bodyText = tableDef.Fields
+                    .Select(field =>
+                        DataMapper.ContainsKey(field.FieldType)
+                            ? (field.ColumnName + " " + DataMapper[field.FieldType]).Indent()
+                            : (field.ColumnName + " BIGINT").Indent())
+                    .JoinStr(",\r\n");
+
+            script.AppendLine(bodyText);
+
+            script.AppendLine(")");
+
+            return script.ToString();
+        }
+        
+
+        /// <summary>
+        /// Creates CREATE TABLE script from an array of types - includes FK's for references.
+        /// </summary>
+        /// <param name="types"></param>
+        /// <returns></returns>
         public static string FromTypes(Type[] types)
         {
             var returnLines = new List<string>();
 
-            var tables = new List<CreateTableSqlFromTypesClass>();
+            var tables = new List<BasicTableDefinition>();
 
             // Get Types in the assembly.
             foreach (var t in types)
             {
-                var tc = new CreateTableSqlFromTypesClass(t);
-                tables.Add(tc);
-            }
+                var tc = t.GetPropertyAndFieldInfo().ToArray();
 
-            // Create SQL for each table
-            foreach (var table in tables)
-            {
-                returnLines.Add(table.CreateTableScript());
+                returnLines.Add(GenerateCreateTableScriptFromType(tc, t.Name));
                 returnLines.Add("");
+
+                tables.Add(new BasicTableDefinition
+                {
+                    Fields = tc,
+                    TableName = t.Name
+                });
             }
 
             // Total Hacked way to find FK relationships! Too lazy to fix right now
             foreach (var table in tables)
                 foreach (var field in table.Fields)
                     foreach (var t2 in tables)
-                        if (field.Value.Name == t2.ClassName)
+                        if (field.ColumnName == t2.TableName)
                         {
                             // We have a FK Relationship!
                             returnLines.Add("GO");
-                            returnLines.Add("ALTER TABLE " + table.ClassName + " WITH NOCHECK");
-                            returnLines.Add("ADD CONSTRAINT FK_" + field.Key + " FOREIGN KEY (" + field.Key +
-                                            ") REFERENCES " + t2.ClassName + "(ID)");
+                            returnLines.Add("ALTER TABLE " + table.TableName + " WITH NOCHECK");
+                            returnLines.Add("ADD CONSTRAINT FK_" + field.ColumnName + " FOREIGN KEY (" + field.ColumnName +
+                                            ") REFERENCES " + t2.TableName + "(ID)");
                             returnLines.Add("GO");
                         }
 
@@ -172,11 +250,10 @@ namespace DataPowerTools.PowerTools
         /// <param name="dataReader">Data reader implmementation.</param>
         /// <param name="numberOfRowsToExamine">Examine the first n rows for data type determination.</param>
         /// <returns></returns>
-        public static string FromDataReader_Smart(string outputTableName, IDataReader dataReader, string sourceFilePath,
-            int numberOfRowsToExamine = -1)
+        public static string FromDataReader_Smart(string outputTableName, IDataReader dataReader, int numberOfRowsToExamine = -1)
         {
             var drFac =
-                new Func<DataReaderInfo>(() => new DataReaderInfo {DataReader = dataReader, FilePath = sourceFilePath});
+                new Func<DataReaderInfo>(() => new DataReaderInfo {DataReader = dataReader});
 
             return FromDataReader_Smart(
                 outputTableName, new[] {drFac}, numberOfRowsToExamine);
@@ -452,7 +529,7 @@ namespace DataPowerTools.PowerTools
                 if (!(schema.Columns.Contains("IsHidden") && (bool) column["IsHidden"]))
                 {
                     sqlCol.ColumnName = column["ColumnName"].ToString();
-                    sqlCol.DataType = SQLGetType(column);
+                    sqlCol.DataType = SqlGetType(column);
 
                     if (schema.Columns.Contains("AllowDBNull") && ((bool) column["AllowDBNull"] == false))
                         sqlCol.IsNullable = false;
@@ -484,7 +561,7 @@ namespace DataPowerTools.PowerTools
             var sql = "CREATE TABLE [" + tableName + "] (\n";
             // columns
             foreach (DataColumn column in table.Columns)
-                sql += "[" + column.ColumnName + "] " + SQLGetType(column) + ",\n";
+                sql += "[" + column.ColumnName + "] " + SqlGetType(column) + ",\n";
             sql = sql.TrimEnd(',', '\n') + "\n";
             // primary keys
             if (table.PrimaryKey.Length > 0)
@@ -510,7 +587,7 @@ namespace DataPowerTools.PowerTools
         }
 
         // Return T-SQL data type definition, based on schema definition for a column
-        public static string SQLGetType(object type, int columnSize, int numericPrecision, int numericScale)
+        public static string SqlGetType(object type, int columnSize, int numericPrecision, int numericScale)
         {
             switch (type.ToString())
             {
@@ -549,7 +626,7 @@ namespace DataPowerTools.PowerTools
         }
 
         // Overload based on row from schema table
-        private static string SQLGetType(DataRow schemaRow)
+        private static string SqlGetType(DataRow schemaRow)
         {
             var colSize = schemaRow["ColumnSize"].ToString();
 
@@ -566,211 +643,17 @@ namespace DataPowerTools.PowerTools
             if (string.IsNullOrWhiteSpace(numericScale))
                 numericScale = "16";
 
-            return SQLGetType(schemaRow["DataType"],
+            return SqlGetType(schemaRow["DataType"],
                 int.Parse(colSize),
                 int.Parse(numericPrecision),
                 int.Parse(numericScale));
         }
 
         // Overload based on DataColumn from DataTable type
-        private static string SQLGetType(DataColumn column)
+        private static string SqlGetType(DataColumn column)
         {
-            return SQLGetType(column.DataType, column.MaxLength, 10, 2);
+            return SqlGetType(column.DataType, column.MaxLength, 10, 2);
         }
 
-        private class CreateTableSqlFromTypesClass
-        {
-            public CreateTableSqlFromTypesClass(Type t)
-            {
-                ClassName = t.Name;
-
-                foreach (var p in t.GetProperties())
-                {
-                    var field = new KeyValuePair<string, Type>(p.Name, p.PropertyType);
-
-                    Fields.Add(field);
-                }
-            }
-
-            private Dictionary<Type, string> dataMapper
-            {
-                get
-                {
-                    // Add the rest of your CLR Types to SQL Types mapping here
-                    var dataMapper = new Dictionary<Type, string>
-                    {
-                        {typeof(int), "BIGINT"},
-                        {typeof(string), "NVARCHAR(500)"},
-                        {typeof(bool), "BIT"},
-                        {typeof(DateTime), "DATETIME"},
-                        {typeof(float), "FLOAT"},
-                        {typeof(decimal), "DECIMAL(18,0)"},
-                        {typeof(Guid), "UNIQUEIDENTIFIER"}
-                    };
-
-                    return dataMapper;
-                }
-            }
-
-            public List<KeyValuePair<string, Type>> Fields { get; } = new List<KeyValuePair<string, Type>>();
-
-            public string ClassName { get; } = string.Empty;
-
-            public string CreateTableScript()
-            {
-                var script = new StringBuilder();
-
-                script.AppendLine("CREATE TABLE " + ClassName);
-                script.AppendLine("(");
-                script.AppendLine("\t ID BIGINT,");
-                for (var i = 0; i < Fields.Count; i++)
-                {
-                    var field = Fields[i];
-
-                    if (dataMapper.ContainsKey(field.Value))
-                        script.Append("\t " + field.Key + " " + dataMapper[field.Value]);
-                    else
-                        script.Append("\t " + field.Key + " BIGINT");
-
-                    if (i != Fields.Count - 1)
-                        script.Append(",");
-
-                    script.Append(Environment.NewLine);
-                }
-
-                script.AppendLine(")");
-
-                return script.ToString();
-            }
-        }
-
-        public class SqlTableDefinition
-        {
-            public string TableName { get; set; }
-
-            public List<SqlColumnDefinition> ColumnDefinitions { get; set; }
-            = new List<SqlColumnDefinition>();
-
-            public List<string> PrimaryKeyColumnNames { get; set; }
-            = new List<string>();
-        }
-
-        public class SqlColumnDefinition
-        {
-            public string ColumnName { get; set; }
-
-            public string DataType { get; set; }
-
-            public bool IsNullable { get; set; } = true;
-        }
-
-        public class ConcurrentHashSet<T> : IDisposable
-        {
-            private readonly ReaderWriterLockSlim _lock = new ReaderWriterLockSlim(LockRecursionPolicy.SupportsRecursion);
-            public HashSet<T> Hashset { get; } = new HashSet<T>();
-
-            public T[] ToArray() => Hashset.ToArray();
-            public IEnumerable<T> AsEnumerable() => (IEnumerable<T>) Hashset;
-
-            #region Implementation of ICollection<T> ...ish
-
-            public bool Add(T item)
-            {
-                _lock.EnterWriteLock();
-                try
-                {
-                    return Hashset.Add(item);
-                }
-                finally
-                {
-                    if (_lock.IsWriteLockHeld) _lock.ExitWriteLock();
-                }
-            }
-
-            public void Clear()
-            {
-                _lock.EnterWriteLock();
-                try
-                {
-                    Hashset.Clear();
-                }
-                finally
-                {
-                    if (_lock.IsWriteLockHeld) _lock.ExitWriteLock();
-                }
-            }
-
-            public bool Contains(T item)
-            {
-                _lock.EnterReadLock();
-                try
-                {
-                    return Hashset.Contains(item);
-                }
-                finally
-                {
-                    if (_lock.IsReadLockHeld) _lock.ExitReadLock();
-                }
-            }
-
-            public bool Remove(T item)
-            {
-                _lock.EnterWriteLock();
-                try
-                {
-                    return Hashset.Remove(item);
-                }
-                finally
-                {
-                    if (_lock.IsWriteLockHeld) _lock.ExitWriteLock();
-                }
-            }
-
-            public int Count
-            {
-                get
-                {
-                    _lock.EnterReadLock();
-                    try
-                    {
-                        return Hashset.Count;
-                    }
-                    finally
-                    {
-                        if (_lock.IsReadLockHeld) _lock.ExitReadLock();
-                    }
-                }
-            }
-
-            #endregion
-
-            #region Dispose
-
-            public void Dispose()
-            {
-                Dispose(true);
-                GC.SuppressFinalize(this);
-            }
-
-            protected virtual void Dispose(bool disposing)
-            {
-                if (disposing)
-                    if (_lock != null)
-                        _lock.Dispose();
-            }
-
-            ~ConcurrentHashSet()
-            {
-                Dispose(false);
-            }
-
-            #endregion
-        }
-
-        public class DataReaderInfo
-        {
-            public IDataReader DataReader { get; set; }
-            public string FilePath { get; set; }
-        }
     }
 }

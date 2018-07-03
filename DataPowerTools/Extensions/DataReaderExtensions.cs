@@ -1061,6 +1061,18 @@ namespace DataPowerTools.Extensions
 
         #endregion
 
+        /// <summary>
+        /// Analyzes the rows in a DataReader and generates a CREATE TABLE statement from the data it finds.
+        /// </summary>
+        /// <param name="reader"></param>
+        /// <param name="outputTableName"></param>
+        /// <param name="numberOfRowsToExamine"></param>
+        /// <returns></returns>
+        public static string FitDataToSqlTableDefinition(this IDataReader reader, string outputTableName, int numberOfRowsToExamine = -1)
+        {
+            return CreateTableSql.FromDataReader_Smart(outputTableName, reader, numberOfRowsToExamine);
+        }
+
         //#region IDataReader read extensions
 
 

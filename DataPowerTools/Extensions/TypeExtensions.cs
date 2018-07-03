@@ -5,6 +5,8 @@ using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
+using DataPowerTools.DataReaderExtensibility.Columns;
+using DataPowerTools.PowerTools;
 
 namespace DataPowerTools.Extensions
 {
@@ -265,6 +267,96 @@ namespace DataPowerTools.Extensions
                    type.IsArray ||
                    (type.IsGenericType &&
                     (type.GetGenericTypeDefinition() == typeof(Nullable<>)));
+        }
+
+        /// <summary>
+        /// Generates a CREATE TABLE statement from a type definition, where the 
+        /// </summary>
+        /// <param name="t"></param>
+        /// <param name="outputTableName">Output table name, default will be class name.</param>
+        /// <returns></returns>
+        public static string GenerateCreateTableScript(this Type t, string outputTableName = null)
+        {
+            return CreateTableSql.GenerateCreateTableScriptFromType(t, outputTableName);
+        }
+
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="type"></param>
+        /// <returns></returns>s
+        public static IEnumerable<BasicDataFieldInfo> GetPropertyAndFieldInfo(this Type type)
+        {
+            var p = type.GetPropertiesAndFields();
+
+            foreach (var entry in p)
+            {
+                switch (entry.Value)
+                {
+                    case FieldInfo fieldInfo:
+                        yield return new BasicDataFieldInfo
+                        {
+                            ColumnName = fieldInfo.Name,
+                            FieldType = fieldInfo.FieldType
+                        };
+                        break;
+                    case PropertyInfo propertyInfo:
+                        yield return new BasicDataFieldInfo
+                        {
+                            ColumnName = propertyInfo.Name,
+                            FieldType = propertyInfo.PropertyType
+                        };
+                        break;
+                }
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="type"></param>
+        /// <returns></returns>s
+        public static IEnumerable<string> GetPropertyAndFieldNames(this Type type)
+        {
+            var p = type.GetPropertiesAndFields();
+
+            foreach (var entry in p)
+            {   
+                switch (entry.Value)
+                {
+                    case FieldInfo fieldInfo:
+                        yield return fieldInfo.Name;
+                        break;
+                    case PropertyInfo propertyInfo:
+                        yield return propertyInfo.Name;
+                        break;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Gets the types properties and field as a dictionary of lowercase member names and PropertyInfo or FieldInfo as the values.
+        /// </summary>
+        public static Dictionary<string, object> GetPropertiesAndFields(this Type type)
+        {
+            var dictionary = new Dictionary<string, object>(StringComparer.InvariantCultureIgnoreCase);
+
+            var properties = type.GetProperties();
+
+            foreach (var propertyInfo in properties)
+            {
+                dictionary[propertyInfo.Name] = propertyInfo;
+            }
+
+            var fields = type.GetFields();
+
+            foreach (var fieldInfo in fields)
+            {
+                dictionary[fieldInfo.Name] = fieldInfo;
+            }
+
+            return dictionary;
         }
     }
 }

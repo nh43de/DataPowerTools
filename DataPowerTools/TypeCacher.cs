@@ -31,7 +31,9 @@
 
 using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Collections.Specialized;
+using DataPowerTools.Extensions;
 
 namespace DataPowerTools
 {
@@ -41,38 +43,24 @@ namespace DataPowerTools
         /// <summary>
         /// Cache that stores types as the key and the type's PropertyInfo and FieldInfo in a <see cref="OrderedDictionary"/> as the value.
         /// </summary>
-        private static readonly ConcurrentDictionary<Type, OrderedDictionary> PropertiesAndFieldsCache = new ConcurrentDictionary<Type, OrderedDictionary>();
+        private static readonly ConcurrentDictionary<Type, Dictionary<string, object>> PropertiesAndFieldsCache 
+            = new ConcurrentDictionary<Type, Dictionary<string, object>>();
 
         /// <summary>Gets the types properties and fields and caches the results.</summary>
         /// <param name="type">Type.</param>
         /// <returns><see cref="OrderedDictionary"/> of lowercase member names and PropertyInfo or FieldInfo as the values.</returns>
-        public static OrderedDictionary GetPropertiesAndFields( Type type )
+        public static Dictionary<string, object> GetPropertiesAndFields( Type type )
         {
             if ( PropertiesAndFieldsCache.TryGetValue( type, out var orderedDictionary ) )
             {
                 return orderedDictionary;
             }
 
-            orderedDictionary = new OrderedDictionary( StringComparer.InvariantCultureIgnoreCase );
-            
-            var properties = type.GetProperties();
-
-            foreach ( var propertyInfo in properties )
-            {
-                orderedDictionary[ propertyInfo.Name ] = propertyInfo;
-            }
-
-            var fields = type.GetFields();
-
-            foreach ( var fieldInfo in fields )
-            {
-                orderedDictionary[ fieldInfo.Name ] = fieldInfo;
-            }
+            orderedDictionary = type.GetPropertiesAndFields();
 
             return PropertiesAndFieldsCache.TryAdd( type, orderedDictionary ) 
                 ? orderedDictionary 
                 : PropertiesAndFieldsCache[ type ];
         }
     }
-
 }

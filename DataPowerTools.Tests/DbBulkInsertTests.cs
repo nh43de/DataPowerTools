@@ -9,6 +9,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using DataPowerTools.Extensions;
+using DataPowerTools.PowerTools;
 using Microsoft.VisualBasic.CompilerServices;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -38,46 +39,6 @@ namespace ExcelDataReader.Tests
             d.Close();
             d.Dispose();
         }
-
-        public class ClassWithTheLastFieldNullable
-        {
-            public int Ant;
-            public string Baboon;
-            public int? Cat;
-        }
-
-        [TestMethod]
-        public void Should_Not_Produce_A_Trailing_Comma_After_The_Last_Parameter_In_The_Parameter_List()
-        {
-            // Arrange
-            var customer = new ClassWithTheLastFieldNullable { Ant = 1, Baboon = "broom" };
-
-            DbCommand dbCommand = new SqlCommand();
-
-            // Act
-            dbCommand = dbCommand.GenerateInsertCommand(customer, "INSERT INTO {0} ({1}) VALUES({2});");
-            
-            // Assert
-            Assert.IsNotNull(dbCommand.CommandText);
-            Assert.IsFalse(dbCommand.CommandText.Contains(",) VALUES"));
-        }
-
-        [TestMethod]
-        public void Should_Not_Produce_A_Trailing_Comma_After_The_Last_Parameter_In_The_Values_List()
-        {
-            // Arrange
-            var customer = new ClassWithTheLastFieldNullable { Ant = 1, Baboon = "broom" };
-
-            DbCommand dbCommand = new SqlCommand();
-
-            // Act
-            dbCommand = dbCommand.GenerateInsertCommand(customer, "INSERT INTO {0} ({1}) VALUES({2});");
-
-            // Assert
-            Assert.IsNotNull(dbCommand.CommandText);
-            Assert.IsFalse(dbCommand.CommandText.Contains(",);"));
-        }
-        
 
         ///// <summary>
         ///// We're going to take the reader and insert it at the connection.

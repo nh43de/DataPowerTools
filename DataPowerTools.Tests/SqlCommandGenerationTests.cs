@@ -9,6 +9,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using DataPowerTools.Extensions;
+using DataPowerTools.PowerTools;
 using Microsoft.VisualBasic.CompilerServices;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -33,7 +34,7 @@ namespace ExcelDataReader.Tests
             DbCommand dbCommand = new SqlCommand();
 
             // Act
-            dbCommand = dbCommand.GenerateInsertCommand(customer, "INSERT INTO {0} ({1}) VALUES({2});");
+            dbCommand = InsertSqlBuilder.AppendInsertForSqlServer(dbCommand, customer, "INSERT INTO {0} ({1}) VALUES({2});");
             
             // Assert
             Assert.IsNotNull(dbCommand.CommandText);
@@ -49,7 +50,7 @@ namespace ExcelDataReader.Tests
             DbCommand dbCommand = new SqlCommand();
 
             // Act
-            dbCommand = dbCommand.GenerateInsertCommand(customer, "INSERT INTO {0} ({1}) VALUES({2});");
+            dbCommand = InsertSqlBuilder.AppendInsertForSqlServer(dbCommand, customer, "INSERT INTO {0} ({1}) VALUES({2});");
 
             // Assert
             Assert.IsNotNull(dbCommand.CommandText);
