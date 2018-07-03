@@ -15,30 +15,8 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace ExcelDataReader.Tests
 {
     [TestClass]
-    public class DbBulkInsertTests
+    public class SqlCommandGenerationTests
     {
-        [TestMethod]
-        public void TestBulkInsert()
-        {
-            var d = new SQLiteConnection("Data Source=:memory:");
-            d.Open();
-
-            var r = new[]
-            {
-                new
-                {
-                    Col1 = 10,
-                    Col2 = 20,
-                    Col3 = "abc",
-                }
-            }.ToDataReader();
-
-            var s = r.GetSchemaTable();
-
-            d.Close();
-            d.Dispose();
-        }
-
         public class ClassWithTheLastFieldNullable
         {
             public int Ant;

@@ -1,7 +1,9 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Reflection;
 using DataPowerTools.Extensions.MiscUtil.Reflection;
 
 namespace DataPowerTools.Extensions
@@ -128,6 +130,45 @@ namespace DataPowerTools.Extensions
             {
                 throw new InvalidCastException("The type " + @this.GetType().Name + " does have a property named " + name + ", but it is of type " + ret.GetType().Name + ", not " + typeof(T).Name + ".");
             }
+        }
+        
+        /// <summary>Gets a dictionary containing the objects property and field names and values.</summary>
+        /// <param name="obj">Object to get names and values from.</param>
+        /// <returns>Dictionary containing property and field names and values.</returns>
+        public static IDictionary<string, object> GetPropertyAndFieldNamesAndValues(this object obj)
+        {
+            // Support dynamic objects backed by a dictionary of string object.
+
+            if (obj is IDictionary<string, object> objectAsDictionary)
+                return objectAsDictionary;
+
+            var type = obj.GetType();
+
+            var orderedDictionary = TypeCacher.GetPropertiesAndFields(type);
+
+            var dictionary = new Dictionary<string, object>();
+
+            foreach (DictionaryEntry entry in orderedDictionary)
+            {
+                object value = null;
+
+                if (entry.Value is FieldInfo)
+                {
+                    var fieldInfo = entry.Value as FieldInfo;
+
+                    value = fieldInfo.GetValue(obj);
+                }
+                else if (entry.Value is PropertyInfo)
+                {
+                    var propertyInfo = entry.Value as PropertyInfo;
+
+                    value = propertyInfo.GetValue(obj, null);
+                }
+
+                dictionary.Add(entry.Key.ToString(), value);
+            }
+
+            return dictionary;
         }
 
         /// <summary>

@@ -32,11 +32,9 @@
 */
 
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
-using System.Reflection;
 using System.Threading.Tasks;
 
 namespace DataPowerTools.Extensions
@@ -718,7 +716,7 @@ SELECT SCOPE_IDENTITY() AS [LastInsertedId];
 
             var values = string.Empty;
 
-            var namesAndValues = GetPropertyAndFieldNamesAndValues(obj);
+            var namesAndValues = obj.GetPropertyAndFieldNamesAndValues();
 
             foreach (var nameAndValue in namesAndValues)
             {
@@ -739,45 +737,6 @@ SELECT SCOPE_IDENTITY() AS [LastInsertedId];
             dbCommand.AppendCommandText(string.Format(sqlInsertStatementTemplate, tableName, columns.TrimEnd(','), values.TrimEnd(',')));
 
             return dbCommand;
-        }
-
-        /// <summary>Gets a dictionary containing the objects property and field names and values.</summary>
-        /// <param name="obj">Object to get names and values from.</param>
-        /// <returns>Dictionary containing property and field names and values.</returns>
-        private static IDictionary<string, object> GetPropertyAndFieldNamesAndValues(object obj)
-        {
-            // Support dynamic objects backed by a dictionary of string object.
-
-            if (obj is IDictionary<string, object> objectAsDictionary)
-                return objectAsDictionary;
-
-            var type = obj.GetType();
-
-            var orderedDictionary = TypeCacher.GetPropertiesAndFields(type);
-
-            var dictionary = new Dictionary<string, object>();
-
-            foreach (DictionaryEntry entry in orderedDictionary)
-            {
-                object value = null;
-
-                if (entry.Value is FieldInfo)
-                {
-                    var fieldInfo = entry.Value as FieldInfo;
-
-                    value = fieldInfo.GetValue(obj);
-                }
-                else if (entry.Value is PropertyInfo)
-                {
-                    var propertyInfo = entry.Value as PropertyInfo;
-
-                    value = propertyInfo.GetValue(obj, null);
-                }
-
-                dictionary.Add(entry.Key.ToString(), value);
-            }
-
-            return dictionary;
         }
 
     }
