@@ -13,6 +13,47 @@ namespace Sqlite.Extensions
 {
     public static class SqlLiteHelpers
     {
+        /// <summary>
+        /// Get column metadata for a table in a Sqlite database
+        /// </summary>
+        public static Dictionary<string, SqlBasicColumnTypes> GetColumnMetaData(DbConnection dbConnection, string destinationTableName)
+        {
+            if (string.IsNullOrEmpty(destinationTableName))
+                throw new ArgumentNullException(nameof(destinationTableName));
+
+            var ColumnNameToTypeDictionary = new Dictionary<string, SqlBasicColumnTypes>();
+
+            var sql = $"pragma table_info('{destinationTableName}')";
+
+            var cmd = dbConnection.CreateCommand();
+
+            cmd.CommandText = sql;
+            cmd.CommandType = CommandType.Text;
+
+            using (cmd)
+            {
+                using (var dr = cmd.ExecuteReader())
+                {
+                    while (dr.Read())
+                    {
+                        var key = dr["name"].ToString();
+
+                        // data types found @ http://www.tutorialspoint.com/sqlite/sqlite_data_types.htm
+                        var columnType = dr["type"].ToString().ToUpper();
+
+                        var typ = SqlLiteHelpers.MapSqliteColumnType(columnType);
+
+                        ColumnNameToTypeDictionary.Add(key, typ);
+                    }
+                }
+            }
+
+            if (ColumnNameToTypeDictionary == null || ColumnNameToTypeDictionary.Count < 1)
+                throw new Exception($"{destinationTableName} could not be found in the database");
+
+            return ColumnNameToTypeDictionary;
+        }
+
 
         public static SqlBasicColumnTypes MapSqliteColumnType(string sqliteColumnType)
         {
@@ -76,41 +117,8 @@ namespace Sqlite.Extensions
 
             return typ;
         }
-
-        public static void Test(string destinationTableName, DbConnection connection)
-        {
-            var columnMappings = new Dictionary<string, SqlBasicColumnTypes>();
-
-            var sql = $"pragma table_info('{destinationTableName}')";
-
-            var cmd = connection.CreateCommand();
-
-            cmd.CommandText = sql;
-            cmd.CommandType = CommandType.Text;
-
-            using (cmd)
-            {
-                using (var dr = cmd.ExecuteReader())
-                {
-                    while (dr.Read())
-                    {
-                        var key = dr["name"].ToString();
-                        
-                        // data types found @ http://www.tutorialspoint.com/sqlite/sqlite_data_types.htm
-                        var columnType = dr["type"].ToString().ToUpper();
-
-                        var typ = MapSqliteColumnType(columnType);
-                        
-                        columnMappings.Add(key, typ);
-                    }
-                }
-            }
-            if (columnMappings == null || columnMappings.Count < 1)
-                throw new Exception($"{destinationTableName} could not be found in the database");
-
-        }
     }
-
+    
     /// <summary>
     /// Defines the mapping between a column in a SqliteBulkCopy instance's data source and a column in the instance's destination table.
     /// </summary>
@@ -149,24 +157,13 @@ namespace Sqlite.Extensions
     public class GenericBulkCopy : IDisposable
     {
         private readonly DbConnection _connection;
-        private string _tableName;
         
         public Dictionary<string, SqlBasicColumnTypes> ColumnNameToTypeDictionary { get; private set; }
 
         /// <summary>
         /// Name of the destination table in the database.
         /// </summary>
-        public string DestinationTableName
-        {
-            get => _tableName;
-            set
-            {
-                _tableName = value;
-                if (!string.IsNullOrEmpty(value))
-                    SetColumnMetaData();
-            }
-        }
-
+        public string DestinationTableName { get; set; }
         /// <summary>
         /// Allows control of the incoming DataReader by closing and disposing of it by default after all bulk copy 
         /// operations have completed if set to TRUE, if set to FALSE you need to do your own cleanup (this is useful 
@@ -192,133 +189,20 @@ namespace Sqlite.Extensions
         public GenericBulkCopy(DbConnection connection)
         {
             _connection = connection;
-
-            if (_connection.State == ConnectionState.Closed)
-                _connection.Open();
         }
         
-
-
-        /// <summary>
-        /// Get column metadata for a table in a Sqlite database
-        /// </summary>
-        private void SetColumnMetaData()
-        {
-            if (string.IsNullOrEmpty(DestinationTableName))
-                return;
-
-            ColumnNameToTypeDictionary = new Dictionary<string, SqlBasicColumnTypes>();
-
-            var sql = $"pragma table_info('{DestinationTableName}')";
-
-            var cmd = _connection.CreateCommand();
-
-            cmd.CommandText = sql;
-            cmd.CommandType = CommandType.Text;
-
-            using (cmd)
-            {
-                using (var dr = cmd.ExecuteReader())
-                {
-                    while (dr.Read())
-                    {
-                        var key = dr["name"].ToString();
-                        var typ = new SqlBasicColumnTypes();
-                        // data types found @ http://www.tutorialspoint.com/sqlite/sqlite_data_types.htm
-                        var columnType = dr["type"].ToString().ToUpper();
-                        switch (columnType)
-                        {
-                            case "INTEGER":
-                            case "TINYINT":
-                            case "SMALLINT":
-                            case "MEDIUMINT":
-                            case "BIGINT":
-                            case "UNSIGNED BIG INT":
-                            case "INT2":
-                            case "INT8":
-                            case "INT":
-                                typ = SqlBasicColumnTypes.Integer;
-                                break;
-                            case "CLOB":
-                            case "TEXT":
-                                typ = SqlBasicColumnTypes.Text;
-                                break;
-                            case "BLOB":
-                                typ = SqlBasicColumnTypes.Blob;
-                                break;
-                            case "REAL":
-                            case "DOUBLE":
-                            case "DOUBLE PRECISION":
-                            case "FLOAT":
-                                typ = SqlBasicColumnTypes.Real;
-                                break;
-                            case "NUMERIC":
-                                typ = SqlBasicColumnTypes.Numeric;
-                                break;
-                            case "BOOLEAN":
-                                typ = SqlBasicColumnTypes.Boolean;
-                                break;
-                            case "DATE":
-                            case "DATETIME":
-                                typ = SqlBasicColumnTypes.Date;
-                                break;
-                            default: // look for fringe cases that need logic
-                                if (columnType.StartsWith("CHARACTER"))
-                                    typ = SqlBasicColumnTypes.Text;
-                                if (columnType.StartsWith("VARCHAR"))
-                                    typ = SqlBasicColumnTypes.Text;
-                                if (columnType.StartsWith("VARYING CHARACTER"))
-                                    typ = SqlBasicColumnTypes.Text;
-                                if (columnType.StartsWith("NCHAR"))
-                                    typ = SqlBasicColumnTypes.Text;
-                                if (columnType.StartsWith("NATIVE CHARACTER"))
-                                    typ = SqlBasicColumnTypes.Text;
-                                if (columnType.StartsWith("NVARCHAR"))
-                                    typ = SqlBasicColumnTypes.Text;
-                                if (columnType.StartsWith("NVARCHAR"))
-                                    typ = SqlBasicColumnTypes.Text;
-                                if (columnType.StartsWith("DECIMAL"))
-                                    typ = SqlBasicColumnTypes.Numeric;
-                                break;
-                        }
-                        ColumnNameToTypeDictionary.Add(key, typ);
-                    }
-                }
-            }
-
-            if (ColumnNameToTypeDictionary == null || ColumnNameToTypeDictionary.Count < 1)
-                throw new Exception($"{DestinationTableName} could not be found in the database");
-        }
-
-        /// <summary>
-        /// Close and database connections.
-        /// </summary>
-        public void Close()
-        {
-            if (_connection.State == ConnectionState.Open)
-                _connection.Close();
-        }
-
-        private DbCommand GetDbCommand(string dml)
-        {
-            var cmd = _connection.CreateCommand();
-
-            cmd.CommandTimeout = BulkCopyTimeout;
-            cmd.CommandType = CommandType.Text;
-            cmd.CommandText = dml;
-
-            return cmd;
-        }
-
         /// <summary>
         /// Copies all rows in the supplied IDataReader to a destination table specified 
-        /// by the DestinationTableName property of the SqliteBulkCopy object.
+        /// by the destinationTableName property of the SqliteBulkCopy object.
         /// </summary>
         /// <param name="reader"></param>
         public void WriteToServer(IDataReader reader)
         {
             if (reader == null)
                 throw new ArgumentNullException(nameof(reader));
+            
+            if (_connection.State == ConnectionState.Closed)
+                _connection.Open();
 
             // build the insert schema
             var insertClause = new StringBuilder();
@@ -423,6 +307,7 @@ namespace Sqlite.Extensions
                 reader.Close();
                 reader.Dispose();
             }
+
             // if any records remain after the read loop has completed then write them to the DB
             if (currentBatch > 0)
             {
@@ -435,16 +320,7 @@ namespace Sqlite.Extensions
             }
         }
 
-        /// <summary>
-        /// ?? The asynchronous version of WriteToServer, which copies all rows in the supplied IDataReader to a 
-        /// destination table specified by the DestinationTableName property of the SqliteBulkCopy object.
-        /// </summary>
-        /// <param name="reader"></param>
-        /// <returns></returns>
-        private async Task WriteToServerAsyncInternal(IDataReader reader)
-        {
-            WriteToServer(reader);
-        }
+
 
         /// <summary>
         /// Releases all resources used by the current instance of the SqliteBulkCopy class.
@@ -454,5 +330,27 @@ namespace Sqlite.Extensions
             Close();
             _connection.Dispose();
         }
+
+
+        /// <summary>
+        /// Close and database connections.
+        /// </summary>
+        public void Close()
+        {
+            if (_connection.State == ConnectionState.Open)
+                _connection.Close();
+        }
+
+        private DbCommand GetDbCommand(string dml)
+        {
+            var cmd = _connection.CreateCommand();
+
+            cmd.CommandTimeout = BulkCopyTimeout;
+            cmd.CommandType = CommandType.Text;
+            cmd.CommandText = dml;
+
+            return cmd;
+        }
+
     }
 }
