@@ -68,6 +68,24 @@ namespace DataPowerTools.Extensions
         }
 
         /// <summary>
+        /// Generates a create table statement for the enumerable by fitting the data to a best fit table.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="connection"></param>
+        /// <param name="reader"></param>
+        /// <param name="outputTableName"></param>
+        /// <param name="ignoreNonStringReferenceTypes"></param>
+        /// <returns></returns>
+        public static Task CreateTableFor(this DbConnection connection, IDataReader reader, string outputTableName, bool ignoreNonStringReferenceTypes = true)
+        {
+            var sql = reader.FitToCreateTableStatement(outputTableName, null);
+
+            var cmd = connection.CreateSqlCommand(sql);
+
+            return cmd.ExecuteNonQueryAsync();
+        }
+
+        /// <summary>
         /// Inserts records into the database by generating insert statements.
         /// </summary>
         /// <typeparam name="T"></typeparam>

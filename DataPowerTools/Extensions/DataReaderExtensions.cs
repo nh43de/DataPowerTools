@@ -1068,10 +1068,12 @@ namespace DataPowerTools.Extensions
         /// <param name="outputTableName"></param>
         /// <param name="numberOfRowsToExamine"></param>
         /// <returns></returns>
-        public static string FitDataToSqlTableDefinition(this IDataReader reader, string outputTableName, int numberOfRowsToExamine = -1)
+        public static string FitToCreateTableStatement(this IDataReader reader, string outputTableName, int? numberOfRowsToExamine)
         {
             return CreateTableSql.FromDataReader_Smart(outputTableName, reader, numberOfRowsToExamine);
         }
+
+       
 
         //#region IDataReader read extensions
 

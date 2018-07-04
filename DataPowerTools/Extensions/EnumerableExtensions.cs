@@ -41,7 +41,19 @@ namespace DataPowerTools.Extensions
         //}
 
 
-        
+        public static IEnumerable<T> Repeat<T>(this IEnumerable<T> items, int repeatCount)
+        {
+            for (var i = 0; i < repeatCount; i++)
+            {
+                // ReSharper disable once PossibleMultipleEnumeration
+                foreach (var a in items) //we are definitely going to enumerate this several times.
+                {
+                    yield return a;
+                }
+            }
+        }
+
+
         /// <summary>
         /// Returns a SortedDictionary of the source dictionary.
         /// </summary>

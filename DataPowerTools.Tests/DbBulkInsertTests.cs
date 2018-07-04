@@ -9,6 +9,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using DataPowerTools.DataConnectivity.Sql;
 using DataPowerTools.Extensions;
 using DataPowerTools.PowerTools;
 using Microsoft.VisualBasic.CompilerServices;
@@ -20,7 +21,7 @@ namespace ExcelDataReader.Tests
     public class DbBulkInsertTests
     {
         [TestMethod]
-        public async Task TestBulkInsert()
+        public async Task TestInsert()
         {
             var conn = new SQLiteConnection("Data Source=:memory:");
             conn.Open();
@@ -33,8 +34,8 @@ namespace ExcelDataReader.Tests
                     Col2 = 20,
                     Col3 = "abc",
                 }
-            };
-            
+            }.Repeat(1000).ToArray();
+
             await conn.CreateTableFor(r, "DestinationTable");
 
             await conn.InsertRecords(r, "DestinationTable", DatabaseEngine.Sqlite);
@@ -42,19 +43,73 @@ namespace ExcelDataReader.Tests
             conn.CloseAndDispose();
         }
 
-        ///// <summary>
-        ///// We're going to take the reader and insert it at the connection.
-        ///// </summary>
-        ///// <param name="reader"></param>
-        ///// <param name="connection"></param>
-        //public static void TestT(IDataReader reader, DbConnection connection)
-        //{
-        //    var providerFactory = connection.GetDbProviderFactory();
+        [TestMethod]
+        public async Task TestBulkInsertUsingEnumerable()
+        {
+            var conn = new SQLiteConnection("Data Source=:memory:");
+            conn.Open();
 
-        //    var commandBuilder = providerFactory.CreateCommandBuilder();
+            var r = new[]
+            {
+                new
+                {
+                    Col1 = 10,
+                    Col2 = 20,
+                    Col3 = "abc",
+                }
+            }.Repeat(10000).ToArray();
 
-        //    commandBuilder.DataAdapter
-        //}
+            var destinationtable = "DestinationTable2";
 
+            await conn.CreateTableFor(r, destinationtable);
+
+            await r.BulkInsert(conn, destinationtable, DatabaseEngine.Sqlite, new GenericBulkCopyOptions()
+            {
+                BatchSize = 1
+            });
+
+            conn.CloseAndDispose();
+        }
+
+        [TestMethod]
+        public async Task TestBulkInsertUsingReader()
+        {
+            var conn = new SQLiteConnection("Data Source=:memory:");
+            conn.Open();
+
+            var r = new[]
+            {
+                new
+                {
+                    Col1 = 10,
+                    Col2 = 20,
+                    Col3 = "abc",
+                }
+            }.Repeat(10000).ToArray().ToDataReader();
+
+            var destinationtable = "DestinationTable2";
+
+            await conn.CreateTableFor(r, destinationtable);
+
+            await r.BulkInsert(conn, destinationtable, DatabaseEngine.Sqlite);
+
+            conn.CloseAndDispose();
+        }
     }
+
+
+    ///// <summary>
+    ///// We're going to take the reader and insert it at the connection.
+    ///// </summary>
+    ///// <param name="reader"></param>
+    ///// <param name="connection"></param>
+    //public static void TestT(IDataReader reader, DbConnection connection)
+    //{
+    //    var providerFactory = connection.GetDbProviderFactory();
+
+    //    var commandBuilder = providerFactory.CreateCommandBuilder();
+
+    //    commandBuilder.DataAdapter
+    //}
+
 }

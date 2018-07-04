@@ -25,5 +25,15 @@ namespace ExcelDataReader.Tests
             Assert.AreEqual(dd.Sum(), 111+222+333);
         }
 
+        [TestMethod]
+        public void TestRepeat()
+        {
+            var a = new[] { 1, 2, 3 };
+
+            var b = a.Repeat(3).ToArray();
+
+            Assert.AreEqual(b.Length, a.Length * 3);
+        }
+
     }
 }

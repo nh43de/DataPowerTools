@@ -71,7 +71,7 @@ namespace Sqlite.Extensions
                     continue; //otherwise send to db
                 
                 using (cmd)
-                    await cmd.ExecuteNonQueryAsync();
+                    cmd.ExecuteNonQuery();
 
                 cmd = GetDbCommand();
 
