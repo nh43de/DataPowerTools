@@ -30,4 +30,9 @@
     <PackageReference Include="System.Reflection.Emit" Version="4.0.1" />
     <PackageReference Include="System.Reflection.Emit.Lightweight" Version="4.0.1" />
   </ItemGroup>
+  <ItemGroup>
+    <Compile Remove="DataConnectivity\Csv\**" />
+    <EmbeddedResource Remove="DataConnectivity\Csv\**" />
+    <None Remove="DataConnectivity\Csv\**" />
+  </ItemGroup>
 </Project>

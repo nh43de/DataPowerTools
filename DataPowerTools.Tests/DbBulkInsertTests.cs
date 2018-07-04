@@ -9,6 +9,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using DataPowerTools.DataConnectivity;
 using DataPowerTools.DataConnectivity.Sql;
 using DataPowerTools.Extensions;
 using DataPowerTools.PowerTools;
@@ -39,6 +40,41 @@ namespace ExcelDataReader.Tests
             await conn.CreateTableFor(r, "DestinationTable");
 
             await conn.InsertRecords(r, "DestinationTable", DatabaseEngine.Sqlite);
+
+            conn.CloseAndDispose();
+        }
+
+
+        [TestMethod]
+        public async Task TestBulkInsertUsingCsv()
+        {
+            //
+            var conn = new SQLiteConnection("Data Source=:memory:");
+            conn.Open();
+
+            var tab = new[]
+            {
+                new
+                {
+                    Col1 = 10,
+                    Col2 = 20,
+                    Col3 = "abc",
+                }
+            }.Repeat(10000).ToArray();
+
+            var destinationtable = "DestinationTable2";
+
+            await conn.CreateTableFor(tab, destinationtable);
+            //
+
+            var csvData = tab.AsCsv();
+
+            var r = Csv.ReadString(csvData);
+
+            await r.BulkInsert(conn, destinationtable, DatabaseEngine.Sqlite, new GenericBulkCopyOptions()
+            {
+                BatchSize = 1
+            });
 
             conn.CloseAndDispose();
         }

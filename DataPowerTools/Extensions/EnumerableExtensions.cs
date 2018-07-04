@@ -632,7 +632,19 @@ namespace DataPowerTools.Extensions
         {
             enumerable.ToDataReader(fieldNames).WriteCsv(outputFile);
         }
-        
+
+        /// <summary>
+        /// Writes an enumerable to CSV.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="enumerable"></param>
+        /// <param name="outputFile"></param>
+        /// <param name="fieldNames">Field names to include, in that order. By default all are included.</param>
+        public static string AsCsv<T>(this IEnumerable<T> enumerable, string[] fieldNames = null)
+        {
+             return enumerable.ToDataReader(fieldNames).AsCsv();
+        }
+
         [DebuggerHidden]
         public static void Each<T>(this IEnumerable<T> items, Action<T> action)
         {

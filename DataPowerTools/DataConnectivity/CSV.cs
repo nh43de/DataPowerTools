@@ -4,6 +4,7 @@ using System.Data;
 using System.IO;
 using System.Linq;
 using System.Text;
+using CsvDataReader;
 using DataPowerTools.Extensions;
 
 namespace DataPowerTools.DataConnectivity
@@ -45,13 +46,36 @@ namespace DataPowerTools.DataConnectivity
             }
         }
 
+        /// <summary>
+        /// Opens a CSV file and returns a data reader.
+        /// </summary>
+        /// <param name="filePath"></param>
+        /// <param name="hasHeaders">Whether the first row in the file has headers.</param>
+        /// <param name="delimiter">Field delimiter e.g. '|' or ','</param>
+        /// <returns></returns>
+        public static IDataReader Read(string filePath, bool hasHeaders = true, char delimiter = ',')
+        {
+            return new CsvReader(File.OpenText(filePath), true, delimiter);
+        }
 
+        /// <summary>
+        /// Opens a CSV string and returns a data reader for it.
+        /// </summary>
+        /// <param name="data"></param>
+        /// <param name="hasHeaders">Whether the first row in the file has headers.</param>
+        /// <param name="delimiter">Field delimiter e.g. '|' or ','</param>
+        /// <returns></returns>
+        public static IDataReader ReadString(string data, bool hasHeaders = true, char delimiter = ',')
+        {
+            return new CsvReader(new StringReader(data), true, delimiter);
+        }
 
         /// <summary>
         /// Writes the reader to CSV.
         /// </summary>
         /// <param name="reader"></param>
         /// <param name="outputFile"></param>
+        /// <param name="writeHeaders">Whether to write the headers.</param>
         public static void Write(IDataReader reader, string outputFile, bool writeHeaders = true)
         {
             var ts = File.OpenWrite(outputFile);
@@ -101,14 +125,62 @@ namespace DataPowerTools.DataConnectivity
             }
         }
 
+        /// <summary>
+        /// Writes the reader to CSV.
+        /// </summary>
+        /// <param name="reader"></param>
+        /// <param name="writeHeaders">Whether to write the headers.</param>
+        public static string WriteString(IDataReader reader, bool writeHeaders = true)
+        {
+            //TODO: WARNING: duplicated to above
+
+            var sb = new StringBuilder(1024);
+
+            var isInitialized = false;
+            var fieldCount = 0;
+
+            void Initialize()
+            {
+                var fieldHeaders = reader.GetFieldNames().ToArray();
+
+                if (writeHeaders)
+                {
+                    foreach (var col in fieldHeaders)
+                        sb.Append("\"" + col + "\",");
+
+                    sb.Remove(sb.Length - 1, 1);
+                    sb.Append(Environment.NewLine);
+                }
+
+                fieldCount = reader.FieldCount;
+
+                isInitialized = true;
+            }
+
+            while (reader.Read())
+            {
+                if (isInitialized == false)
+                    Initialize();
+
+                var row = new object[fieldCount];
+                reader.GetValues(row);
+                var rowStr = string.Join(",", row.Select(i => @"""" + i?.ToString() + @""""));
+                sb.Append(rowStr + Environment.NewLine);
+            }
+            
+            return sb.ToString();
+        }
+
+
+
 
         //TODO: needs to be support streaming to disk
 
-        
+
         //public static void Write<T>(IEnumerable<T> rowObjects, IEnumerable<string> headers, string outputFile)
         //{
         //    var props = typeof(T).GetProperties().Select(p => p.Name).ToArray();
-            
+
         //    var sb = new StringBuilder(1024 * 5);
 
         //    foreach (var col in headers)
