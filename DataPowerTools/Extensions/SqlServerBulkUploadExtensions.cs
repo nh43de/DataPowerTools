@@ -15,7 +15,7 @@ namespace DataPowerTools.Extensions
     /// <summary>
     /// Methods that assist in bulk uploading to the databases. These need to be cleaned up and unified as there is a lot of duplicated code.
     /// </summary>
-    public static class SqlBulkUploadExtensions
+    public static class SqlServerBulkUploadExtensions
     {
         /// <summary>
         /// Bulk insert data table using connection string.

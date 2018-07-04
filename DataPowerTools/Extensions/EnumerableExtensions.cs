@@ -3,12 +3,14 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Data;
+using System.Data.Common;
 using System.Diagnostics;
 using System.Linq;
 using DataPowerTools.DataConnectivity.Sql;
 using DataPowerTools.DataStructures;
 using DataPowerTools.FastMember;
 using DataPowerTools.PowerTools;
+using Sqlite.Extensions;
 
 namespace DataPowerTools.Extensions
 {
@@ -37,7 +39,6 @@ namespace DataPowerTools.Extensions
 
         //    BulkUploadSqlServer(items, cs, destinationTable, bulkInsertOptions, members);
         //}
-
 
 
         /// <summary>
