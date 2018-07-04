@@ -34,7 +34,7 @@ namespace ExcelDataReader.Tests
             DbCommand dbCommand = new SqlCommand();
 
             // Act
-            dbCommand = CreateInsertSql.AppendInsertForSqlServer(dbCommand, customer, "INSERT INTO {0} ({1}) VALUES({2});");
+            dbCommand = new InsertCommandSqlBuilder(DatabaseEngine.SqlServer).AppendInsert(dbCommand, customer, "INSERT INTO {0} ({1}) VALUES({2});");
             
             // Assert
             Assert.IsNotNull(dbCommand.CommandText);
@@ -50,7 +50,7 @@ namespace ExcelDataReader.Tests
             DbCommand dbCommand = new SqlCommand();
 
             // Act
-            dbCommand = CreateInsertSql.AppendInsertForSqlServer(dbCommand, customer, "INSERT INTO {0} ({1}) VALUES({2});");
+            dbCommand = new InsertCommandSqlBuilder(DatabaseEngine.SqlServer).AppendInsert(dbCommand, customer, "INSERT INTO {0} ({1}) VALUES({2});");
 
             // Assert
             Assert.IsNotNull(dbCommand.CommandText);

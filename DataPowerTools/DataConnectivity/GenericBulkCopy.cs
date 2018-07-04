@@ -6,6 +6,7 @@ using System.Data.Common;
 using System.Text;
 using System.Threading.Tasks;
 using DataPowerTools.DataConnectivity.Sql;
+using DataPowerTools.PowerTools;
 
 namespace Sqlite.Extensions
 {
@@ -13,81 +14,93 @@ namespace Sqlite.Extensions
     /// <summary>
     /// Lets you efficiently bulk load a Sqlite table with data from another source.
     /// </summary>
-    public class GenericBulkCopy : IDisposable
+    public class GenericBulkCopy 
     {
         public GenericBulkCopyOptions BulkCopyOptions { get; }
-
-
+        
         public DbConnection Connection { get; }
-        
-        
-
-        /// <summary>
-        /// Name of the destination table in the database.
-        /// </summary>
-        public string DestinationTableName { get; }
         
         /// <summary>
         /// Allows control of the incoming DataReader by closing and disposing of it by default after all bulk copy 
         /// operations have completed if set to TRUE, if set to FALSE you need to do your own cleanup (this is useful 
-        /// when your DataReader returns more than one result set).  By default this is set to TRUE.
+        /// when your DataReader returns more than one result set).  By default this is set to FALSE.
         /// </summary>
-        public bool CloseAndDisploseDataReader { get; set; } = true;
-
+        public bool CloseAndDisploseDataReader { get; set; } = false;
 
         /// <summary>
         /// Initializes a new instance of the SqliteBulkCopy class using the specified open instance of SqliteConnection.
         /// </summary>
         /// <param name="connection"></param>
-        /// <param name="destinationTableName"></param>
         /// <param name="bulkCopyOptions"></param>
-        public GenericBulkCopy(DbConnection connection, string destinationTableName, GenericBulkCopyOptions bulkCopyOptions = null)
+        public GenericBulkCopy(DbConnection connection, GenericBulkCopyOptions bulkCopyOptions = null)
         {
             BulkCopyOptions = bulkCopyOptions ?? new GenericBulkCopyOptions();
             Connection = connection; 
-            DestinationTableName = destinationTableName;
         }
-
-
-
+        
         /// <summary>
-        /// Copies all rows in the supplied IDataReader to a destination table specified 
-        /// by the destinationTableName property of the SqliteBulkCopy object.
+        /// Copies all rows in the supplied IDataReader to a destination table specified
+        /// by the destinationTableName.
         /// </summary>
         /// <param name="reader"></param>
-        public void WriteToServer_2(IDataReader reader)
+        /// <param name="destinationTableName"> Name of the destination table in the database.</param>
+        /// <param name="databaseEngine"></param>
+        public void WriteToServer(IDataReader reader, string destinationTableName, DatabaseEngine databaseEngine)
         {
+            if (reader == null)
+                throw new ArgumentNullException(nameof(reader));
 
+            if (reader == null)
+                throw new ArgumentNullException(nameof(destinationTableName));
+
+            if (Connection.State == ConnectionState.Closed)
+                Connection.Open();
+
+
+            var sqlBuilder = new InsertCommandSqlBuilder(databaseEngine);
+            
+            var currentBatch = 0;
+            var cmd = GetDbCommand();
+            while (reader.Read())
+            {
+                sqlBuilder.AppendInsert(cmd, reader, destinationTableName);
+
+                currentBatch++;
+
+                if (currentBatch != BulkCopyOptions.BatchSize)
+                    continue; //otherwise send to db
+                
+                using (cmd)
+                    cmd.ExecuteNonQuery();
+
+                cmd = GetDbCommand();
+
+                currentBatch = 0;
+            }
+
+            // if any records remain after the read loop has completed then write them to the DB
+            // we also need to close the command
+            using (cmd)
+            {
+                if (currentBatch > 0)
+                {
+                    cmd.ExecuteNonQuery();
+                }
+            }
+            
+            if (CloseAndDisploseDataReader)
+            {
+                reader.Close();
+                reader.Dispose();
+            }
         }
 
-
-
-        /// <summary>
-        /// Releases all resources used by the current instance of the SqliteBulkCopy class.
-        /// </summary>
-        public void Dispose()
-        {
-            Close();
-            Connection.Dispose();
-        }
-
-
-        /// <summary>
-        /// Close and database connections.
-        /// </summary>
-        public void Close()
-        {
-            if (Connection.State == ConnectionState.Open)
-                Connection.Close();
-        }
-
-        private DbCommand GetDbCommand(string dml)
+        private DbCommand GetDbCommand()
         {
             var cmd = Connection.CreateCommand();
 
             cmd.CommandTimeout = BulkCopyOptions.BulkCopyTimeout;
             cmd.CommandType = CommandType.Text;
-            cmd.CommandText = dml;
 
             return cmd;
         }

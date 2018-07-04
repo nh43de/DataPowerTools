@@ -82,23 +82,7 @@ namespace DataPowerTools.Extensions
 
             using (cmd)
             {
-                switch (databaseEngine)
-                {
-                    case DatabaseEngine.MySql:
-                        cmd.AppendInsertsForMySql(enumerable, tableName);
-                        break;
-                    case DatabaseEngine.Postgre:
-                        cmd.AppendInsertsForPostgreSql(enumerable, tableName);
-                        break;
-                    case DatabaseEngine.Sqlite:
-                        cmd.AppendInsertsForSQLite(enumerable, tableName);
-                        break;
-                    case DatabaseEngine.SqlServer:
-                        cmd.AppendInsertsForSqlServer(enumerable, tableName);
-                        break;
-                    default:
-                        throw new ArgumentOutOfRangeException(nameof(databaseEngine), databaseEngine, null);
-                }
+                cmd.AppendInserts(enumerable, tableName, databaseEngine);
 
                 return await cmd.ExecuteNonQueryAsync();
             }

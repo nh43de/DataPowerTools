@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Data.Common;
 using System.Linq;
 using System.Text;
@@ -10,8 +11,14 @@ namespace DataPowerTools.PowerTools
 {
     public class InsertCommandSqlBuilder
     {
+        public DatabaseEngine DatabaseEngine { get; }
         public TypeAccessorCache TypeAccessorCache { get; } = new TypeAccessorCache();
 
+
+        public InsertCommandSqlBuilder(DatabaseEngine databaseEngine)
+        {
+            DatabaseEngine = databaseEngine;
+        }
 
         /// <summary>
         /// The method used for escaping keywords.
@@ -27,28 +34,21 @@ namespace DataPowerTools.PowerTools
             /// <summary>Keywords are enclosed in backticks aka grave accents (ASCII code 96). Used by MySQL, SQLite.</summary>
             Backtick = 3
         }
-        
-        /// <summary>
-        /// Generates a parameterized MySQL INSERT statement from the given object and adds it to the <see cref="DbCommand" />
-        /// .
-        /// <para>
-        /// Note that the generated query also selects the last inserted id using MySQL's SELECT LAST_INSERT_ID() function.
-        /// </para>
-        /// </summary>
-        /// <param name="dbCommand"><see cref="DbCommand" /> instance.</param>
-        /// <param name="obj">Object to generate the SQL INSERT statement from.</param>
-        /// <param name="tableName">
-        /// Optional table name to insert into. If none is supplied, it will use the type name. Note that this parameter is
-        /// required when passing in an anonymous object or an <see cref="ArgumentNullException" /> will be thrown.
-        /// </param>
-        /// <returns>The given <see cref="DbCommand" /> instance.</returns>
-        /// <exception cref="ArgumentNullException">
-        /// The value of 'tableName' cannot be null when the object passed is an anonymous
-        /// type.
-        /// </exception>
-        public DbCommand AppendInsertForMySql(DbCommand dbCommand, object obj, string tableName = null)
+
+        private struct SqlInsertInfo
         {
-            const string mySqlInsertStatementTemplate = @"
+            public string InsertTemplate { get; set; }
+            public KeywordEscapeMethod KeywordEscapeMethod { get; set; }
+        }
+
+        private static SqlInsertInfo GetInsertTemplate(DatabaseEngine databaseEngine)
+        {
+            switch (databaseEngine)
+            {
+                case DatabaseEngine.MySql:
+                    return new SqlInsertInfo
+                    {
+                        InsertTemplate = @"
 INSERT INTO {0}
 ({1}
 )
@@ -56,32 +56,14 @@ VALUES
 ({2}
 );
 SELECT LAST_INSERT_ID() AS LastInsertedId;
-"; // Intentional line break for readability of multiple inserts
-
-            return AppendInsertCommand(dbCommand, obj, mySqlInsertStatementTemplate, tableName, KeywordEscapeMethod.Backtick);
-        }
-
-        /// <summary>
-        /// Generates a parameterized PostgreSQL INSERT statement from the given object and adds it to the <see cref="DbCommand" />
-        /// .
-        /// <para>
-        /// Note that the generated query also selects the last inserted id using PostgreSQL's LastVal() function.
-        /// </para>
-        /// </summary>
-        /// <param name="dbCommand"><see cref="DbCommand" /> instance.</param>
-        /// <param name="obj">Object to generate the SQL INSERT statement from.</param>
-        /// <param name="tableName">
-        /// Optional table name to insert into. If none is supplied, it will use the type name. Note that this parameter is
-        /// required when passing in an anonymous object or an <see cref="ArgumentNullException" /> will be thrown.
-        /// </param>
-        /// <returns>The given <see cref="DbCommand" /> instance.</returns>
-        /// <exception cref="ArgumentNullException">
-        /// The value of 'tableName' cannot be null when the object passed is an anonymous
-        /// type.
-        /// </exception>
-        public DbCommand AppendInsertForPostgreSql(DbCommand dbCommand, object obj, string tableName = null)
-        {
-            const string postgreSqlInsertStatementTemplate = @"
+",
+                        KeywordEscapeMethod = KeywordEscapeMethod.Backtick
+                    }
+                    ;
+                case DatabaseEngine.Postgre:
+                    return new SqlInsertInfo
+                    {
+                        InsertTemplate = @"
 INSERT INTO {0}
 ({1}
 )
@@ -89,33 +71,13 @@ VALUES
 ({2}
 );
 select LastVal();
-";
-
-            return AppendInsertCommand(dbCommand, obj, postgreSqlInsertStatementTemplate, tableName, KeywordEscapeMethod.None);
-        }
-
-        /// <summary>
-        /// Generates a parameterized SQLite INSERT statement from the given object and adds it to the <see cref="DbCommand" />
-        /// .
-        /// <para>
-        /// Note that the generated query also selects the last inserted id using SQLite's SELECT last_insert_rowid() function.
-        /// </para>
-        /// </summary>
-        /// <param name="dbCommand"><see cref="DbCommand" /> instance.</param>
-        /// <param name="obj">Object to generate the SQL INSERT statement from.</param>
-        /// <param name="tableName">
-        /// Optional table name to insert into. If none is supplied, it will use the type name. Note that this parameter is
-        /// required when passing in an anonymous object or an <see cref="ArgumentNullException" /> will be thrown.
-        /// </param>
-        /// <returns>The given <see cref="DbCommand" /> instance.</returns>
-        /// <exception cref="ArgumentNullException">
-        /// The value of 'tableName' cannot be null when the object passed is an anonymous
-        /// type.
-        /// </exception>
-        // ReSharper disable once InconsistentNaming
-        public DbCommand AppendInsertForSQLite(DbCommand dbCommand, object obj, string tableName = null)
-        {
-            const string sqliteInsertStatementTemplate = @"
+",
+                        KeywordEscapeMethod = KeywordEscapeMethod.None
+                    };
+                case DatabaseEngine.Sqlite:
+                        return new SqlInsertInfo
+                        {
+                            InsertTemplate = @"
 INSERT INTO {0}
 ({1}
 )
@@ -123,32 +85,13 @@ VALUES
 ({2}
 );
 SELECT last_insert_rowid() AS [LastInsertedId];
-"; // Intentional line break for readability of multiple inserts
-
-            return AppendInsertCommand(dbCommand, obj, sqliteInsertStatementTemplate, tableName, KeywordEscapeMethod.SquareBracket);
-        }
-        
-        /// <summary>
-        /// Generates a parameterized SQL Server INSERT statement from the given object and adds it to the
-        /// <see cref="DbCommand" />.
-        /// <para>
-        /// Note that the generated query also selects the last inserted id using SQL Server's SELECT SCOPE_IDENTITY() function.
-        /// </para>
-        /// </summary>
-        /// <param name="dbCommand"><see cref="DbCommand" /> instance.</param>
-        /// <param name="obj">Object to generate the SQL INSERT statement from.</param>
-        /// <param name="tableName">
-        /// Optional table name to insert into. If none is supplied, it will use the type name. Note that this parameter is
-        /// required when passing in an anonymous object or an <see cref="ArgumentNullException" /> will be thrown.
-        /// </param>
-        /// <returns>The given <see cref="DbCommand" /> instance.</returns>
-        /// <exception cref="ArgumentNullException">
-        /// The value of 'tableName' cannot be null when the object passed is an anonymous
-        /// type.
-        /// </exception>
-        public DbCommand AppendInsertForSqlServer(DbCommand dbCommand, object obj, string tableName = null)
-        {
-            const string sqlServerInsertStatementTemplate = @"
+",
+                            KeywordEscapeMethod = KeywordEscapeMethod.SquareBracket
+                        };
+                case DatabaseEngine.SqlServer:
+                        return new SqlInsertInfo
+                        {
+                            InsertTemplate = @"
 INSERT INTO {0}
 ({1}
 )
@@ -156,37 +99,72 @@ VALUES
 ({2}
 );
 SELECT SCOPE_IDENTITY() AS [LastInsertedId];
-"; // Intentional line break for readability of multiple inserts
-
-            return AppendInsertCommand(dbCommand, obj, sqlServerInsertStatementTemplate, tableName, KeywordEscapeMethod.SquareBracket);
+",
+                            KeywordEscapeMethod = KeywordEscapeMethod.SquareBracket
+                        };
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(databaseEngine), databaseEngine, null);
+            }
         }
+
+        /// <summary>
+        /// Generates a parameterized MySQL INSERT statement from the given object and adds it to the <see cref="DbCommand" />
+        /// </summary>
+        /// <param name="dbCommand"><see cref="DbCommand" /> instance to append inserts to.</param>
+        /// <param name="obj">Object to generate the SQL INSERT statement from.</param>
+        /// <param name="destinationTableName"></param>
+        public DbCommand AppendInsert(DbCommand dbCommand, object obj, string destinationTableName)
+        {
+            var i = GetInsertTemplate(DatabaseEngine);
+
+            return AppendInsertCommand(dbCommand, obj, i.InsertTemplate, destinationTableName, i.KeywordEscapeMethod);
+        }
+
+
+        /// <summary>
+        /// Generates a parameterized MySQL INSERT statement from the given object and adds it to the <see cref="DbCommand" />
+        /// </summary>
+        /// <param name="dbCommand"><see cref="DbCommand" /> instance to append inserts to.</param>
+        /// <param name="dataRecord">Record to generate the SQL INSERT statement from.</param>
+        /// <param name="destinationTableName"></param>
+        public DbCommand AppendInsert(DbCommand dbCommand, IDataRecord dataRecord, string destinationTableName)
+        {
+            var i = GetInsertTemplate(DatabaseEngine);
+
+            return AppendInsertCommand(dbCommand, dataRecord, i.InsertTemplate, destinationTableName, i.KeywordEscapeMethod);
+        }
+
+        /// <summary>
+        /// Generates a parameterized SQL INSERT statement from the given object and adds it to the
+        /// <see cref="DbCommand" />.
+        /// </summary>
+        public DbCommand AppendInsertCommand(DbCommand dbCommand, object obj, string sqlInsertStatementTemplate, string tableName, KeywordEscapeMethod keywordEscapeMethod = KeywordEscapeMethod.None)
+        {
+            if (obj == null)
+            {
+                throw new ArgumentNullException(nameof(obj));
+            }
+            
+            var typeAccessor = TypeAccessorCache.GetTypeAccessor(obj);
+
+            var namesAndValues = obj.GetPropertyAndFieldNamesAndValues(typeAccessor);
+
+            return AppendInsertCommand(dbCommand, namesAndValues, sqlInsertStatementTemplate, tableName,
+                keywordEscapeMethod);
+        }
+
         
         /// <summary>
         /// Generates a parameterized SQL INSERT statement from the given object and adds it to the
         /// <see cref="DbCommand" />.
         /// </summary>
-        /// <param name="dbCommand"><see cref="DbCommand" /> instance.</param>
-        /// <param name="obj">Object to generate the SQL INSERT statement from.</param>
-        /// <param name="sqlInsertStatementTemplate">
-        /// SQL INSERT statement template where argument 0 is the table name, argument 1 is the comma delimited list of columns,
-        /// and argument 2 is the comma delimited list of values.
-        /// <para>Example: INSERT INTO {0} ({1}) VALUES({2});</para>
-        /// </param>
-        /// <param name="tableName">
-        /// Optional table name to insert into. If none is supplied, it will use the type name. Note that this parameter is
-        /// required when passing in an anonymous object or an <see cref="ArgumentNullException" /> will be thrown.
-        /// </param>
-        /// <param name="keywordEscapeMethod">The method used for escaping keywords.</param>
-        /// <returns>The given <see cref="DbCommand" /> instance.</returns>
-        /// <exception cref="ArgumentNullException">
-        /// The value of 'tableName' cannot be null when the object passed is an anonymous
-        /// type.
-        /// </exception>
-        public DbCommand AppendInsertCommand(DbCommand dbCommand, object obj, string sqlInsertStatementTemplate, string tableName = null, KeywordEscapeMethod keywordEscapeMethod = KeywordEscapeMethod.None)
+        public DbCommand AppendInsertCommand(DbCommand dbCommand, IDictionary<string, object> columnNamesAndValues, string sqlInsertStatementTemplate, string tableName, KeywordEscapeMethod keywordEscapeMethod = KeywordEscapeMethod.None)
         {
-            if (obj == null)
+            //TODO: do we really want this a dictionary?? seems like a waste to do all that hashing when building it
+
+            if (columnNamesAndValues == null)
             {
-                throw new ArgumentNullException(nameof(obj));
+                throw new ArgumentNullException(nameof(columnNamesAndValues));
             }
 
             if (sqlInsertStatementTemplate == null)
@@ -204,29 +182,14 @@ SELECT SCOPE_IDENTITY() AS [LastInsertedId];
                 throw new Exception("The 'sqlInsertStatementTemplate' parameter does not conform to the template requirements of containing three string.Format arguments. A valid example is: INSERT INTO {0} ({1}) VALUES({2});");
             }
 
-            if (tableName == null && obj.IsAnonymousType())
-            {
-                throw new ArgumentNullException(nameof(tableName), "The 'tableName' parameter must be provided when the object supplied is an anonymous type.");
-            }
-            
             GetEscapeStrings(keywordEscapeMethod, out var preKeywordEscapeCharacter, out var postKeywordEscapeCharacter);
-
-            if (tableName == null)
-            {
-                tableName = $"{preKeywordEscapeCharacter}{obj.GetType().Name}{postKeywordEscapeCharacter}";
-            }
-
+            
             var linePrefix = Environment.NewLine + "\t";
 
             var columns = string.Empty;
-
             var values = string.Empty;
-
-            var typeAccessor = TypeAccessorCache.GetTypeAccessor(obj);
-
-            var namesAndValues = obj.GetPropertyAndFieldNamesAndValues(typeAccessor);
-
-            foreach (var nameAndValue in namesAndValues)
+            
+            foreach (var nameAndValue in columnNamesAndValues)
             {
                 if (nameAndValue.Value == null)
                     continue;
@@ -246,6 +209,62 @@ SELECT SCOPE_IDENTITY() AS [LastInsertedId];
 
             return dbCommand;
         }
+
+        /// <summary>
+        /// Generates a parameterized SQL INSERT statement from the given object and adds it to the
+        /// <see cref="DbCommand" />.
+        /// </summary>
+        public DbCommand AppendInsertCommand(DbCommand dbCommand, IDataRecord dataRecord, string sqlInsertStatementTemplate, string tableName, KeywordEscapeMethod keywordEscapeMethod = KeywordEscapeMethod.None)
+        {
+            if (dataRecord == null)
+            {
+                throw new ArgumentNullException(nameof(dataRecord));
+            }
+
+            if (sqlInsertStatementTemplate == null)
+            {
+                throw new ArgumentNullException(nameof(sqlInsertStatementTemplate));
+            }
+
+            if (string.IsNullOrWhiteSpace(sqlInsertStatementTemplate))
+            {
+                throw new ArgumentNullException(nameof(sqlInsertStatementTemplate), "The 'sqlInsertStatementTemplate' parameter must not be null, empty, or whitespace.");
+            }
+
+            if (sqlInsertStatementTemplate.Contains("{0}") == false || sqlInsertStatementTemplate.Contains("{1}") == false || sqlInsertStatementTemplate.Contains("{2}") == false)
+            {
+                throw new Exception("The 'sqlInsertStatementTemplate' parameter does not conform to the template requirements of containing three string.Format arguments. A valid example is: INSERT INTO {0} ({1}) VALUES({2});");
+            }
+
+            GetEscapeStrings(keywordEscapeMethod, out var preKeywordEscapeCharacter, out var postKeywordEscapeCharacter);
+
+            var linePrefix = Environment.NewLine + "\t";
+
+            var columns = string.Empty;
+            var values = string.Empty;
+
+            for (var i = 0; i < dataRecord.FieldCount; i++)
+            {
+                var columnName = dataRecord.GetName(i);
+                var columnValue = dataRecord[i];
+                
+                columns += linePrefix + preKeywordEscapeCharacter + columnName + postKeywordEscapeCharacter + ",";
+
+                // Note that we are appending the ordinal parameter position as a suffix to the parameter name in order to create
+                // some uniqueness for each parameter name so that this method can be called repeatedly as well as to aid in debugging.
+                var parameterName = "@" + columnName + "_p" + dbCommand.Parameters.Count;
+
+                values += linePrefix + parameterName + ",";
+
+                dbCommand.AddParameter(parameterName, columnValue);
+            }
+
+            dbCommand.AppendCommandText(string.Format(sqlInsertStatementTemplate, tableName, columns.TrimEnd(','), values.TrimEnd(',')));
+
+            return dbCommand;
+        }
+
+
 
         private static void GetEscapeStrings(KeywordEscapeMethod keywordEscapeMethod, out string preKeywordEscapeCharacter, out string postKeywordEscapeCharacter)
         {

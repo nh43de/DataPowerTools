@@ -354,25 +354,10 @@ namespace DataPowerTools.Extensions
         /// <param name="dbCommand"></param>
         /// <param name="destinationTableName"></param>
         /// <param name="databaseEngine"></param>
-        public static void AppendInsertStatementToCommand(this object obj, DbCommand dbCommand, string destinationTableName, DatabaseEngine databaseEngine)
+        public static void AppendInsertStatementToCommand(this object obj, DbCommand dbCommand,
+            string destinationTableName, DatabaseEngine databaseEngine)
         {
-            switch (databaseEngine)
-            {
-                case DatabaseEngine.MySql:
-                    dbCommand.AppendInsertForMySql(obj, destinationTableName);
-                    break;
-                case DatabaseEngine.Postgre:
-                    dbCommand.AppendInsertForPostgreSql(obj, destinationTableName);
-                    break;
-                case DatabaseEngine.Sqlite:
-                    dbCommand.AppendInsertForSQLite(obj, destinationTableName);
-                    break;
-                case DatabaseEngine.SqlServer:
-                    dbCommand.AppendInsertForSqlServer(obj, destinationTableName);
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(databaseEngine), databaseEngine, null);
-            }
+            dbCommand.AppendInsert(obj, destinationTableName, databaseEngine);
         }
     }
 

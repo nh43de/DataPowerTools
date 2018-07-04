@@ -371,218 +371,26 @@ namespace DataPowerTools.Extensions
 
             return commandText;
         }
-
-
-
-
-        /// <summary>
-        /// Generates a parameterized MySQL INSERT statement from the given object and adds it to the <see cref="DbCommand" />
-        /// .
-        /// <para>
-        /// Note that the generated query also selects the last inserted id using MySQL's SELECT LAST_INSERT_ID() function.
-        /// </para>
-        /// </summary>
-        /// <param name="dbCommand"><see cref="DbCommand" /> instance.</param>
-        /// <param name="obj">Object to generate the SQL INSERT statement from.</param>
-        /// <param name="tableName">
-        /// Optional table name to insert into. If none is supplied, it will use the type name. Note that this parameter is
-        /// required when passing in an anonymous object or an <see cref="ArgumentNullException" /> will be thrown.
-        /// </param>
-        /// <returns>The given <see cref="DbCommand" /> instance.</returns>
-        /// <exception cref="ArgumentNullException">
-        /// The value of 'tableName' cannot be null when the object passed is an anonymous
-        /// type.
-        /// </exception>
-        public static DbCommand AppendInsertForMySql(this DbCommand dbCommand, object obj, string tableName = null)
-        {
-            return new InsertCommandSqlBuilder().AppendInsertForMySql(dbCommand, obj, tableName);
-        }
-
-        /// <summary>
-        /// Generates a parameterized PostgreSQL INSERT statement from the given object and adds it to the <see cref="DbCommand" />
-        /// .
-        /// <para>
-        /// Note that the generated query also selects the last inserted id using PostgreSQL's LastVal() function.
-        /// </para>
-        /// </summary>
-        /// <param name="dbCommand"><see cref="DbCommand" /> instance.</param>
-        /// <param name="obj">Object to generate the SQL INSERT statement from.</param>
-        /// <param name="tableName">
-        /// Optional table name to insert into. If none is supplied, it will use the type name. Note that this parameter is
-        /// required when passing in an anonymous object or an <see cref="ArgumentNullException" /> will be thrown.
-        /// </param>
-        /// <returns>The given <see cref="DbCommand" /> instance.</returns>
-        /// <exception cref="ArgumentNullException">
-        /// The value of 'tableName' cannot be null when the object passed is an anonymous
-        /// type.
-        /// </exception>
-        public static DbCommand AppendInsertForPostgreSql(this DbCommand dbCommand, object obj, string tableName = null)
-        {
-            return new InsertCommandSqlBuilder().AppendInsertForPostgreSql(dbCommand, obj, tableName);
-        }
-
-        /// <summary>
-        /// Generates a parameterized SQLite INSERT statement from the given object and adds it to the <see cref="DbCommand" />
-        /// .
-        /// <para>
-        /// Note that the generated query also selects the last inserted id using SQLite's SELECT last_insert_rowid() function.
-        /// </para>
-        /// </summary>
-        /// <param name="dbCommand"><see cref="DbCommand" /> instance.</param>
-        /// <param name="obj">Object to generate the SQL INSERT statement from.</param>
-        /// <param name="tableName">
-        /// Optional table name to insert into. If none is supplied, it will use the type name. Note that this parameter is
-        /// required when passing in an anonymous object or an <see cref="ArgumentNullException" /> will be thrown.
-        /// </param>
-        /// <returns>The given <see cref="DbCommand" /> instance.</returns>
-        /// <exception cref="ArgumentNullException">
-        /// The value of 'tableName' cannot be null when the object passed is an anonymous
-        /// type.
-        /// </exception>
-        // ReSharper disable once InconsistentNaming
-        public static DbCommand AppendInsertForSQLite(this DbCommand dbCommand, object obj, string tableName = null)
-        {
-            return new InsertCommandSqlBuilder().AppendInsertForSQLite(dbCommand, obj, tableName);
-        }
-
-
-        /// <summary>
-        /// Generates a parameterized SQL Server INSERT statement from the given object and adds it to the
-        /// <see cref="DbCommand" />.
-        /// <para>
-        /// Note that the generated query also selects the last inserted id using SQL Server's SELECT SCOPE_IDENTITY() function.
-        /// </para>
-        /// </summary>
-        /// <param name="dbCommand"><see cref="DbCommand" /> instance.</param>
-        /// <param name="obj">Object to generate the SQL INSERT statement from.</param>
-        /// <param name="tableName">
-        /// Optional table name to insert into. If none is supplied, it will use the type name. Note that this parameter is
-        /// required when passing in an anonymous object or an <see cref="ArgumentNullException" /> will be thrown.
-        /// </param>
-        /// <returns>The given <see cref="DbCommand" /> instance.</returns>
-        /// <exception cref="ArgumentNullException">
-        /// The value of 'tableName' cannot be null when the object passed is an anonymous
-        /// type.
-        /// </exception>
-        public static DbCommand AppendInsertForSqlServer(this DbCommand dbCommand, object obj, string tableName = null)
-        {
-            return new InsertCommandSqlBuilder().AppendInsertForSqlServer(dbCommand, obj, tableName);
-        }
         
+        /// <summary>
+        /// Generates a parameterized MySQL INSERT statement from the given object and adds it to the <see cref="DbCommand" />.
+        /// </summary>
+        public static DbCommand AppendInsert(this DbCommand dbCommand, object obj, string destinationTableName, DatabaseEngine databaseEngine)
+        {
+            return new InsertCommandSqlBuilder(databaseEngine).AppendInsert(dbCommand, obj, destinationTableName);
+        }
+
         /// <summary>
         /// Generates a list of concatenated parameterized MySQL INSERT statements from the given list of objects and adds it to
         /// the <see cref="DbCommand" />.
-        /// <para>
-        /// Note that the generated query also selects the last inserted id using MySQL's SELECT LAST_INSERT_ID() function.
-        /// </para>
         /// </summary>
-        /// <typeparam name="T">Type of the objects in the list.</typeparam>
-        /// <param name="dbCommand"><see cref="DbCommand" /> instance.</param>
-        /// <param name="objects">List of objects to generate the SQL INSERT statements from.</param>
-        /// <param name="tableName">
-        /// Optional table name to insert into. If none is supplied, it will use the type name. Note that this parameter is
-        /// required when passing in an anonymous object or an <see cref="ArgumentNullException" /> will be thrown.
-        /// </param>
-        /// <returns>The given <see cref="DbCommand" /> instance.</returns>
-        /// <exception cref="ArgumentNullException">
-        /// The value of 'tableName' cannot be null when the object passed is an anonymous
-        /// type.
-        /// </exception>
-        public static DbCommand AppendInsertsForMySql<T>(this DbCommand dbCommand, IEnumerable<T> objects, string tableName = null)
+        public static DbCommand AppendInserts<T>(this DbCommand dbCommand, IEnumerable<T> objects, string destinationTableName, DatabaseEngine databaseEngine)
         {
-            var sqlBuilder = new InsertCommandSqlBuilder();
+            var sqlBuilder = new InsertCommandSqlBuilder(databaseEngine);
 
             foreach (var obj in objects)
             {
-                sqlBuilder.AppendInsertForMySql(dbCommand, obj, tableName);
-            }
-
-            return dbCommand;
-        }
-        
-        /// <summary>
-        /// Generates a list of concatenated parameterized PostgreSQL INSERT statements from the given list of objects and adds it to
-        /// the <see cref="DbCommand" />.
-        /// <para>
-        /// Note that the generated query also selects the last inserted id using PostgreSQL's LastVal() function.
-        /// </para>
-        /// </summary>
-        /// <typeparam name="T">Type of the objects in the list.</typeparam>
-        /// <param name="dbCommand"><see cref="DbCommand" /> instance.</param>
-        /// <param name="objects">List of objects to generate the SQL INSERT statements from.</param>
-        /// <param name="tableName">
-        /// Optional table name to insert into. If none is supplied, it will use the type name. Note that this parameter is
-        /// required when passing in an anonymous object or an <see cref="ArgumentNullException" /> will be thrown.
-        /// </param>
-        /// <returns>The given <see cref="DbCommand" /> instance.</returns>
-        /// <exception cref="ArgumentNullException">
-        /// The value of 'tableName' cannot be null when the object passed is an anonymous
-        /// type.
-        /// </exception>
-        public static DbCommand AppendInsertsForPostgreSql<T>(this DbCommand dbCommand, IEnumerable<T> objects, string tableName = null)
-        {
-            foreach (var obj in objects)
-            {
-                dbCommand.AppendInsertForPostgreSql(obj, tableName);
-            }
-
-            return dbCommand;
-        }
-        
-        /// <summary>
-        /// Generates a list of concatenated parameterized SQLite INSERT statements from the given list of objects and adds it to
-        /// the <see cref="DbCommand" />.
-        /// <para>
-        /// Note that the generated query also selects the last inserted id using SQLite's SELECT last_insert_rowid() function.
-        /// </para>
-        /// </summary>
-        /// <typeparam name="T">Type of the objects in the list.</typeparam>
-        /// <param name="dbCommand"><see cref="DbCommand" /> instance.</param>
-        /// <param name="objects">List of objects to generate the SQL INSERT statements from.</param>
-        /// <param name="tableName">
-        /// Optional table name to insert into. If none is supplied, it will use the type name. Note that this parameter is
-        /// required when passing in an anonymous object or an <see cref="ArgumentNullException" /> will be thrown.
-        /// </param>
-        /// <returns>The given <see cref="DbCommand" /> instance.</returns>
-        /// <exception cref="ArgumentNullException">
-        /// The value of 'tableName' cannot be null when the object passed is an anonymous
-        /// type.
-        /// </exception>
-        // ReSharper disable once InconsistentNaming
-        public static DbCommand AppendInsertsForSQLite<T>(this DbCommand dbCommand, IEnumerable<T> objects, string tableName = null)
-        {
-            foreach (var obj in objects)
-            {
-                dbCommand.AppendInsertForSQLite(obj, tableName);
-            }
-
-            return dbCommand;
-        }
-
-        /// <summary>
-        /// Generates a list of concatenated parameterized SQL Server INSERT statements from the given list of objects and adds it
-        /// to the <see cref="DbCommand" />.
-        /// <para>
-        /// Note that the generated query also selects the last inserted id using SQL Server's SELECT SCOPE_IDENTITY() function.
-        /// </para>
-        /// </summary>
-        /// <typeparam name="T">Type of the objects in the list.</typeparam>
-        /// <param name="dbCommand"><see cref="DbCommand" /> instance.</param>
-        /// <param name="objects">List of objects to generate the SQL INSERT statements from.</param>
-        /// <param name="tableName">
-        /// Optional table name to insert into. If none is supplied, it will use the type name. Note that this parameter is
-        /// required when passing in an anonymous object or an <see cref="ArgumentNullException" /> will be thrown.
-        /// </param>
-        /// <returns>The given <see cref="DbCommand" /> instance.</returns>
-        /// <exception cref="ArgumentNullException">
-        /// The value of 'tableName' cannot be null when the object passed is an anonymous
-        /// type.
-        /// </exception>
-        public static DbCommand AppendInsertsForSqlServer<T>(this DbCommand dbCommand, IEnumerable<T> objects, string tableName = null)
-        {
-            foreach (var obj in objects)
-            {
-                dbCommand.AppendInsertForSqlServer(obj, tableName);
+                sqlBuilder.AppendInsert(dbCommand, obj, destinationTableName);
             }
 
             return dbCommand;
