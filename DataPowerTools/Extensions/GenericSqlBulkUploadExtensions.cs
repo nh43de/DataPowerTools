@@ -15,12 +15,12 @@ using Sqlite.Extensions;
 namespace DataPowerTools.Extensions
 {
     /// <summary>
-    /// Methods that assist in bulk uploading to the databases. These need to be cleaned up and unified as there is a lot of duplicated code.
+    /// This generates inserts statements. Methods that assist in bulk uploading to the databases. These need to be cleaned up and unified as there is a lot of duplicated code.
     /// </summary>
     public static class GenericSqlBulkUploadExtensions
     {
         /// <summary>
-        /// Bulk upload enumerable using a server/database name.
+        /// Bulk upload enumerable by generating insert statements. If using sql server, use SqlServer extension methods instead.
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="items"></param>
@@ -39,9 +39,9 @@ namespace DataPowerTools.Extensions
 
             await d.WriteToServer(items.ToDataReader(), destinationTable, databaseEngine);
         }
-        
+
         /// <summary>
-        /// Bulk insert data table.
+        /// Bulk insert data table. If using sql server, use SqlServer extension methods instead.
         /// </summary>
         /// <param name="data"></param>
         /// <param name="destinationTableName"></param>
@@ -59,9 +59,9 @@ namespace DataPowerTools.Extensions
 
             await bulkCopy.WriteToServer(data.ToDataReader(), destinationTableName, databaseEngine);
         }
-        
+
         /// <summary>
-        /// Bulk insert data reader synchronously.
+        /// Bulk insert data reader synchronously. If using sql server, use SqlServer extension methods instead.
         /// </summary>
         /// <param name="dataReader"></param>
         /// <param name="connection"></param>
@@ -87,7 +87,7 @@ namespace DataPowerTools.Extensions
         /// <param name="connection"></param>
         /// <param name="sqlServerBulkInsertOptions"></param>
         /// <returns></returns>
-        public static GenericBulkCopy GetBulkCopy(
+        private static GenericBulkCopy GetBulkCopy(
             string destinationTableName,
             DbConnection connection,
             GenericBulkCopyOptions sqlServerBulkInsertOptions = null)

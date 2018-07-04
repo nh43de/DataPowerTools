@@ -13,6 +13,7 @@ using DataPowerTools.PowerTools;
 namespace DataPowerTools.Extensions
 {
     /// <summary>
+    /// These are specific to SQL SERVER, and uses bcp (bulkcopy) to load records into db very quickly.
     /// Methods that assist in bulk uploading to the databases. These need to be cleaned up and unified as there is a lot of duplicated code.
     /// </summary>
     public static class SqlServerBulkUploadExtensions
