@@ -41,55 +41,6 @@ namespace DataPowerTools.Extensions
         //}
 
 
-        /// <summary>
-        /// Bulk upload enumerable using a server/database name.
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="items"></param>
-        /// <param name="destinationServer"></param>
-        /// <param name="destinationDatabase"></param>
-        /// <param name="destinationTable"></param>
-        /// <param name="sqlServerBulkInsertOptions"></param>
-        /// <param name="members"></param>
-        public static void BulkUploadSqlServer<T>(
-            this IEnumerable<T> items,
-            string destinationServer,
-            string destinationDatabase,
-            string destinationTable,
-            SqlServerBulkInsertOptions sqlServerBulkInsertOptions = null,
-            IEnumerable<string> members = null)
-        {
-            var cs = Database.GetConnectionString(destinationDatabase, destinationServer);
-
-            BulkUploadSqlServer(items, cs, destinationTable, sqlServerBulkInsertOptions, members);
-        }
-        
-        /// <summary>
-        /// Bulk upload enumerable using a connection string.
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="items"></param>
-        /// <param name="connectionString"></param>
-        /// <param name="destinationTable"></param>
-        /// <param name="sqlServerBulkInsertOptions"></param>
-        /// <param name="members"></param>
-        public static void BulkUploadSqlServer<T>(
-            this IEnumerable<T> items,
-            string connectionString,
-            string destinationTable,
-            SqlServerBulkInsertOptions sqlServerBulkInsertOptions = null,
-            IEnumerable<string> members = null
-        )
-        {
-            members = members ?? 
-                typeof(T).GetProperties().Where(p =>
-                        (p.GetGetMethod().IsVirtual == false) && p.GetGetMethod().IsPublic && //TODO: this will have to change if we use dynamic proxies (we use this to skip navigation properties)
-                        (p.GetIndexParameters().Length == 0)).Select(p => p.Name).ToArray();
-            
-            var uploadReader = items.ToDataReader(members?.ToArray());
-
-            uploadReader.BulkInsertSqlServer(connectionString, destinationTable, sqlServerBulkInsertOptions ?? new SqlServerBulkInsertOptions());
-        }
         
         /// <summary>
         /// Returns a SortedDictionary of the source dictionary.
