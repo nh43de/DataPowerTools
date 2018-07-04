@@ -395,7 +395,7 @@ namespace DataPowerTools.Extensions
         /// </exception>
         public static DbCommand AppendInsertForMySql(this DbCommand dbCommand, object obj, string tableName = null)
         {
-            return InsertSqlBuilder.AppendInsertForMySql(dbCommand, obj, tableName);
+            return CreateInsertSql.AppendInsertForMySql(dbCommand, obj, tableName);
         }
 
         /// <summary>
@@ -418,7 +418,7 @@ namespace DataPowerTools.Extensions
         /// </exception>
         public static DbCommand AppendInsertForPostgreSql(this DbCommand dbCommand, object obj, string tableName = null)
         {
-            return InsertSqlBuilder.AppendInsertForPostgreSql(dbCommand, obj, tableName);
+            return CreateInsertSql.AppendInsertForPostgreSql(dbCommand, obj, tableName);
         }
 
         /// <summary>
@@ -442,7 +442,7 @@ namespace DataPowerTools.Extensions
         // ReSharper disable once InconsistentNaming
         public static DbCommand AppendInsertForSQLite(this DbCommand dbCommand, object obj, string tableName = null)
         {
-            return InsertSqlBuilder.AppendInsertForSQLite(dbCommand, obj, tableName);
+            return CreateInsertSql.AppendInsertForSQLite(dbCommand, obj, tableName);
         }
 
 
@@ -466,7 +466,7 @@ namespace DataPowerTools.Extensions
         /// </exception>
         public static DbCommand AppendInsertForSqlServer(this DbCommand dbCommand, object obj, string tableName = null)
         {
-            return InsertSqlBuilder.AppendInsertForSqlServer(dbCommand, obj, tableName);
+            return CreateInsertSql.AppendInsertForSqlServer(dbCommand, obj, tableName);
         }
         
         /// <summary>

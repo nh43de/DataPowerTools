@@ -8,7 +8,7 @@ using DataPowerTools.Extensions;
 
 namespace DataPowerTools.PowerTools
 {
-    public static class InsertSqlBuilder
+    public static class CreateInsertSql
     {
         /// <summary>
         /// The method used for escaping keywords.
@@ -56,7 +56,7 @@ VALUES
 SELECT LAST_INSERT_ID() AS LastInsertedId;
 "; // Intentional line break for readability of multiple inserts
 
-            return AppendInsertCommand(dbCommand, obj, mySqlInsertStatementTemplate, tableName, InsertSqlBuilder.KeywordEscapeMethod.Backtick);
+            return AppendInsertCommand(dbCommand, obj, mySqlInsertStatementTemplate, tableName, CreateInsertSql.KeywordEscapeMethod.Backtick);
         }
 
         /// <summary>
@@ -89,7 +89,7 @@ VALUES
 select LastVal();
 ";
 
-            return AppendInsertCommand(dbCommand, obj, postgreSqlInsertStatementTemplate, tableName, InsertSqlBuilder.KeywordEscapeMethod.None);
+            return AppendInsertCommand(dbCommand, obj, postgreSqlInsertStatementTemplate, tableName, CreateInsertSql.KeywordEscapeMethod.None);
         }
 
         /// <summary>
@@ -123,7 +123,7 @@ VALUES
 SELECT last_insert_rowid() AS [LastInsertedId];
 "; // Intentional line break for readability of multiple inserts
 
-            return AppendInsertCommand(dbCommand, obj, sqliteInsertStatementTemplate, tableName, InsertSqlBuilder.KeywordEscapeMethod.SquareBracket);
+            return AppendInsertCommand(dbCommand, obj, sqliteInsertStatementTemplate, tableName, CreateInsertSql.KeywordEscapeMethod.SquareBracket);
         }
         
         /// <summary>
@@ -156,7 +156,7 @@ VALUES
 SELECT SCOPE_IDENTITY() AS [LastInsertedId];
 "; // Intentional line break for readability of multiple inserts
 
-            return AppendInsertCommand(dbCommand, obj, sqlServerInsertStatementTemplate, tableName, InsertSqlBuilder.KeywordEscapeMethod.SquareBracket);
+            return AppendInsertCommand(dbCommand, obj, sqlServerInsertStatementTemplate, tableName, CreateInsertSql.KeywordEscapeMethod.SquareBracket);
         }
         
         /// <summary>
