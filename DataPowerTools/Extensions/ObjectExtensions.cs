@@ -6,6 +6,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using DataPowerTools.Extensions.MiscUtil.Reflection;
+using DataPowerTools.FastMember;
 using DataPowerTools.PowerTools;
 
 namespace DataPowerTools.Extensions
@@ -133,40 +134,40 @@ namespace DataPowerTools.Extensions
                 throw new InvalidCastException("The type " + @this.GetType().Name + " does have a property named " + name + ", but it is of type " + ret.GetType().Name + ", not " + typeof(T).Name + ".");
             }
         }
-        
+
         /// <summary>Gets a dictionary containing the objects property and field names and values.</summary>
         /// <param name="obj">Object to get names and values from.</param>
         /// <returns>Dictionary containing property and field names and values.</returns>
         public static IDictionary<string, object> GetPropertyAndFieldNamesAndValues(this object obj)
         {
-            //TODO: replace with fastmember
-            if (obj is IDictionary<string, object> objectAsDictionary)
-                return objectAsDictionary;
+            var accessor = obj.GetTypeAccessor();
 
+            return obj.GetPropertyAndFieldNamesAndValues(accessor);
+        }
+
+        /// <summary>
+        /// Gets the type accessor the object's underlying type.
+        /// </summary>
+        /// <param name="obj"></param>
+        /// <returns></returns>
+        public static TypeAccessor GetTypeAccessor(this object obj)
+        {
             var type = obj.GetType();
 
-            var orderedDictionary = type.GetPropertiesAndFields();
+            return TypeAccessor.Create(type);
+        }
 
-            var dictionary = new Dictionary<string, object>();
+        /// <summary>Gets a dictionary containing the objects property and field names and values.</summary>
+        /// <param name="obj">Object to get names and values from.</param>
+        /// <param name="accessor">The type accessor to use.</param>
+        /// <returns>Dictionary containing property and field names and values.</returns>
+        public static IDictionary<string, object> GetPropertyAndFieldNamesAndValues(this object obj, TypeAccessor accessor)
+        {
+            var props = accessor.GetMembers().ToDictionary(
+                p => p.Name,
+                p => accessor[obj, p.Name]);
 
-            foreach (var entry in orderedDictionary)
-            {
-                object value = null;
-
-                switch (entry.Value)
-                {
-                    case FieldInfo fieldInfo:
-                        value = fieldInfo.GetValue(obj);
-                        break;
-                    case PropertyInfo propertyInfo:
-                        value = propertyInfo.GetValue(obj, null);
-                        break;
-                }
-
-                dictionary.Add(entry.Key, value);
-            }
-
-            return dictionary;
+            return props;
         }
 
         /// <summary>
@@ -353,7 +354,7 @@ namespace DataPowerTools.Extensions
         /// <param name="dbCommand"></param>
         /// <param name="destinationTableName"></param>
         /// <param name="databaseEngine"></param>
-        public static void AppendInsertStatement(this object obj, DbCommand dbCommand, string destinationTableName, DatabaseEngine databaseEngine)
+        public static void AppendInsertStatementToCommand(this object obj, DbCommand dbCommand, string destinationTableName, DatabaseEngine databaseEngine)
         {
             switch (databaseEngine)
             {

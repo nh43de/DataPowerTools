@@ -6,6 +6,7 @@ using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using DataPowerTools.DataReaderExtensibility.Columns;
+using DataPowerTools.FastMember;
 using DataPowerTools.PowerTools;
 
 namespace DataPowerTools.Extensions
@@ -279,8 +280,7 @@ namespace DataPowerTools.Extensions
         {
             return CreateTableSql.GenerateCreateTableScriptFromType(t, outputTableName);
         }
-
-
+        
         /// <summary>
         /// 
         /// </summary>
@@ -288,27 +288,15 @@ namespace DataPowerTools.Extensions
         /// <returns></returns>s
         public static IEnumerable<BasicDataFieldInfo> GetPropertyAndFieldInfo(this Type type)
         {
-            var p = type.GetPropertiesAndFields();
+            var p = TypeAccessor.Create(type).GetMembers();
 
             foreach (var entry in p)
             {
-                switch (entry.Value)
+                yield return new BasicDataFieldInfo
                 {
-                    case FieldInfo fieldInfo:
-                        yield return new BasicDataFieldInfo
-                        {
-                            ColumnName = fieldInfo.Name,
-                            FieldType = fieldInfo.FieldType
-                        };
-                        break;
-                    case PropertyInfo propertyInfo:
-                        yield return new BasicDataFieldInfo
-                        {
-                            ColumnName = propertyInfo.Name,
-                            FieldType = propertyInfo.PropertyType
-                        };
-                        break;
-                }
+                    ColumnName = entry.Name,
+                    FieldType = entry.Type
+                };
             }
         }
 
@@ -317,46 +305,40 @@ namespace DataPowerTools.Extensions
         /// </summary>
         /// <param name="type"></param>
         /// <returns></returns>s
-        public static IEnumerable<string> GetPropertyAndFieldNames(this Type type)
+        public static IEnumerable<string> GetFieldNames(this Type type)
         {
-            var p = type.GetPropertiesAndFields();
-
-            foreach (var entry in p)
-            {   
-                switch (entry.Value)
-                {
-                    case FieldInfo fieldInfo:
-                        yield return fieldInfo.Name;
-                        break;
-                    case PropertyInfo propertyInfo:
-                        yield return propertyInfo.Name;
-                        break;
-                }
-            }
+            var accessor = TypeAccessor.Create(type);
+            return accessor.GetMembers().Select(p => p.Name);
         }
 
-        /// <summary>
-        /// Gets the types properties and field as a dictionary of lowercase member names and PropertyInfo or FieldInfo as the values.
-        /// </summary>
-        public static Dictionary<string, object> GetPropertiesAndFields(this Type type)
+        public static TypeAccessor GetTypeAccessor(this Type type, bool allowNonPublicFieldAccess = false)
         {
-            var dictionary = new Dictionary<string, object>(StringComparer.InvariantCultureIgnoreCase);
-
-            var properties = type.GetProperties();
-
-            foreach (var propertyInfo in properties)
-            {
-                dictionary[propertyInfo.Name] = propertyInfo;
-            }
-
-            var fields = type.GetFields();
-
-            foreach (var fieldInfo in fields)
-            {
-                dictionary[fieldInfo.Name] = fieldInfo;
-            }
-
-            return dictionary;
+            return TypeAccessor.Create(type, allowNonPublicFieldAccess);
         }
+
+        ///// <summary>
+        ///// Gets the types properties and field as a dictionary of lowercase member names and PropertyInfo or FieldInfo as the values.
+        ///// </summary>
+        //[Obsolete("This is garbage")]
+        //private static Dictionary<string, object> GetPropertiesAndFields(this Type type)
+        //{
+        //    var dictionary = new Dictionary<string, object>(StringComparer.InvariantCultureIgnoreCase);
+
+        //    var properties = type.GetProperties();
+
+        //    foreach (var propertyInfo in properties)
+        //    {
+        //        dictionary[propertyInfo.Name] = propertyInfo;
+        //    }
+
+        //    var fields = type.GetFields();
+
+        //    foreach (var fieldInfo in fields)
+        //    {
+        //        dictionary[fieldInfo.Name] = fieldInfo;
+        //    }
+
+        //    return dictionary;
+        //}
     }
 }

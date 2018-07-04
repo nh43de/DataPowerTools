@@ -8,8 +8,11 @@ using DataPowerTools.Extensions;
 
 namespace DataPowerTools.PowerTools
 {
-    public static class CreateInsertSql
+    public class InsertCommandSqlBuilder
     {
+        public TypeAccessorCache TypeAccessorCache { get; } = new TypeAccessorCache();
+
+
         /// <summary>
         /// The method used for escaping keywords.
         /// </summary>
@@ -24,7 +27,6 @@ namespace DataPowerTools.PowerTools
             /// <summary>Keywords are enclosed in backticks aka grave accents (ASCII code 96). Used by MySQL, SQLite.</summary>
             Backtick = 3
         }
-
         
         /// <summary>
         /// Generates a parameterized MySQL INSERT statement from the given object and adds it to the <see cref="DbCommand" />
@@ -44,7 +46,7 @@ namespace DataPowerTools.PowerTools
         /// The value of 'tableName' cannot be null when the object passed is an anonymous
         /// type.
         /// </exception>
-        public static DbCommand AppendInsertForMySql(DbCommand dbCommand, object obj, string tableName = null)
+        public DbCommand AppendInsertForMySql(DbCommand dbCommand, object obj, string tableName = null)
         {
             const string mySqlInsertStatementTemplate = @"
 INSERT INTO {0}
@@ -56,7 +58,7 @@ VALUES
 SELECT LAST_INSERT_ID() AS LastInsertedId;
 "; // Intentional line break for readability of multiple inserts
 
-            return AppendInsertCommand(dbCommand, obj, mySqlInsertStatementTemplate, tableName, CreateInsertSql.KeywordEscapeMethod.Backtick);
+            return AppendInsertCommand(dbCommand, obj, mySqlInsertStatementTemplate, tableName, KeywordEscapeMethod.Backtick);
         }
 
         /// <summary>
@@ -77,7 +79,7 @@ SELECT LAST_INSERT_ID() AS LastInsertedId;
         /// The value of 'tableName' cannot be null when the object passed is an anonymous
         /// type.
         /// </exception>
-        public static DbCommand AppendInsertForPostgreSql(DbCommand dbCommand, object obj, string tableName = null)
+        public DbCommand AppendInsertForPostgreSql(DbCommand dbCommand, object obj, string tableName = null)
         {
             const string postgreSqlInsertStatementTemplate = @"
 INSERT INTO {0}
@@ -89,7 +91,7 @@ VALUES
 select LastVal();
 ";
 
-            return AppendInsertCommand(dbCommand, obj, postgreSqlInsertStatementTemplate, tableName, CreateInsertSql.KeywordEscapeMethod.None);
+            return AppendInsertCommand(dbCommand, obj, postgreSqlInsertStatementTemplate, tableName, KeywordEscapeMethod.None);
         }
 
         /// <summary>
@@ -111,7 +113,7 @@ select LastVal();
         /// type.
         /// </exception>
         // ReSharper disable once InconsistentNaming
-        public static DbCommand AppendInsertForSQLite(DbCommand dbCommand, object obj, string tableName = null)
+        public DbCommand AppendInsertForSQLite(DbCommand dbCommand, object obj, string tableName = null)
         {
             const string sqliteInsertStatementTemplate = @"
 INSERT INTO {0}
@@ -123,7 +125,7 @@ VALUES
 SELECT last_insert_rowid() AS [LastInsertedId];
 "; // Intentional line break for readability of multiple inserts
 
-            return AppendInsertCommand(dbCommand, obj, sqliteInsertStatementTemplate, tableName, CreateInsertSql.KeywordEscapeMethod.SquareBracket);
+            return AppendInsertCommand(dbCommand, obj, sqliteInsertStatementTemplate, tableName, KeywordEscapeMethod.SquareBracket);
         }
         
         /// <summary>
@@ -144,7 +146,7 @@ SELECT last_insert_rowid() AS [LastInsertedId];
         /// The value of 'tableName' cannot be null when the object passed is an anonymous
         /// type.
         /// </exception>
-        public static DbCommand AppendInsertForSqlServer(DbCommand dbCommand, object obj, string tableName = null)
+        public DbCommand AppendInsertForSqlServer(DbCommand dbCommand, object obj, string tableName = null)
         {
             const string sqlServerInsertStatementTemplate = @"
 INSERT INTO {0}
@@ -156,7 +158,7 @@ VALUES
 SELECT SCOPE_IDENTITY() AS [LastInsertedId];
 "; // Intentional line break for readability of multiple inserts
 
-            return AppendInsertCommand(dbCommand, obj, sqlServerInsertStatementTemplate, tableName, CreateInsertSql.KeywordEscapeMethod.SquareBracket);
+            return AppendInsertCommand(dbCommand, obj, sqlServerInsertStatementTemplate, tableName, KeywordEscapeMethod.SquareBracket);
         }
         
         /// <summary>
@@ -180,7 +182,7 @@ SELECT SCOPE_IDENTITY() AS [LastInsertedId];
         /// The value of 'tableName' cannot be null when the object passed is an anonymous
         /// type.
         /// </exception>
-        public static DbCommand AppendInsertCommand(DbCommand dbCommand, object obj, string sqlInsertStatementTemplate, string tableName = null, KeywordEscapeMethod keywordEscapeMethod = KeywordEscapeMethod.None)
+        public DbCommand AppendInsertCommand(DbCommand dbCommand, object obj, string sqlInsertStatementTemplate, string tableName = null, KeywordEscapeMethod keywordEscapeMethod = KeywordEscapeMethod.None)
         {
             if (obj == null)
             {
@@ -206,30 +208,12 @@ SELECT SCOPE_IDENTITY() AS [LastInsertedId];
             {
                 throw new ArgumentNullException(nameof(tableName), "The 'tableName' parameter must be provided when the object supplied is an anonymous type.");
             }
-
-            var preKeywordEscapeCharacter = "";
-
-            var postKeywordEscapeCharacter = "";
-
-            switch (keywordEscapeMethod)
-            {
-                case KeywordEscapeMethod.SquareBracket:
-                    preKeywordEscapeCharacter = "[";
-                    postKeywordEscapeCharacter = "]";
-                    break;
-                case KeywordEscapeMethod.DoubleQuote:
-                    preKeywordEscapeCharacter = "\"";
-                    postKeywordEscapeCharacter = "\"";
-                    break;
-                case KeywordEscapeMethod.Backtick:
-                    preKeywordEscapeCharacter = "`";
-                    postKeywordEscapeCharacter = "`";
-                    break;
-            }
+            
+            GetEscapeStrings(keywordEscapeMethod, out var preKeywordEscapeCharacter, out var postKeywordEscapeCharacter);
 
             if (tableName == null)
             {
-                tableName = preKeywordEscapeCharacter + obj.GetType().Name + postKeywordEscapeCharacter;
+                tableName = $"{preKeywordEscapeCharacter}{obj.GetType().Name}{postKeywordEscapeCharacter}";
             }
 
             var linePrefix = Environment.NewLine + "\t";
@@ -238,7 +222,9 @@ SELECT SCOPE_IDENTITY() AS [LastInsertedId];
 
             var values = string.Empty;
 
-            var namesAndValues = obj.GetPropertyAndFieldNamesAndValues();
+            var typeAccessor = TypeAccessorCache.GetTypeAccessor(obj);
+
+            var namesAndValues = obj.GetPropertyAndFieldNamesAndValues(typeAccessor);
 
             foreach (var nameAndValue in namesAndValues)
             {
@@ -261,6 +247,33 @@ SELECT SCOPE_IDENTITY() AS [LastInsertedId];
             return dbCommand;
         }
 
+        private static void GetEscapeStrings(KeywordEscapeMethod keywordEscapeMethod, out string preKeywordEscapeCharacter, out string postKeywordEscapeCharacter)
+        {
+            switch (keywordEscapeMethod)
+            {
+                case KeywordEscapeMethod.SquareBracket:
+                    preKeywordEscapeCharacter = "[";
+                    postKeywordEscapeCharacter = "]";
+                    break;
+                case KeywordEscapeMethod.DoubleQuote:
+                    preKeywordEscapeCharacter = "\"";
+                    postKeywordEscapeCharacter = "\"";
+                    break;
+                case KeywordEscapeMethod.Backtick:
+                    preKeywordEscapeCharacter = "`";
+                    postKeywordEscapeCharacter = "`";
+                    break;
+                case KeywordEscapeMethod.None:
+                    preKeywordEscapeCharacter = "";
+                    postKeywordEscapeCharacter = "";
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(keywordEscapeMethod), keywordEscapeMethod, null);
+            }
+        }
+
 
     }
+
+
 }

@@ -395,7 +395,7 @@ namespace DataPowerTools.Extensions
         /// </exception>
         public static DbCommand AppendInsertForMySql(this DbCommand dbCommand, object obj, string tableName = null)
         {
-            return CreateInsertSql.AppendInsertForMySql(dbCommand, obj, tableName);
+            return new InsertCommandSqlBuilder().AppendInsertForMySql(dbCommand, obj, tableName);
         }
 
         /// <summary>
@@ -418,7 +418,7 @@ namespace DataPowerTools.Extensions
         /// </exception>
         public static DbCommand AppendInsertForPostgreSql(this DbCommand dbCommand, object obj, string tableName = null)
         {
-            return CreateInsertSql.AppendInsertForPostgreSql(dbCommand, obj, tableName);
+            return new InsertCommandSqlBuilder().AppendInsertForPostgreSql(dbCommand, obj, tableName);
         }
 
         /// <summary>
@@ -442,7 +442,7 @@ namespace DataPowerTools.Extensions
         // ReSharper disable once InconsistentNaming
         public static DbCommand AppendInsertForSQLite(this DbCommand dbCommand, object obj, string tableName = null)
         {
-            return CreateInsertSql.AppendInsertForSQLite(dbCommand, obj, tableName);
+            return new InsertCommandSqlBuilder().AppendInsertForSQLite(dbCommand, obj, tableName);
         }
 
 
@@ -466,7 +466,7 @@ namespace DataPowerTools.Extensions
         /// </exception>
         public static DbCommand AppendInsertForSqlServer(this DbCommand dbCommand, object obj, string tableName = null)
         {
-            return CreateInsertSql.AppendInsertForSqlServer(dbCommand, obj, tableName);
+            return new InsertCommandSqlBuilder().AppendInsertForSqlServer(dbCommand, obj, tableName);
         }
         
         /// <summary>
@@ -490,9 +490,11 @@ namespace DataPowerTools.Extensions
         /// </exception>
         public static DbCommand AppendInsertsForMySql<T>(this DbCommand dbCommand, IEnumerable<T> objects, string tableName = null)
         {
+            var sqlBuilder = new InsertCommandSqlBuilder();
+
             foreach (var obj in objects)
             {
-                dbCommand.AppendInsertForMySql(obj, tableName);
+                sqlBuilder.AppendInsertForMySql(dbCommand, obj, tableName);
             }
 
             return dbCommand;

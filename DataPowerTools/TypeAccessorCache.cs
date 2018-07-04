@@ -33,34 +33,42 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.Reflection;
 using DataPowerTools.Extensions;
+using DataPowerTools.FastMember;
 
 namespace DataPowerTools
 {
-    /// <summary>Provides methods for accessing and caching <see cref="Type" /> metadata.</summary>
-    public static class TypeCacher
+    /// <summary>
+    /// Methods for caching type accessors.
+    /// </summary>
+    public class TypeAccessorCache
     {
-        /// <summary>
-        /// Cache that stores types as the key and the type's PropertyInfo and FieldInfo in a <see cref="OrderedDictionary"/> as the value.
-        /// </summary>
-        private static readonly ConcurrentDictionary<Type, Dictionary<string, object>> PropertiesAndFieldsCache 
-            = new ConcurrentDictionary<Type, Dictionary<string, object>>();
+        private static readonly ConcurrentDictionary<Type, TypeAccessor> PropertiesAndFieldsCache
+            = new ConcurrentDictionary<Type, TypeAccessor>();
 
-        /// <summary>Gets the types properties and fields and caches the results.</summary>
+        /// <summary>Gets the type accessor and caches the results.</summary>
         /// <param name="type">Type.</param>
-        /// <returns><see cref="OrderedDictionary"/> of lowercase member names and PropertyInfo or FieldInfo as the values.</returns>
-        public static Dictionary<string, object> GetPropertiesAndFields( Type type )
+        public static TypeAccessor GetTypeAccessor(Type type)
         {
-            if ( PropertiesAndFieldsCache.TryGetValue( type, out var orderedDictionary ) )
+            if (PropertiesAndFieldsCache.TryGetValue(type, out var typeAccessor))
             {
-                return orderedDictionary;
+                return typeAccessor;
             }
 
-            orderedDictionary = type.GetPropertiesAndFields();
+            typeAccessor = type.GetTypeAccessor();
 
-            return PropertiesAndFieldsCache.TryAdd( type, orderedDictionary ) 
-                ? orderedDictionary 
-                : PropertiesAndFieldsCache[ type ];
+            return PropertiesAndFieldsCache.TryAdd(type, typeAccessor)
+                ? typeAccessor
+                : PropertiesAndFieldsCache[type];
+        }
+
+        public static TypeAccessor GetTypeAccessor(object obj)
+        {
+            var type = obj.GetType();
+
+            return GetTypeAccessor(type);
         }
     }
+
 }
