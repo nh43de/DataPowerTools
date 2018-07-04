@@ -45,7 +45,7 @@ namespace Sqlite.Extensions
         /// <param name="reader"></param>
         /// <param name="destinationTableName"> Name of the destination table in the database.</param>
         /// <param name="databaseEngine"></param>
-        public void WriteToServer(IDataReader reader, string destinationTableName, DatabaseEngine databaseEngine)
+        public async Task WriteToServer(IDataReader reader, string destinationTableName, DatabaseEngine databaseEngine)
         {
             if (reader == null)
                 throw new ArgumentNullException(nameof(reader));
@@ -71,7 +71,7 @@ namespace Sqlite.Extensions
                     continue; //otherwise send to db
                 
                 using (cmd)
-                    cmd.ExecuteNonQuery();
+                    await cmd.ExecuteNonQueryAsync();
 
                 cmd = GetDbCommand();
 
@@ -84,7 +84,7 @@ namespace Sqlite.Extensions
             {
                 if (currentBatch > 0)
                 {
-                    cmd.ExecuteNonQuery();
+                    await cmd.ExecuteNonQueryAsync();
                 }
             }
             
