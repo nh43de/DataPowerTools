@@ -16,7 +16,7 @@ namespace Sqlite.Extensions
 
         public static SqlBasicColumnTypes MapSqliteColumnType(string sqliteColumnType)
         {
-            SqlBasicColumnTypes typ;
+            var typ = SqlBasicColumnTypes.Text;
 
             switch (sqliteColumnType)
             {
@@ -73,6 +73,8 @@ namespace Sqlite.Extensions
                         typ = SqlBasicColumnTypes.Numeric;
                     break;
             }
+
+            return typ;
         }
 
         public static void Test(string destinationTableName, DbConnection connection)
@@ -93,14 +95,12 @@ namespace Sqlite.Extensions
                     while (dr.Read())
                     {
                         var key = dr["name"].ToString();
-                        var typ = 
-
-
+                        
                         // data types found @ http://www.tutorialspoint.com/sqlite/sqlite_data_types.htm
                         var columnType = dr["type"].ToString().ToUpper();
+
+                        var typ = MapSqliteColumnType(columnType);
                         
-
-
                         columnMappings.Add(key, typ);
                     }
                 }
