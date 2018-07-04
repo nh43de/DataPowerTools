@@ -23,17 +23,17 @@ namespace DataPowerTools.Extensions
         /// <param name="data"></param>
         /// <param name="destinationTableName"></param>
         /// <param name="connectionString"></param>
-        /// <param name="bulkInsertOptions"></param>
+        /// <param name="sqlServerBulkInsertOptions"></param>
         public static void BulkInsertSqlServer(
             this DataTable data,
             string connectionString,
             string destinationTableName,
-            BulkInsertOptions bulkInsertOptions = null)
+            SqlServerBulkInsertOptions sqlServerBulkInsertOptions = null)
         {
             using (var connection = new SqlConnection(connectionString))
             {
                 connection.Open();
-                BulkInsertSqlServer(data, connection, destinationTableName, bulkInsertOptions);
+                BulkInsertSqlServer(data, connection, destinationTableName, sqlServerBulkInsertOptions);
             }
         }
 
@@ -43,14 +43,14 @@ namespace DataPowerTools.Extensions
         /// <param name="data"></param>
         /// <param name="destinationTableName"></param>
         /// <param name="connection"></param>
-        /// <param name="bulkInsertOptions"></param>
+        /// <param name="sqlServerBulkInsertOptions"></param>
         public static void BulkInsertSqlServer(
             this DataTable data,
             SqlConnection connection,
             string destinationTableName,
-            BulkInsertOptions bulkInsertOptions = null)
+            SqlServerBulkInsertOptions sqlServerBulkInsertOptions = null)
         {
-            var bulkCopy = GetSqlBulkCopy(data, destinationTableName, connection, bulkInsertOptions);
+            var bulkCopy = GetSqlBulkCopy(data, destinationTableName, connection, sqlServerBulkInsertOptions);
             using (bulkCopy)
             {
                 bulkCopy.WriteToServer(data);
@@ -63,18 +63,18 @@ namespace DataPowerTools.Extensions
         /// <param name="dataReader"></param>
         /// <param name="destinationTableName"></param>
         /// <param name="connectionString"></param>
-        /// <param name="bulkInsertOptions"></param>
+        /// <param name="sqlServerBulkInsertOptions"></param>
         /// <returns></returns>
         public static async Task BulkInsertSqlServerAsync(
             this IDataReader dataReader,
             string connectionString,
             string destinationTableName,
-            AsyncBulkInsertOptions bulkInsertOptions)
+            AsyncSqlServerBulkInsertOptions sqlServerBulkInsertOptions)
         {
             using (var connection = new SqlConnection(connectionString))
             {
                 connection.Open();
-                await BulkInsertSqlServerAsync(dataReader, connection, destinationTableName, bulkInsertOptions);
+                await BulkInsertSqlServerAsync(dataReader, connection, destinationTableName, sqlServerBulkInsertOptions);
             }
         }
         
@@ -84,18 +84,18 @@ namespace DataPowerTools.Extensions
         /// <param name="dataReader"></param>
         /// <param name="connection"></param>
         /// <param name="destinationTableName"></param>
-        /// <param name="bulkInsertOptions"></param>
+        /// <param name="sqlServerBulkInsertOptions"></param>
         /// <returns></returns>
-        public static async Task BulkInsertSqlServerAsync(this IDataReader dataReader, SqlConnection connection, string destinationTableName, AsyncBulkInsertOptions bulkInsertOptions = null)
+        public static async Task BulkInsertSqlServerAsync(this IDataReader dataReader, SqlConnection connection, string destinationTableName, AsyncSqlServerBulkInsertOptions sqlServerBulkInsertOptions = null)
         {
-            bulkInsertOptions = bulkInsertOptions ?? new AsyncBulkInsertOptions();
-            var bulkCopy = GetSqlBulkCopy(dataReader, destinationTableName, connection, bulkInsertOptions);
+            sqlServerBulkInsertOptions = sqlServerBulkInsertOptions ?? new AsyncSqlServerBulkInsertOptions();
+            var bulkCopy = GetSqlBulkCopy(dataReader, destinationTableName, connection, sqlServerBulkInsertOptions);
             
             using (bulkCopy)
             {
                 try
                 {
-                    await bulkCopy.WriteToServerAsync(dataReader, bulkInsertOptions.CancellationToken);
+                    await bulkCopy.WriteToServerAsync(dataReader, sqlServerBulkInsertOptions.CancellationToken);
                 }
                 catch (SqlException ex)
                 {
@@ -117,13 +117,13 @@ namespace DataPowerTools.Extensions
         /// <param name="dataReader"></param>
         /// <param name="connectionString"></param>
         /// <param name="destinationTableName"></param>
-        /// <param name="bulkInsertOptions"></param>
-        public static void BulkInsertSqlServer(this IDataReader dataReader, string connectionString, string destinationTableName, BulkInsertOptions bulkInsertOptions = null)
+        /// <param name="sqlServerBulkInsertOptions"></param>
+        public static void BulkInsertSqlServer(this IDataReader dataReader, string connectionString, string destinationTableName, SqlServerBulkInsertOptions sqlServerBulkInsertOptions = null)
         {
             using (var connection = new SqlConnection(connectionString))
             {
                 connection.Open();
-                dataReader.BulkInsertSqlServer(connection, destinationTableName, bulkInsertOptions);
+                dataReader.BulkInsertSqlServer(connection, destinationTableName, sqlServerBulkInsertOptions);
             }
         }
 
@@ -134,11 +134,11 @@ namespace DataPowerTools.Extensions
         /// <param name="dataReader"></param>
         /// <param name="connection"></param>
         /// <param name="destinationTableName"></param>
-        /// <param name="bulkInsertOptions"></param>
-        public static void BulkInsertSqlServer(this IDataReader dataReader, SqlConnection connection, string destinationTableName, BulkInsertOptions bulkInsertOptions = null)
+        /// <param name="sqlServerBulkInsertOptions"></param>
+        public static void BulkInsertSqlServer(this IDataReader dataReader, SqlConnection connection, string destinationTableName, SqlServerBulkInsertOptions sqlServerBulkInsertOptions = null)
         {
-            bulkInsertOptions = bulkInsertOptions ?? new AsyncBulkInsertOptions();
-            var bulkCopy = GetSqlBulkCopy(dataReader, destinationTableName, connection, bulkInsertOptions);
+            sqlServerBulkInsertOptions = sqlServerBulkInsertOptions ?? new AsyncSqlServerBulkInsertOptions();
+            var bulkCopy = GetSqlBulkCopy(dataReader, destinationTableName, connection, sqlServerBulkInsertOptions);
             
             using (bulkCopy)
             {
@@ -188,25 +188,25 @@ namespace DataPowerTools.Extensions
         /// <param name="data"></param>
         /// <param name="destinationTableName"></param>
         /// <param name="connection"></param>
-        /// <param name="bulkInsertOptions"></param>
+        /// <param name="sqlServerBulkInsertOptions"></param>
         /// <returns></returns>
         public static SqlBulkCopy GetSqlBulkCopy(
             DataTable data,
             string destinationTableName,
             SqlConnection connection,
-            BulkInsertOptions bulkInsertOptions = null)
+            SqlServerBulkInsertOptions sqlServerBulkInsertOptions = null)
         {
-            bulkInsertOptions = bulkInsertOptions ?? new BulkInsertOptions();
+            sqlServerBulkInsertOptions = sqlServerBulkInsertOptions ?? new SqlServerBulkInsertOptions();
 
-            var bulkCopy = new SqlBulkCopy(connection, bulkInsertOptions.SqlBulkCopyOptions, bulkInsertOptions.SqlTransaction)
+            var bulkCopy = new SqlBulkCopy(connection, sqlServerBulkInsertOptions.SqlBulkCopyOptions, sqlServerBulkInsertOptions.SqlTransaction)
             {
-                BulkCopyTimeout = bulkInsertOptions.BulkCopyTimeout,
-                BatchSize = bulkInsertOptions.BatchSize,
+                BulkCopyTimeout = sqlServerBulkInsertOptions.BulkCopyTimeout,
+                BatchSize = sqlServerBulkInsertOptions.BatchSize,
                 DestinationTableName = destinationTableName,
-                NotifyAfter = bulkInsertOptions.BatchSize
+                NotifyAfter = sqlServerBulkInsertOptions.BatchSize
             };
             
-            PopulateBulkCopyMappings(bulkCopy, data, destinationTableName, connection, bulkInsertOptions.UseOrdinals);
+            PopulateBulkCopyMappings(bulkCopy, data, destinationTableName, connection, sqlServerBulkInsertOptions.UseOrdinals);
             
             return bulkCopy;
         }
@@ -217,33 +217,33 @@ namespace DataPowerTools.Extensions
         /// <param name="dataReader"></param>
         /// <param name="destinationTableName"></param>
         /// <param name="connection"></param>
-        /// <param name="bulkInsertOptions"></param>
+        /// <param name="sqlServerBulkInsertOptions"></param>
         /// <returns></returns>
         public static SqlBulkCopy GetSqlBulkCopy(
             this IDataReader dataReader,
             string destinationTableName,
             SqlConnection connection,
-            BulkInsertOptions bulkInsertOptions = null)
+            SqlServerBulkInsertOptions sqlServerBulkInsertOptions = null)
         {
             //if (Database.TableExists(connection, destinationTableName) == false)
             //    throw new Exception(
             //        $"Table {destinationTableName} does not exist using connection {connection.ConnectionString}");
 
-            bulkInsertOptions = bulkInsertOptions ?? new BulkInsertOptions();
+            sqlServerBulkInsertOptions = sqlServerBulkInsertOptions ?? new SqlServerBulkInsertOptions();
 
-            var bulkCopy = new SqlBulkCopy(connection, bulkInsertOptions.SqlBulkCopyOptions, bulkInsertOptions.SqlTransaction)
+            var bulkCopy = new SqlBulkCopy(connection, sqlServerBulkInsertOptions.SqlBulkCopyOptions, sqlServerBulkInsertOptions.SqlTransaction)
             {
-                BulkCopyTimeout = bulkInsertOptions.BulkCopyTimeout,
-                BatchSize = bulkInsertOptions.BatchSize,
+                BulkCopyTimeout = sqlServerBulkInsertOptions.BulkCopyTimeout,
+                BatchSize = sqlServerBulkInsertOptions.BatchSize,
                 DestinationTableName = destinationTableName,
-                NotifyAfter = bulkInsertOptions.BatchSize,
+                NotifyAfter = sqlServerBulkInsertOptions.BatchSize,
                 EnableStreaming = true
             };
 
-            if (bulkInsertOptions.RowsCopiedEventHandler != null)
-                bulkCopy.SqlRowsCopied += (e, i) => bulkInsertOptions.RowsCopiedEventHandler(i.RowsCopied);
+            if (sqlServerBulkInsertOptions.RowsCopiedEventHandler != null)
+                bulkCopy.SqlRowsCopied += (e, i) => sqlServerBulkInsertOptions.RowsCopiedEventHandler(i.RowsCopied);
             
-            PopulateBulkCopyMappings(bulkCopy, dataReader, destinationTableName, connection, bulkInsertOptions.UseOrdinals);
+            PopulateBulkCopyMappings(bulkCopy, dataReader, destinationTableName, connection, sqlServerBulkInsertOptions.UseOrdinals);
             
             return bulkCopy;
         }

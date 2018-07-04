@@ -2,7 +2,7 @@
 
 namespace DataPowerTools.DataConnectivity.Sql
 {
-    public class AsyncBulkInsertOptions : BulkInsertOptions
+    public class AsyncSqlServerBulkInsertOptions : SqlServerBulkInsertOptions
     {
         public CancellationToken CancellationToken { get; set; }
     }

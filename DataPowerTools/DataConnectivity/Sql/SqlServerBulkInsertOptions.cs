@@ -3,7 +3,7 @@ using DataPowerTools.DataReaderExtensibility.Columns;
 
 namespace DataPowerTools.DataConnectivity.Sql
 {
-    public class BulkInsertOptions
+    public class SqlServerBulkInsertOptions
     {
         public RowsCopiedEventHandler RowsCopiedEventHandler { get; set; }
         public int BatchSize { get; set; } = 5000;
