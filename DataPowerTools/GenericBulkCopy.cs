@@ -14,6 +14,67 @@ namespace Sqlite.Extensions
     public static class SqlLiteHelpers
     {
 
+        public static SqlBasicColumnTypes MapSqliteColumnType(string sqliteColumnType)
+        {
+            SqlBasicColumnTypes typ;
+
+            switch (sqliteColumnType)
+            {
+                case "INTEGER":
+                case "TINYINT":
+                case "SMALLINT":
+                case "MEDIUMINT":
+                case "BIGINT":
+                case "UNSIGNED BIG INT":
+                case "INT2":
+                case "INT8":
+                case "INT":
+                    typ = SqlBasicColumnTypes.Integer;
+                    break;
+                case "CLOB":
+                case "TEXT":
+                    typ = SqlBasicColumnTypes.Text;
+                    break;
+                case "BLOB":
+                    typ = SqlBasicColumnTypes.Blob;
+                    break;
+                case "REAL":
+                case "DOUBLE":
+                case "DOUBLE PRECISION":
+                case "FLOAT":
+                    typ = SqlBasicColumnTypes.Real;
+                    break;
+                case "NUMERIC":
+                    typ = SqlBasicColumnTypes.Numeric;
+                    break;
+                case "BOOLEAN":
+                    typ = SqlBasicColumnTypes.Boolean;
+                    break;
+                case "DATE":
+                case "DATETIME":
+                    typ = SqlBasicColumnTypes.Date;
+                    break;
+                default: // look for fringe cases that need logic
+                    if (sqliteColumnType.StartsWith("CHARACTER"))
+                        typ = SqlBasicColumnTypes.Text;
+                    if (sqliteColumnType.StartsWith("VARCHAR"))
+                        typ = SqlBasicColumnTypes.Text;
+                    if (sqliteColumnType.StartsWith("VARYING CHARACTER"))
+                        typ = SqlBasicColumnTypes.Text;
+                    if (sqliteColumnType.StartsWith("NCHAR"))
+                        typ = SqlBasicColumnTypes.Text;
+                    if (sqliteColumnType.StartsWith("NATIVE CHARACTER"))
+                        typ = SqlBasicColumnTypes.Text;
+                    if (sqliteColumnType.StartsWith("NVARCHAR"))
+                        typ = SqlBasicColumnTypes.Text;
+                    if (sqliteColumnType.StartsWith("NVARCHAR"))
+                        typ = SqlBasicColumnTypes.Text;
+                    if (sqliteColumnType.StartsWith("DECIMAL"))
+                        typ = SqlBasicColumnTypes.Numeric;
+                    break;
+            }
+        }
+
         public static void Test(string destinationTableName, DbConnection connection)
         {
             var columnMappings = new Dictionary<string, SqlBasicColumnTypes>();
@@ -32,64 +93,14 @@ namespace Sqlite.Extensions
                     while (dr.Read())
                     {
                         var key = dr["name"].ToString();
-                        var typ = new SqlBasicColumnTypes();
+                        var typ = 
+
+
                         // data types found @ http://www.tutorialspoint.com/sqlite/sqlite_data_types.htm
                         var columnType = dr["type"].ToString().ToUpper();
-                        switch (columnType)
-                        {
-                            case "INTEGER":
-                            case "TINYINT":
-                            case "SMALLINT":
-                            case "MEDIUMINT":
-                            case "BIGINT":
-                            case "UNSIGNED BIG INT":
-                            case "INT2":
-                            case "INT8":
-                            case "INT":
-                                typ = SqlBasicColumnTypes.Integer;
-                                break;
-                            case "CLOB":
-                            case "TEXT":
-                                typ = SqlBasicColumnTypes.Text;
-                                break;
-                            case "BLOB":
-                                typ = SqlBasicColumnTypes.Blob;
-                                break;
-                            case "REAL":
-                            case "DOUBLE":
-                            case "DOUBLE PRECISION":
-                            case "FLOAT":
-                                typ = SqlBasicColumnTypes.Real;
-                                break;
-                            case "NUMERIC":
-                                typ = SqlBasicColumnTypes.Numeric;
-                                break;
-                            case "BOOLEAN":
-                                typ = SqlBasicColumnTypes.Boolean;
-                                break;
-                            case "DATE":
-                            case "DATETIME":
-                                typ = SqlBasicColumnTypes.Date;
-                                break;
-                            default: // look for fringe cases that need logic
-                                if (columnType.StartsWith("CHARACTER"))
-                                    typ = SqlBasicColumnTypes.Text;
-                                if (columnType.StartsWith("VARCHAR"))
-                                    typ = SqlBasicColumnTypes.Text;
-                                if (columnType.StartsWith("VARYING CHARACTER"))
-                                    typ = SqlBasicColumnTypes.Text;
-                                if (columnType.StartsWith("NCHAR"))
-                                    typ = SqlBasicColumnTypes.Text;
-                                if (columnType.StartsWith("NATIVE CHARACTER"))
-                                    typ = SqlBasicColumnTypes.Text;
-                                if (columnType.StartsWith("NVARCHAR"))
-                                    typ = SqlBasicColumnTypes.Text;
-                                if (columnType.StartsWith("NVARCHAR"))
-                                    typ = SqlBasicColumnTypes.Text;
-                                if (columnType.StartsWith("DECIMAL"))
-                                    typ = SqlBasicColumnTypes.Numeric;
-                                break;
-                        }
+                        
+
+
                         columnMappings.Add(key, typ);
                     }
                 }
