@@ -47,6 +47,8 @@ namespace Sqlite.Extensions
         /// <param name="databaseEngine"></param>
         public async Task WriteToServer(IDataReader reader, string destinationTableName, DatabaseEngine databaseEngine)
         {
+            //TODO: needs to support mapping columns
+
             if (reader == null)
                 throw new ArgumentNullException(nameof(reader));
 

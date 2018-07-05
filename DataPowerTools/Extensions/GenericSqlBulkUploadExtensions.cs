@@ -19,6 +19,8 @@ namespace DataPowerTools.Extensions
     /// </summary>
     public static class GenericSqlBulkUploadExtensions
     {
+        //TODO: needs to support mapping columns
+
         /// <summary>
         /// Bulk upload enumerable by generating insert statements. If using sql server, use SqlServer extension methods instead.
         /// </summary>

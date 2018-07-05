@@ -11,6 +11,8 @@ namespace DataPowerTools.PowerTools
 {
     public class InsertCommandSqlBuilder
     {
+        //TODO: needs to support mapping columns
+
         public DatabaseEngine DatabaseEngine { get; }
         public TypeAccessorCache TypeAccessorCache { get; } = new TypeAccessorCache();
 
@@ -39,72 +41,6 @@ namespace DataPowerTools.PowerTools
         {
             public string InsertTemplate { get; set; }
             public KeywordEscapeMethod KeywordEscapeMethod { get; set; }
-        }
-
-        private static SqlInsertInfo GetInsertTemplate(DatabaseEngine databaseEngine)
-        {
-            switch (databaseEngine)
-            {
-                case DatabaseEngine.MySql:
-                    return new SqlInsertInfo
-                    {
-                        InsertTemplate = @"
-INSERT INTO {0}
-({1}
-)
-VALUES
-({2}
-);
-SELECT LAST_INSERT_ID() AS LastInsertedId;
-",
-                        KeywordEscapeMethod = KeywordEscapeMethod.Backtick
-                    }
-                    ;
-                case DatabaseEngine.Postgre:
-                    return new SqlInsertInfo
-                    {
-                        InsertTemplate = @"
-INSERT INTO {0}
-({1}
-)
-VALUES
-({2}
-);
-select LastVal();
-",
-                        KeywordEscapeMethod = KeywordEscapeMethod.None
-                    };
-                case DatabaseEngine.Sqlite:
-                        return new SqlInsertInfo
-                        {
-                            InsertTemplate = @"
-INSERT INTO {0}
-({1}
-)
-VALUES
-({2}
-);
-SELECT last_insert_rowid() AS [LastInsertedId];
-",
-                            KeywordEscapeMethod = KeywordEscapeMethod.SquareBracket
-                        };
-                case DatabaseEngine.SqlServer:
-                        return new SqlInsertInfo
-                        {
-                            InsertTemplate = @"
-INSERT INTO {0}
-({1}
-)
-VALUES
-({2}
-);
-SELECT SCOPE_IDENTITY() AS [LastInsertedId];
-",
-                            KeywordEscapeMethod = KeywordEscapeMethod.SquareBracket
-                        };
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(databaseEngine), databaseEngine, null);
-            }
         }
 
         /// <summary>
@@ -210,6 +146,7 @@ SELECT SCOPE_IDENTITY() AS [LastInsertedId];
             return dbCommand;
         }
 
+        //TODO: needs to support mapping columns
         /// <summary>
         /// Generates a parameterized SQL INSERT statement from the given object and adds it to the
         /// <see cref="DbCommand" />.
@@ -245,7 +182,7 @@ SELECT SCOPE_IDENTITY() AS [LastInsertedId];
 
             for (var i = 0; i < dataRecord.FieldCount; i++)
             {
-                var columnName = dataRecord.GetName(i);
+                var columnName = dataRecord.GetName(i); //TODO: needs to support mapping columns
                 var columnValue = dataRecord[i];
                 
                 columns += linePrefix + preKeywordEscapeCharacter + columnName + postKeywordEscapeCharacter + ",";
@@ -288,6 +225,73 @@ SELECT SCOPE_IDENTITY() AS [LastInsertedId];
                     break;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(keywordEscapeMethod), keywordEscapeMethod, null);
+            }
+        }
+
+
+        private static SqlInsertInfo GetInsertTemplate(DatabaseEngine databaseEngine)
+        {
+            switch (databaseEngine)
+            {
+                case DatabaseEngine.MySql:
+                    return new SqlInsertInfo
+                        {
+                            InsertTemplate = @"
+INSERT INTO {0}
+({1}
+)
+VALUES
+({2}
+);
+SELECT LAST_INSERT_ID() AS LastInsertedId;
+",
+                            KeywordEscapeMethod = KeywordEscapeMethod.Backtick
+                        }
+                        ;
+                case DatabaseEngine.Postgre:
+                    return new SqlInsertInfo
+                    {
+                        InsertTemplate = @"
+INSERT INTO {0}
+({1}
+)
+VALUES
+({2}
+);
+select LastVal();
+",
+                        KeywordEscapeMethod = KeywordEscapeMethod.None
+                    };
+                case DatabaseEngine.Sqlite:
+                    return new SqlInsertInfo
+                    {
+                        InsertTemplate = @"
+INSERT INTO {0}
+({1}
+)
+VALUES
+({2}
+);
+SELECT last_insert_rowid() AS [LastInsertedId];
+",
+                        KeywordEscapeMethod = KeywordEscapeMethod.SquareBracket
+                    };
+                case DatabaseEngine.SqlServer:
+                    return new SqlInsertInfo
+                    {
+                        InsertTemplate = @"
+INSERT INTO {0}
+({1}
+)
+VALUES
+({2}
+);
+SELECT SCOPE_IDENTITY() AS [LastInsertedId];
+",
+                        KeywordEscapeMethod = KeywordEscapeMethod.SquareBracket
+                    };
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(databaseEngine), databaseEngine, null);
             }
         }
 
