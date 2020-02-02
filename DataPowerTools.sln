@@ -15,6 +15,17 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DataPowerTools.Tests", "Dat
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DataPowerTools", "DataPowerTools\DataPowerTools.csproj", "{3D358DF7-BD69-4626-86B8-B5B361FAA62B}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{E49FB4F1-55C7-47F2-8CB1-97DD863479F9}"
+	ProjectSection(SolutionItems) = preProject
+		.gitignore = .gitignore
+		appveyor.yml = appveyor.yml
+		Build.ps1 = Build.ps1
+		LICENSE = LICENSE
+		nuget.exe = nuget.exe
+		README.md = README.md
+		readme.txt = readme.txt
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
