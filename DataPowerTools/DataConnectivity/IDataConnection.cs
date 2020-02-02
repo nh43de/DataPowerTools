@@ -23,7 +23,7 @@ namespace DataPowerTools.DataConnectivity
 
         DataTable GetTableSchema(string tableName); //TODO: standardize this
 
-        void BulkInsertDataTable(string destinationTable, DataTable data, bool useOrdinals = false);
+        Task BulkInsertDataTable(string destinationTable, DataTable data, bool useOrdinals = false);
         Task BulkInsertDataTableAsync(string destinationTable, DataTable data, bool useOrdinals = false);
     }
 }

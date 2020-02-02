@@ -4,7 +4,6 @@ using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Threading.Tasks;
-using DataPowerTools.Async;
 
 namespace DataPowerTools.DataConnectivity.Sql
 {
@@ -144,9 +143,9 @@ namespace DataPowerTools.DataConnectivity.Sql
         }
 
 
-        public void BulkInsertDataTable(string destinationTable, DataTable data, bool useOrdinals = false)
+        public Task BulkInsertDataTable(string destinationTable, DataTable data, bool useOrdinals = false)
         {
-            BulkInsertDataTableAsync(destinationTable, data, useOrdinals).RunSync();
+            return BulkInsertDataTableAsync(destinationTable, data, useOrdinals);
         }
 
         public async Task BulkInsertDataTableAsync(string destinationTable, DataTable data, bool useOrdinals = false)
