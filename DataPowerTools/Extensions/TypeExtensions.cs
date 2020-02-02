@@ -105,7 +105,7 @@ namespace DataPowerTools.Extensions
 
             return colType;
         }
-
+        
         /// <summary>
         /// Returns all column-type information about a type, enumerating all properties (and properties only).
         /// </summary>

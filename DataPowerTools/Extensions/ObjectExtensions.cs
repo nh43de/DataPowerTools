@@ -12,6 +12,10 @@ using DataPowerTools.PowerTools;
 namespace DataPowerTools.Extensions
 {
 
+    //TODO: add a "type reflection scope" IDisposable to cache the type accessors for the functions that support using type accessors
+    //TODO: add more type accessor support to some of these functions
+    //TODO: dynamic dictionary stuff?
+
     namespace MiscUtil.Reflection
     {
     }
@@ -85,6 +89,28 @@ namespace DataPowerTools.Extensions
         }
 
         /// <summary>
+        /// Checks whether the object has the specified property.
+        /// </summary>
+        /// <param name="obj"></param>
+        /// <param name="name"></param>
+        /// <returns></returns>
+        public static bool HasProperty(this object obj, string name)
+        {
+            if (obj == null)
+            {
+                throw new ArgumentNullException(nameof(obj), "Object passed to HasProperty cannot be null.");
+            }
+            
+            var property = obj.GetType().GetProperty(name);
+            if (property == null)
+            {
+                return false;
+            }
+
+            return true;
+        }
+
+        /// <summary>
         /// Reads an untyped property from an object.
         /// </summary>
         /// <param name="this">The object from which to read the property. May not be <c>null</c>.</param>
@@ -135,16 +161,6 @@ namespace DataPowerTools.Extensions
             }
         }
 
-        /// <summary>Gets a dictionary containing the objects property and field names and values.</summary>
-        /// <param name="obj">Object to get names and values from.</param>
-        /// <returns>Dictionary containing property and field names and values.</returns>
-        public static IDictionary<string, object> GetPropertyAndFieldNamesAndValues(this object obj)
-        {
-            var accessor = obj.GetTypeAccessor();
-
-            return obj.GetPropertyAndFieldNamesAndValues(accessor);
-        }
-
         /// <summary>
         /// Gets the type accessor the object's underlying type.
         /// </summary>
@@ -157,11 +173,44 @@ namespace DataPowerTools.Extensions
             return TypeAccessor.Create(type);
         }
 
+        ///// <summary>Gets a dictionary containing the objects property and field names and values.</summary>
+        ///// <param name="obj">Object to get names and values from.</param>
+        ///// <param name="accessor">The type accessor to use.</param>
+        ///// <returns>Dictionary containing property and field names and values.</returns>
+        //public static IEnumerable<(string key, object val)> GetPropertyAndFieldNamesAndValues(this object obj)
+        //{
+        //    var accessor = obj.GetTypeAccessor();
+
+        //    return obj.GetPropertyAndFieldNamesAndValues(accessor);
+        //}
+
+        ///// <summary>Gets a dictionary containing the objects property and field names and values.</summary>
+        ///// <param name="obj">Object to get names and values from.</param>
+        ///// <param name="accessor">The type accessor to use.</param>
+        ///// <returns>Dictionary containing property and field names and values.</returns>
+        //public static IEnumerable<(string key, object val)> GetPropertyAndFieldNamesAndValues(this object obj, TypeAccessor accessor)
+        //{
+        //    var props = accessor.GetMembers().Select(p => (key: p.Name, val: accessor[obj, p.Name]));
+
+        //    return props;
+        //}
+
+
+        /// <summary>Gets a dictionary containing the objects property and field names and values.</summary>
+        /// <param name="obj">Object to get names and values from.</param>
+        /// <returns>Dictionary containing property and field names and values.</returns>
+        public static IDictionary<string, object> GetPropertyAndFieldNamesAndValuesDictionary(this object obj)
+        {
+            var accessor = obj.GetTypeAccessor();
+
+            return obj.GetPropertyAndFieldNamesAndValuesDictionary(accessor);
+        }
+
         /// <summary>Gets a dictionary containing the objects property and field names and values.</summary>
         /// <param name="obj">Object to get names and values from.</param>
         /// <param name="accessor">The type accessor to use.</param>
         /// <returns>Dictionary containing property and field names and values.</returns>
-        public static IDictionary<string, object> GetPropertyAndFieldNamesAndValues(this object obj, TypeAccessor accessor)
+        public static IDictionary<string, object> GetPropertyAndFieldNamesAndValuesDictionary(this object obj, TypeAccessor accessor)
         {
             var props = accessor.GetMembers().ToDictionary(
                 p => p.Name,

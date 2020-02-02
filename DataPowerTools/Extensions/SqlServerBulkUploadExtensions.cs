@@ -20,29 +20,6 @@ namespace DataPowerTools.Extensions
     {
 
         /// <summary>
-        /// Bulk upload enumerable using a server/database name.
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="items"></param>
-        /// <param name="destinationServer"></param>
-        /// <param name="destinationDatabase"></param>
-        /// <param name="destinationTable"></param>
-        /// <param name="sqlServerBulkInsertOptions"></param>
-        /// <param name="members"></param>
-        public static void BulkUploadSqlServer<T>(
-            this IEnumerable<T> items,
-            string destinationServer,
-            string destinationDatabase,
-            string destinationTable,
-            SqlServerBulkInsertOptions sqlServerBulkInsertOptions = null,
-            IEnumerable<string> members = null)
-        {
-            var cs = Database.GetConnectionString(destinationDatabase, destinationServer);
-
-            BulkUploadSqlServer(items, cs, destinationTable, sqlServerBulkInsertOptions, members);
-        }
-
-        /// <summary>
         /// Bulk upload enumerable using a connection string.
         /// </summary>
         /// <typeparam name="T"></typeparam>

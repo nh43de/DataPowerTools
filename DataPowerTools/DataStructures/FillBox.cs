@@ -1,12 +1,14 @@
-﻿using System.Collections.Concurrent;
+﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 
 namespace DataPowerTools.DataStructures
 {
     /// <summary>
-    /// Fillboxes are sweet! They are basically a list with a defined capacity- when the list reaches capacity, it "dumps" the items by invoking a callback with the items.
+    /// When the list reaches capacity, it "dumps" the items by invoking a callback with the items.
     /// </summary>
     /// <typeparam name="T"></typeparam>
+    [Obsolete("//TODO: replace with reactive")]
     public class FillBox<T>
     {
         private readonly BoxFilledEventHandler BoxFilled;

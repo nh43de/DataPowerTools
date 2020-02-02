@@ -17,6 +17,3 @@ namespace DataPowerTools.Extensions
 }
 
  
-namespace Microsoft.Data.Sqlite.Extensions
-{
-}

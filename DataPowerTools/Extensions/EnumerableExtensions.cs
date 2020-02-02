@@ -293,6 +293,19 @@ namespace DataPowerTools.Extensions
         /// </summary>
         /// <param name="val"></param>
         /// <returns></returns>
+        public static IEnumerable<short> Count(this int val)
+        {
+            for (short i = 0; i < val; i++)
+            {
+                yield return i;
+            }
+        }
+
+        /// <summary>
+        /// Starting at 0, counts up to but not including the specified number. Does not work with negative integers.
+        /// </summary>
+        /// <param name="val"></param>
+        /// <returns></returns>
         public static IEnumerable<short> Count(this short val)
         {
             for (short i = 0; i < val; i++)

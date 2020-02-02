@@ -56,7 +56,6 @@ namespace DataPowerTools.PowerTools
             return AppendInsertCommand(dbCommand, obj, i.InsertTemplate, destinationTableName, i.KeywordEscapeMethod);
         }
 
-
         /// <summary>
         /// Generates a parameterized MySQL INSERT statement from the given object and adds it to the <see cref="DbCommand" />
         /// </summary>
@@ -83,7 +82,7 @@ namespace DataPowerTools.PowerTools
             
             var typeAccessor = TypeAccessorCache.GetTypeAccessor(obj);
 
-            var namesAndValues = obj.GetPropertyAndFieldNamesAndValues(typeAccessor);
+            var namesAndValues = obj.GetPropertyAndFieldNamesAndValuesDictionary(typeAccessor);
 
             return AppendInsertCommand(dbCommand, namesAndValues, sqlInsertStatementTemplate, tableName,
                 keywordEscapeMethod);

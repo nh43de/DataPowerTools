@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Linq;
 using DataPowerTools.Extensions;
 using ExcelDataReader.Tests;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System.Collections.Generic;
 
 namespace DataPowerTools.Tests
 {
@@ -131,6 +133,22 @@ namespace DataPowerTools.Tests
             Assert.AreEqual(d.Col3, "3");
             
             Assert.AreEqual(tt.Col4, "400");
+        }
+
+        [TestMethod]
+        public void Test1234_M()
+        {
+            var random = new Random();
+
+            var alphanumeric = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+            string RandomString(int n)
+                => new string(Enumerable.Range(0, n).Select(_ => alphanumeric[random.Next(alphanumeric.Length)]).ToArray());
+
+            var ids = Enumerable.Range(0, 900).Select(_ => RandomString(6)).ToList();
+            var dates = Enumerable.Range(0, 1978).Select(i => new DateTimeOffset(2013, 1, 1, 0, 0, 0, TimeSpan.Zero) + TimeSpan.FromDays(i)).ToList();
+
+            var df1 = dates.SelectMany(date => ids.Select(id => (Id: id, Date: date, Value1: random.NextDouble(), Value2: random.NextDouble()))).ToList();
+            var df2 = dates.SelectMany(date => ids.Select(id => (Id: id, Date: date, Returns: random.NextDouble()))).ToList();
         }
     }
 }
