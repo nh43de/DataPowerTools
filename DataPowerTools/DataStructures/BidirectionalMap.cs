@@ -18,7 +18,7 @@ namespace DataPowerTools.DataStructures
     /// </summary>
     /// <typeparam name="TLeft"></typeparam>
     /// <typeparam name="TRight"></typeparam>
-    public class BidirectionalMap<TLeft, TRight> : ICollection<Tuple<TLeft, TRight>>
+    internal class BidirectionalMap<TLeft, TRight> : ICollection<Tuple<TLeft, TRight>>
     {
         private readonly ObservableCollection<Tuple<TLeft, TRight>> Mappings;
         private readonly Dictionary<TLeft, TRight> _leftValues;

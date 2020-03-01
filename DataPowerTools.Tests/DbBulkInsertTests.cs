@@ -44,7 +44,6 @@ namespace ExcelDataReader.Tests
             conn.CloseAndDispose();
         }
 
-
         [TestMethod]
         public async Task TestBulkInsertUsingCsv()
         {
@@ -67,7 +66,7 @@ namespace ExcelDataReader.Tests
             await conn.CreateTableFor(tab, destinationtable);
             //
 
-            var csvData = tab.AsCsv();
+            var csvData = tab.ToCsvString();
 
             var r = Csv.ReadString(csvData);
 

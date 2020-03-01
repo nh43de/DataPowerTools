@@ -23,7 +23,7 @@ namespace DataPowerTools.Extensions
     /// <summary>
     /// <see cref="object" /> extensions.
     /// </summary>
-    public static class ObjectExtensions
+    internal static class ObjectExtensions
     {
         /// <summary>
         /// Copies all public, readable properties from the source object to the

@@ -5,7 +5,7 @@ using System.Threading;
 
 namespace DataPowerTools.DataStructures
 {
-    public class ConcurrentHashSet<T> : IDisposable
+    internal class ConcurrentHashSet<T> : IDisposable
     {
         private readonly ReaderWriterLockSlim _lock = new ReaderWriterLockSlim(LockRecursionPolicy.SupportsRecursion);
         public HashSet<T> Hashset { get; } = new HashSet<T>();
