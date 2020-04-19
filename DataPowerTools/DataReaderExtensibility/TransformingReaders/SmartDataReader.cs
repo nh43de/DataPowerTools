@@ -32,7 +32,7 @@ namespace DataPowerTools.DataReaderExtensibility.TransformingReaders
         }
 
         /// <summary>
-        ///     This is the mapping information between source and target.
+        ///     This is the mapping information between source and target. Rename to mappings
         /// </summary>
         public ColumnMappingInfo ColumnMappingInfo => _mappingInfoLazy.Value;
 

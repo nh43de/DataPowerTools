@@ -10,9 +10,9 @@
     <PackageTags>tools;helpers</PackageTags>
     <PackageIconUrl></PackageIconUrl>
     <PackageReleaseNotes></PackageReleaseNotes>
-    <Copyright>Copyright 2017</Copyright>
+    <Copyright>Copyright 2020</Copyright>
     <RepositoryType>git</RepositoryType>
-    <version>1.0.27</version>
+    <version>1.0.28</version>
     <RepositoryUrl>https://github.com/nh43de/DataPowerTools</RepositoryUrl>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net45|AnyCPU'">
