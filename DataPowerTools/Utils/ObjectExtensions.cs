@@ -5,21 +5,16 @@ using System.Data.Common;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
-using DataPowerTools.Extensions.MiscUtil.Reflection;
 using DataPowerTools.FastMember;
 using DataPowerTools.PowerTools;
 
 namespace DataPowerTools.Extensions
 {
-
+    //TODO: remove a lot of this or make internal
     //TODO: add a "type reflection scope" IDisposable to cache the type accessors for the functions that support using type accessors
     //TODO: add more type accessor support to some of these functions
     //TODO: dynamic dictionary stuff?
-
-    namespace MiscUtil.Reflection
-    {
-    }
-
+    
     /// <summary>
     /// <see cref="object" /> extensions.
     /// </summary>
