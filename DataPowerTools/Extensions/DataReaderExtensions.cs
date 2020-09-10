@@ -18,23 +18,20 @@ namespace DataPowerTools.Extensions
     public static class DataReaderExtensions
     {
         /// <summary>
-        /// Writes datareader to CSV.
+        /// Analyzes the rows in a DataReader and generates a CREATE TABLE statement from the data it finds.
         /// </summary>
-        public static void WriteCsv(this IDataReader reader, string outputFile)
+        /// <param name="reader"></param>
+        /// <param name="outputTableName"></param>
+        /// <param name="numberOfRowsToExamine"></param>
+        /// <returns></returns>
+        public static string FitToCreateTableStatement(this IDataReader reader, string outputTableName, int? numberOfRowsToExamine)
         {
-            Csv.Write(reader, outputFile);
+            return CreateTableSql.FromDataReader_Smart(outputTableName, reader, numberOfRowsToExamine);
         }
+         
 
-        /// <summary>
-        /// Writes datareader to CSV.
-        /// </summary>
-        public static string AsCsv(this IDataReader reader, bool writeHeaders = true)
-        {
-            return Csv.WriteString(reader);
-        }
-
-        #region Advanced data reader operations
-
+        #region Data reader operations
+        
         /// <summary>
         /// Renames columns.
         /// </summary>
@@ -45,7 +42,7 @@ namespace DataPowerTools.Extensions
         /// <returns></returns>
         public static IDataReader ApplyColumnsAliases<TDataReader>(
             this TDataReader dataReader,
-            string[] oldNames,  string[] newNames) where TDataReader : IDataReader
+            string[] oldNames, string[] newNames) where TDataReader : IDataReader
         {
             var dictionary = oldNames.Zip(newNames, (a, b) => new {Old = a, New = b})
                 .ToDictionary(x => x.Old, x => x.New);
@@ -956,8 +953,6 @@ namespace DataPowerTools.Extensions
             return rtn;
         }
 
-
-
         /// <summary>
         ///     This uses fastmember.
         /// </summary>
@@ -1016,12 +1011,10 @@ namespace DataPowerTools.Extensions
             return o;
         }
 
-
         public static string[] GetFieldNames(this IDataReader reader)
         {
             return GetFieldInfo(reader).Select(f => f.ColumnName).ToArray();
         }
-
 
         public static FieldValueInfo[] GetFieldValues<TDataReader>(this SmartDataReader<TDataReader> reader, IEnumerable<int> ordinals) where TDataReader : IDataReader
         {
@@ -1053,6 +1046,8 @@ namespace DataPowerTools.Extensions
             return fieldInfos;
         }
 
+        #endregion
+
         /// <summary>
         /// Get .ToString()'ed array of current IDataReader values.
         /// </summary>
@@ -1062,27 +1057,9 @@ namespace DataPowerTools.Extensions
         {
             return GetFieldValues(dr).Select(f => f.ToString()).ToArray();
         }
-
-
-
-        #endregion
-
-        /// <summary>
-        /// Analyzes the rows in a DataReader and generates a CREATE TABLE statement from the data it finds.
-        /// </summary>
-        /// <param name="reader"></param>
-        /// <param name="outputTableName"></param>
-        /// <param name="numberOfRowsToExamine"></param>
-        /// <returns></returns>
-        public static string FitToCreateTableStatement(this IDataReader reader, string outputTableName, int? numberOfRowsToExamine)
-        {
-            return CreateTableSql.FromDataReader_Smart(outputTableName, reader, numberOfRowsToExamine);
-        }
-
-       
-
-        //#region IDataReader read extensions
-
+        
+        //not really needed
+        #region IDataReader read extensions
 
         ///// <summary>
         /////     Reads a boolean (MS SQL "Bit") value from the specified IDataReader
@@ -1211,7 +1188,7 @@ namespace DataPowerTools.Extensions
         //    var idx = rdr.GetOrdinal(field);
         //    return rdr[idx].ToString();
         //}
-        //#endregion
 
+        #endregion
     }
 }

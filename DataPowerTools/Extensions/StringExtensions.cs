@@ -6,6 +6,7 @@ using DataPowerTools.Strings;
 
 namespace DataPowerTools.Extensions
 {
+    //TODO: add as sql command
     internal static class StringExtensions
     {
         public static readonly Regex IndentRegex = new Regex("^", RegexOptions.Compiled | RegexOptions.Multiline);

@@ -11,6 +11,8 @@ It also provides a powerful API for filtering and object materialization.
 
 - Coming soon
 
+- Debaser integration?
+
 ### Getting Starting
 
 1. Install DataPowerTools nuget.
@@ -32,3 +34,10 @@ It also provides a powerful API for filtering and object materialization.
 ### TODO:
 
 - Move SQL generation stuff to separate repo
+
+
+### Features
+
+Date string parsing
+Shallow comparisons
+Bulk inserts

@@ -171,9 +171,6 @@ namespace DataPowerTools.DataConnectivity
             return sb.ToString();
         }
 
-
-
-
         //TODO: needs to be support streaming to disk
 
 
