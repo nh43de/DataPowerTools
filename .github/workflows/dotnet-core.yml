@@ -26,5 +26,8 @@ jobs:
     - name: Publish NuGet
       uses: brandedoutcast/publish-nuget@v2.5.5
       with:
-        PROJECT_FILE_PATH: DataPowerTools/DataPowerTools/DataPowerTools.csproj
+        PROJECT_FILE_PATH: DataPowerTools/DataPowerTools.csproj
         NUGET_KEY: ${{secrets.NUGET_API_KEY}}
+        PACKAGE_NAME: DataPowerTools 
+        NUGET_SOURCE: https://api.nuget.org
+        INCLUDE_SYMBOLS: true
