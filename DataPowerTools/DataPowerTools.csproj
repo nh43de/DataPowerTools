@@ -14,7 +14,7 @@
     <RepositoryType>git</RepositoryType>
     <version>2020.9.10</version>
     <RepositoryUrl>https://github.com/nh43de/DataPowerTools</RepositoryUrl>
-    <SignAssembly>true</SignAssembly>
+    <SignAssembly>false</SignAssembly>
     <AssemblyOriginatorKeyFile>DataPowerTools.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net45|AnyCPU'">
