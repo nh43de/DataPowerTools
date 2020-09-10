@@ -6,6 +6,7 @@ using System.Data;
 using System.Data.Common;
 using System.Diagnostics;
 using System.Linq;
+using DataPowerTools.Csv;
 using DataPowerTools.DataConnectivity.Sql;
 using DataPowerTools.DataStructures;
 using DataPowerTools.FastMember;
