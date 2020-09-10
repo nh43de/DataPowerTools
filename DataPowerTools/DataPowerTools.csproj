@@ -12,7 +12,7 @@
     <PackageReleaseNotes></PackageReleaseNotes>
     <Copyright>Copyright 2017</Copyright>
     <RepositoryType>git</RepositoryType>
-    <version>1.0.27</version>
+    <version>2020.9.10</version>
     <RepositoryUrl>https://github.com/nh43de/DataPowerTools</RepositoryUrl>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net45|AnyCPU'">
@@ -29,13 +29,5 @@
     <PackageReference Include="System.Data.SqlClient" Version="4.4.3" />
     <PackageReference Include="System.Reflection.Emit" Version="4.0.1" />
     <PackageReference Include="System.Reflection.Emit.Lightweight" Version="4.0.1" />
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Remove="DataConnectivity\Csv\**" />
-    <EmbeddedResource Remove="DataConnectivity\Csv\**" />
-    <None Remove="DataConnectivity\Csv\**" />
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Csv\Extensions\" />
   </ItemGroup>
 </Project>
