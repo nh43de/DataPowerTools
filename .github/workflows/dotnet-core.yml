@@ -25,6 +25,6 @@ jobs:
       run: dotnet test --no-restore --verbosity normal
     - name: Publish NuGet
       uses: brandedoutcast/publish-nuget@v2.5.5
-        with:
-            PROJECT_FILE_PATH: DataPowerTools/DataPowerTools/DataPowerTools.csproj
-            NUGET_KEY: ${{secrets.NUGET_API_KEY}}
+      with:
+        PROJECT_FILE_PATH: DataPowerTools/DataPowerTools/DataPowerTools.csproj
+        NUGET_KEY: ${{secrets.NUGET_API_KEY}}
