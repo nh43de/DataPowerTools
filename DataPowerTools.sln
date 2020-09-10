@@ -18,12 +18,14 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{E49FB4F1-55C7-47F2-8CB1-97DD863479F9}"
 	ProjectSection(SolutionItems) = preProject
 		.gitignore = .gitignore
-		appveyor.yml = appveyor.yml
 		Build.ps1 = Build.ps1
+		.github\workflows\ci.yml = .github\workflows\ci.yml
 		LICENSE = LICENSE
+		NuGet.Config = NuGet.Config
 		nuget.exe = nuget.exe
+		Push.ps1 = Push.ps1
 		README.md = README.md
-		readme.txt = readme.txt
+		.github\workflows\release.yml = .github\workflows\release.yml
 	EndProjectSection
 EndProject
 Global

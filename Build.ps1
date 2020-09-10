@@ -1,4 +1,4 @@
-# Taken from psake https://github.com/psake/psake
+# Taken from https://github.com/jbogard/MediatR
 
 <#
 .SYNOPSIS
@@ -22,21 +22,30 @@ function Exec
     }
 }
 
-if(Test-Path .\artifacts) { Remove-Item .\artifacts -Force -Recurse }
+$artifacts = ".\artifacts"
 
-exec { & dotnet restore }
+if(Test-Path $artifacts) { Remove-Item $artifacts -Force -Recurse }
 
-$branch = @{ $true = $env:APPVEYOR_REPO_BRANCH; $false = $(git symbolic-ref --short -q HEAD) }[$env:APPVEYOR_REPO_BRANCH -ne $NULL];
-$revision = @{ $true = "{0:00000}" -f [convert]::ToInt32("0" + $env:APPVEYOR_BUILD_NUMBER, 10); $false = "local" }[$env:APPVEYOR_BUILD_NUMBER -ne $NULL];
-$suffix = @{ $true = ""; $false = "$($branch.Substring(0, [math]::Min(10,$branch.Length)))-$revision"}[$branch -eq "master" -and $revision -ne "local"]
-$commitHash = $(git rev-parse --short HEAD)
-$buildSuffix = @{ $true = "$($suffix)-$($commitHash)"; $false = "$($branch)-$($commitHash)" }[$suffix -ne ""]
+exec { & dotnet clean -c Release }
 
-$version="$env:MajorVersion.$env:MinorVersion.$env:APPVEYOR_BUILD_NUMBER";
-#
-exec { & dotnet build .\DataPowerTools.sln -c Release --version-suffix $version }
-#
-exec { & dotnet pack .\DataPowerTools\DataPowerTools.csproj -c Release -o ..\artifacts --include-symbols --version-suffix $version /p:PackageVersion=$version --no-build }
-echo "------------------------------------------"
-echo "build: Build version suffix is [$version]"
-echo "------------------------------------------"
+exec { & dotnet build -c Release }
+
+exec { & dotnet test -c Release -r $artifacts --no-build -l trx --verbosity=normal }
+
+<#
+$samples = Get-ChildItem .\samples\MediatR.Examples.*
+
+foreach ($sample in $samples) {
+    Push-Location -Path $sample
+
+    try {
+        exec { & dotnet run -c Release --no-build --no-restore }
+    } catch {
+    } finally {
+        Pop-Location
+    }
+}
+#>
+
+exec { & dotnet pack .\DataPowerTools\DataPowerTools.csproj -c Release -o $artifacts --include-symbols --no-build }
+
