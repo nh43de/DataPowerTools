@@ -10,7 +10,6 @@ using System.Text;
 using System.Threading.Tasks;
 using DataPowerTools.Extensions;
 using DataPowerTools.PowerTools;
-using Microsoft.VisualBasic.CompilerServices;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace ExcelDataReader.Tests

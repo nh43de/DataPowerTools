@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
+using System.Reflection;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace ExcelDataReader.Tests
@@ -16,8 +17,8 @@ namespace ExcelDataReader.Tests
 
         public static string GetKey(string key)
         {
-            string pathFile = ConfigurationManager.AppSettings[key];
-            Debug.WriteLine(pathFile);
+            string pathFile = Assembly.GetExecutingAssembly().Location; //ConfigurationManager.AppSettings[key];
+                Debug.WriteLine(pathFile);
             return pathFile;
         }
 

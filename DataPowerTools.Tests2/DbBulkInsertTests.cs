@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.Data;
 using System.Data.Common;
 using System.Data.SqlClient;
@@ -13,7 +12,6 @@ using DataPowerTools.DataConnectivity;
 using DataPowerTools.DataConnectivity.Sql;
 using DataPowerTools.Extensions;
 using DataPowerTools.PowerTools;
-using Microsoft.VisualBasic.CompilerServices;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace ExcelDataReader.Tests

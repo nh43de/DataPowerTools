@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Data.SQLite;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using DataPowerTools.Extensions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -24,8 +21,11 @@ namespace ExcelDataReader.Tests
 
             var rr = d.ExecuteObject<Test123>("SELECT * FROM Test123");
 
+            object o;
+            
+
             Assert.AreEqual(rr.Col1, 1);
-            Assert.AreEqual(rr.Col2.ConvertTo<double>(), (double)2.344);
+            Assert.AreEqual((double)rr.Col2, (double)2.344);
             Assert.AreEqual(rr.Col3, "this is a test");
             
             d.Close();

@@ -1,5 +1,4 @@
-﻿using System;
-using DataPowerTools.Serialization.Extensions;
+﻿using DataPowerTools.Serialization.Extensions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace ExcelDataReader.Tests

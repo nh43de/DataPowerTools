@@ -225,6 +225,19 @@ namespace DataPowerTools.Extensions
             return (T)value.ConvertTo(typeof(T));
         }
 
+
+        /// <summary>
+        /// Converts the object to the specified type.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <typeparam name="TDest">Target type</typeparam>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public static TDest ConvertTo<TDest, T>(this T value)
+        {
+            return (TDest)value.ConvertTo(typeof(TDest));
+        }
+
         /// <summary>Converts the given value to the given type. DbNull's will be converted to null.</summary>
         /// <param name="value">Value to convert.</param>
         /// <param name="type">Type to convert the given value to.</param>
