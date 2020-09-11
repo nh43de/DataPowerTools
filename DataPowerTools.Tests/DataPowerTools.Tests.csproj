@@ -1,21 +1,30 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>netcoreapp2.0</TargetFramework>
-    <IsPackable>false</IsPackable>
-    <ApplicationIcon />
+    <TargetFramework>netcoreapp2.1</TargetFramework>
+    <AssemblyName>DataPowerTools.Tests</AssemblyName>
+    <PackageId>DataPowerTools.Tests</PackageId>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.5.0" />
-    <PackageReference Include="MSTest.TestAdapter" Version="1.2.0" />
-    <PackageReference Include="MSTest.TestFramework" Version="1.2.0" />
-    <PackageReference Include="System.Configuration.ConfigurationManager" Version="4.4.1" />
-    <PackageReference Include="System.Data.SQLite.Core" Version="1.0.108" />
-    <PackageReference Include="System.Data.SQLite.EF6" Version="1.0.108" />
-    <PackageReference Include="System.Data.SQLite.Linq" Version="1.0.108" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.7.1" />
+    <PackageReference Include="MSTest.TestAdapter" Version="2.1.2" />
+    <PackageReference Include="MSTest.TestFramework" Version="2.1.2" />
+    <PackageReference Include="System.Configuration.ConfigurationManager" Version="4.7.0" />
+    <PackageReference Include="System.Data.SQLite.Core" Version="1.0.113.1" />
+    <PackageReference Include="System.Data.SQLite.EF6" Version="1.0.113" />
+    <PackageReference Include="System.Data.SQLite.Linq" Version="1.0.113" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\DataPowerTools\DataPowerTools.csproj" />
   </ItemGroup>
+
+
+  <ItemGroup Condition=" '$(TargetFramework)' == 'net461' ">
+    <Reference Include="System" />
+    <Reference Include="Microsoft.CSharp" />
+    <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.0-preview.2" PrivateAssets="All" />
+  </ItemGroup>
+
+
   <ItemGroup>
     <None Update="Resources\ConsumerLoans.xlsx">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
