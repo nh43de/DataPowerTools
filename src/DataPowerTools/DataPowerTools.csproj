@@ -12,10 +12,14 @@
     <PackageReleaseNotes></PackageReleaseNotes>
     <Copyright>Copyright 2017</Copyright>
     <RepositoryType>git</RepositoryType>
-    <version>2020.9.10</version>
     <RepositoryUrl>https://github.com/nh43de/DataPowerTools</RepositoryUrl>
-    <SignAssembly>false</SignAssembly>
-    <AssemblyOriginatorKeyFile>DataPowerTools.snk</AssemblyOriginatorKeyFile>
+    <SignAssembly>true</SignAssembly>
+    <AssemblyOriginatorKeyFile>..\..\DataPowerTools.snk</AssemblyOriginatorKeyFile>
+    <MinVerTagPrefix>v</MinVerTagPrefix>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    <MinVerTagPrefix>v</MinVerTagPrefix>
+    <ContinuousIntegrationBuild Condition="'$(GITHUB_ACTIONS)' == 'true'">true</ContinuousIntegrationBuild>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net45|AnyCPU'">
     <DocumentationFile>bin\Release\DataPowerTools.xml</DocumentationFile>
@@ -31,6 +35,12 @@
     <PackageReference Include="System.Data.SqlClient" Version="4.4.3" />
     <PackageReference Include="System.Reflection.Emit" Version="4.0.1" />
     <PackageReference Include="System.Reflection.Emit.Lightweight" Version="4.0.1" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="MinVer" Version="2.3.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
   </ItemGroup>
   <ItemGroup>
     <Compile Update="DataConnectivity\LumenworksCsv\Resources\ExceptionMessage.Designer.cs">
