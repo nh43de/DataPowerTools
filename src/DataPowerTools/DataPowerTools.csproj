@@ -1,0 +1,48 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFrameworks>net461;netstandard2.0;</TargetFrameworks>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <PackageId>DataPowerTools</PackageId>
+    <AssemblyName>DataPowerTools</AssemblyName>
+    <Authors>Nathan Hollis</Authors>
+    <Description>Power Tools for In-Memory Data Processing</Description>
+    <PackageProjectUrl>https://github.com/nh43de/DataPowerTools</PackageProjectUrl>
+    <PackageTags>tools;helpers</PackageTags>
+    <PackageIconUrl></PackageIconUrl>
+    <PackageReleaseNotes></PackageReleaseNotes>
+    <Copyright>Copyright 2017</Copyright>
+    <RepositoryType>git</RepositoryType>
+    <version>2020.9.10</version>
+    <RepositoryUrl>https://github.com/nh43de/DataPowerTools</RepositoryUrl>
+    <SignAssembly>false</SignAssembly>
+    <AssemblyOriginatorKeyFile>DataPowerTools.snk</AssemblyOriginatorKeyFile>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net45|AnyCPU'">
+    <DocumentationFile>bin\Release\DataPowerTools.xml</DocumentationFile>
+  </PropertyGroup>
+  <ItemGroup Condition=" '$(TargetFramework)' == 'net461' ">
+    <Reference Include="System" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
+  </ItemGroup>
+  <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard2.0' ">
+    <PackageReference Include="Microsoft.CSharp" Version="4.4.1" />
+    <PackageReference Include="System.ComponentModel.Annotations" Version="4.4.1" />
+    <PackageReference Include="System.Data.SqlClient" Version="4.4.3" />
+    <PackageReference Include="System.Reflection.Emit" Version="4.0.1" />
+    <PackageReference Include="System.Reflection.Emit.Lightweight" Version="4.0.1" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Update="DataConnectivity\LumenworksCsv\Resources\ExceptionMessage.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>ExceptionMessage.resx</DependentUpon>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Update="DataConnectivity\LumenworksCsv\Resources\ExceptionMessage.resx">
+      <Generator>PublicResXFileCodeGenerator</Generator>
+      <LastGenOutput>ExceptionMessage.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
+</Project>

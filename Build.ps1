@@ -30,7 +30,7 @@ exec { & dotnet clean -c Release }
 
 exec { & dotnet build -c Release }
 
-exec { & dotnet test .\DataPowerTools.Tests2 -c Release -r $artifacts --no-build -l trx --verbosity=normal }
+exec { & dotnet test -c Release -r $artifacts --no-build -l trx --verbosity=normal }
 
 <#
 $samples = Get-ChildItem .\samples\MediatR.Examples.*
@@ -47,5 +47,5 @@ foreach ($sample in $samples) {
 }
 #>
 
-exec { & dotnet pack .\DataPowerTools\DataPowerTools.csproj -c Release -o $artifacts --include-symbols --no-build }
+exec { & dotnet pack .\src\DataPowerTools\DataPowerTools.csproj -c Release -o $artifacts --include-symbols --no-build }
 
