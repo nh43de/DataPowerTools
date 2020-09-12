@@ -48,6 +48,6 @@ foreach ($sample in $samples) {
 #>
 
 
-exec { & dotnet pack .\src\DataPowerTools\DataPowerTools.csproj -c $(Configuration) -o $artifacts --include-symbols --no-build }
+exec { & dotnet pack .\src\DataPowerTools\DataPowerTools.csproj -c Release -o $artifacts --include-symbols --no-build }
 
-exec { & dotnet pack .\src\DataPowerTools.Connectivity\DataPowerTools.Connectivity.csproj -c $(Configuration) -o $artifacts --include-symbols --no-build }
+exec { & dotnet pack .\src\DataPowerTools.Connectivity\DataPowerTools.Connectivity.csproj -c Release -o $artifacts --include-symbols --no-build }
