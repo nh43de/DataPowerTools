@@ -1,35 +1,30 @@
-﻿using Newtonsoft.Json;
+﻿using System.Text.Json;
 
 namespace DataPowerTools.Connectivity.Json
 {
     public static class JsonSerializationExtensions
     {
-        public static TObject ToObject<TObject>(this string jsonString, bool ignoreNonSerializableClassReferences = false)
+        public static TObject ToObject<TObject>(this string jsonString)
         {
-            return JsonConvert.DeserializeObject<TObject>(jsonString, new JsonSerializerSettings
-            {
-                ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
-                NullValueHandling = NullValueHandling.Ignore,
-                MissingMemberHandling = MissingMemberHandling.Ignore,
-                Error = (sender, args) => {
-                    args.ErrorContext.Handled = true;
-                }
-            });
+            var r = JsonSerializer.Deserialize<TObject>(jsonString);
+
+            return r;
         }
 
         public static string ToJson(this object serializableObject, bool indent = false, bool ignoreNonSerializableClassReferences = false)
         {
-            return JsonConvert.SerializeObject(serializableObject, indent ? Formatting.Indented : Formatting.None,
-                new JsonSerializerSettings
-                {
-                    ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
-                    NullValueHandling = NullValueHandling.Ignore,
-                    MissingMemberHandling = MissingMemberHandling.Ignore,
-                    Error = (sender, args) => { args.ErrorContext.Handled = true; },
-                    Converters = ignoreNonSerializableClassReferences
-                        ? new[] {new SerializableAttributeConverter()}
-                        : new JsonConverter[] { }
-                });
+            var o = new JsonSerializerOptions
+            {
+                WriteIndented = indent
+            };
+
+            if (ignoreNonSerializableClassReferences)
+            {
+                o.Converters.Clear();
+                o.Converters.Add(new SerializableAttributeConverter());
+            }
+
+            return JsonSerializer.Serialize(serializableObject, o);
         }
     }
 }
