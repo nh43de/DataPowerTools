@@ -31,6 +31,7 @@ namespace DataPowerTools.DataReaderExtensibility.TransformingReaders
             {
                 disposable.Dispose();
             }
+            DataReader.Dispose();
         }
     }
 }

@@ -69,4 +69,8 @@
     </None>
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="SampleData\" />
+  </ItemGroup>
+
 </Project>

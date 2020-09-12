@@ -6,6 +6,7 @@ using System.Data;
 using System.Data.Common;
 using System.Diagnostics;
 using System.Linq;
+using System.Threading.Tasks;
 using DataPowerTools.Csv;
 using DataPowerTools.DataConnectivity.Sql;
 using DataPowerTools.DataStructures;
@@ -313,7 +314,7 @@ namespace DataPowerTools.Extensions
         /// <param name="numberOfRowsToExamine"></param>
         /// <param name="ignoreNonStringReferenceTypes"></param>
         /// <returns></returns>
-        public static string FitToCreateTableStatement<T>(this IEnumerable<T> enumerable, string outputTableName, 
+        public static string FitToCreateTableSql<T>(this IEnumerable<T> enumerable, string outputTableName, 
             int? numberOfRowsToExamine = null, 
             bool ignoreNonStringReferenceTypes = true)
         {
@@ -322,5 +323,7 @@ namespace DataPowerTools.Extensions
 
             return r;
         }
+
+
     }
 }

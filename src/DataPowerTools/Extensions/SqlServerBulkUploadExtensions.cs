@@ -18,7 +18,6 @@ namespace DataPowerTools.Extensions
     /// </summary>
     public static class SqlServerBulkUploadExtensions
     {
-
         /// <summary>
         /// Bulk upload enumerable using a connection string.
         /// </summary>

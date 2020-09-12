@@ -25,10 +25,12 @@ namespace DataPowerTools.Extensions
         /// <param name="outputTableName"></param>
         /// <param name="numberOfRowsToExamine"></param>
         /// <returns></returns>
-        public static string FitToCreateTableStatement(this IDataReader reader, string outputTableName, int? numberOfRowsToExamine)
+        public static string FitToCreateTableSql(this IDataReader reader, string outputTableName, int? numberOfRowsToExamine)
         {
             return CreateTableSql.FromDataReader_Smart(outputTableName, reader, numberOfRowsToExamine);
         }
+
+
 
 
         #region Data reader operations
@@ -921,6 +923,8 @@ namespace DataPowerTools.Extensions
 
             if (hascolumns == false)
                 InitializeColumns();
+
+            dr.Dispose();
 
             return dt;
         }

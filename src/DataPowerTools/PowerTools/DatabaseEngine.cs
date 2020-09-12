@@ -4,6 +4,9 @@
     {
         MySql,
         Postgre,
+        /// <summary>
+        /// Recommended batch size is 1 for SQLITE bulk inserts
+        /// </summary>
         Sqlite,
         SqlServer
     }

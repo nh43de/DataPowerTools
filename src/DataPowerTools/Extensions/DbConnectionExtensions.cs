@@ -60,7 +60,7 @@ namespace DataPowerTools.Extensions
         /// <returns></returns>
         public static Task CreateTableFor<T>(this DbConnection connection, IEnumerable<T> enumerable, string outputTableName, bool ignoreNonStringReferenceTypes = true)
         {
-            var sql = enumerable.FitToCreateTableStatement(outputTableName, null, ignoreNonStringReferenceTypes);
+            var sql = enumerable.FitToCreateTableSql(outputTableName, null, ignoreNonStringReferenceTypes);
 
             var cmd = connection.CreateSqlCommand(sql);
 
@@ -78,7 +78,7 @@ namespace DataPowerTools.Extensions
         /// <returns></returns>
         public static Task CreateTableFor(this DbConnection connection, IDataReader reader, string outputTableName, bool ignoreNonStringReferenceTypes = true)
         {
-            var sql = reader.FitToCreateTableStatement(outputTableName, null);
+            var sql = reader.FitToCreateTableSql(outputTableName, null);
 
             var cmd = connection.CreateSqlCommand(sql);
 

@@ -57,7 +57,7 @@ namespace ExcelDataReader.Tests
                     Col2 = 20,
                     Col3 = "abc",
                 }
-            }.Repeat(10000).ToArray();
+            }.Repeat(100).ToArray();
 
             var destinationtable = "DestinationTable2";
 
@@ -90,7 +90,7 @@ namespace ExcelDataReader.Tests
                     Col2 = 20,
                     Col3 = "abc",
                 }
-            }.Repeat(10000).ToArray();
+            }.Repeat(100).ToArray();
 
             var destinationtable = "DestinationTable2";
 
@@ -118,7 +118,7 @@ namespace ExcelDataReader.Tests
                     Col2 = 20,
                     Col3 = "abc",
                 }
-            }.Repeat(10000).ToArray().ToDataReader();
+            }.Repeat(100).ToArray().ToDataReader();
 
             var destinationtable = "DestinationTable2";
 
