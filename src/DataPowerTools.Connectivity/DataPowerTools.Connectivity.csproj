@@ -44,6 +44,7 @@
     <ProjectReference Include="..\DataPowerTools\DataPowerTools.csproj" />
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="Helpers\" />
     <Folder Include="Json\" />
   </ItemGroup>
   <ItemGroup>

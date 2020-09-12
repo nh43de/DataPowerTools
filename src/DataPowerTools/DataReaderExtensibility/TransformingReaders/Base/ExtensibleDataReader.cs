@@ -61,4 +61,6 @@ namespace DataPowerTools.DataReaderExtensibility.TransformingReaders
         public virtual bool IsClosed => DataReader.IsClosed;
         public virtual int RecordsAffected => DataReader.RecordsAffected;
     }
+
+
 }

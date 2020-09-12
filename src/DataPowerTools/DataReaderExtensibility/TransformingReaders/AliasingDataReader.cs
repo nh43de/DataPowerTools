@@ -8,6 +8,10 @@ using DataPowerTools.Extensions;
 
 namespace DataPowerTools.DataReaderExtensibility.TransformingReaders
 {
+    /// <summary>
+    /// This data reader applies a new set of names (Aliases) to the IDataReader[string] accessor.
+    /// </summary>
+    /// <typeparam name="TDataReader"></typeparam>
     public class AliasingDataReader<TDataReader> : ExtensibleDataReaderExplicit<TDataReader> where TDataReader : IDataReader
     {
         //these need to be lazy because of the way data readers work (field names may not be available until first read)
@@ -88,4 +92,48 @@ namespace DataPowerTools.DataReaderExtensibility.TransformingReaders
         public override bool IsDBNull(int i) =>
             (GetValue(i) == null) || Convert.IsDBNull(GetValue(i));
     }
+
+
+    ///// <summary>
+    ///// This data reader applies a new set of names (Aliases) to the IDataReader[string] accessor.
+    /////
+    ///// One of the weaker data readers. Can get values by index but not by a column name.
+    ///// </summary>
+    ///// <typeparam name="TDataReader"></typeparam>
+    //public class AliasingDataReader2<TDataReader> : ExtensibleDataReaderBase<TDataReader> where TDataReader : IDataReader
+    //{
+    //    //these need to be lazy because of the way data readers work (field names may not be available until first read)
+
+    //    private readonly Dictionary<int, string> _indexToNameMapping;
+
+
+    //    public override int FieldCount => _indexToNameMapping.Count;
+
+    //    public override string GetName(int i)
+    //    {
+    //        return _indexToNameMapping[i];
+    //    }
+
+    //    public override int GetOrdinal(string name)
+    //    {
+    //        throw new NotSupportedException();
+    //    }
+
+    //    public override int GetChildOrdinal(int i)
+    //    {
+    //        throw new NotImplementedException();
+    //    }
+
+    //    public override object GetValue(int i)
+    //    {
+    //        throw new NotImplementedException();
+    //    }
+
+    //    public AliasingDataReader2(TDataReader reader, Dictionary<int, string> columnNames)
+    //        : base(reader)
+    //    {
+    //        _indexToNameMapping = columnNames;
+    //    }
+
+    //}
 }
