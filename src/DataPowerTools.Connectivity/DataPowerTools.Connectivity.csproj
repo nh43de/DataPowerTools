@@ -1,0 +1,39 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFrameworks>net461;netstandard2.0;</TargetFrameworks>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <PackageId>DataPowerTools.Connectivity</PackageId>
+    <AssemblyName>DataPowerTools.Connectivity</AssemblyName>
+    <Authors>Nathan Hollis</Authors>
+    <Description>Power Tools for In-Memory Data Processing</Description>
+    <PackageProjectUrl>https://github.com/nh43de/DataPowerTools</PackageProjectUrl>
+    <PackageTags>tools;helpers</PackageTags>
+    <PackageIconUrl></PackageIconUrl>
+    <PackageReleaseNotes></PackageReleaseNotes>
+    <Copyright>Copyright 2017</Copyright>
+    <RepositoryType>git</RepositoryType>
+    <RepositoryUrl>https://github.com/nh43de/DataPowerTools</RepositoryUrl>
+    <SignAssembly>true</SignAssembly>
+    <AssemblyOriginatorKeyFile>..\..\DataPowerTools.snk</AssemblyOriginatorKeyFile>
+    <MinVerTagPrefix>v</MinVerTagPrefix>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    <MinVerTagPrefix>v</MinVerTagPrefix>
+    <ContinuousIntegrationBuild Condition="'$(GITHUB_ACTIONS)' == 'true'">true</ContinuousIntegrationBuild>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net45|AnyCPU'">
+    <DocumentationFile>bin\Release\DataPowerTools.Csv.xml</DocumentationFile>
+  </PropertyGroup>
+  
+  <ItemGroup>
+    <PackageReference Include="ExcelDataReader" Version="3.6.0" />
+    <PackageReference Include="ExcelDataReader.DataSet" Version="3.6.0" />
+    <PackageReference Include="MinVer" Version="2.3.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\DataPowerTools\DataPowerTools.csproj" />
+  </ItemGroup>
+</Project>

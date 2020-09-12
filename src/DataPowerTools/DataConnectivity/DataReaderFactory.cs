@@ -1,8 +1,19 @@
 ﻿using System.Data;
+using CsvDataReader;
 
 namespace DataPowerTools.DataConnectivity
 {
-    public delegate IDataReader DataReaderFactory();
 
-    public delegate IDataReader DataReaderFactory<in T>(T item);
+    public class DataReaderFactory
+    {
+
+
+        //public DataReaderFactory()
+        //{
+        //    var d = new CsvReader();
+        //}
+
+
+
+    }
 }
