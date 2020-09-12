@@ -2,7 +2,7 @@
 
 namespace ExcelDataReader.Tests
 {
-    [TestClass]
+    //[TestClass] //uncomment to enable
     public static class TestDb
     {
         /// <summary>
@@ -10,7 +10,7 @@ namespace ExcelDataReader.Tests
         /// </summary>
         public static DatabaseTestHarness Instance { get; private set; }
 
-        //[AssemblyInitialize]
+        [AssemblyInitialize]
         public static void InitializeHarness(TestContext ctx)
         {
             Instance = new DatabaseTestHarness();

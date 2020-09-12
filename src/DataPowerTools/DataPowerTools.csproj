@@ -25,26 +25,14 @@
   <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net45|AnyCPU'">
     <DocumentationFile>bin\Release\DataPowerTools.xml</DocumentationFile>
   </PropertyGroup>
-  <ItemGroup Condition=" '$(TargetFramework)' == 'net461' ">
-    <Reference Include="System" />
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.ComponentModel.DataAnnotations" />
-  </ItemGroup>
-  <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard2.0' ">
-    <PackageReference Include="Microsoft.CSharp" Version="4.4.1" />
-    <PackageReference Include="System.ComponentModel.Annotations" Version="4.4.1" />
-    <PackageReference Include="System.Data.SqlClient" Version="4.4.3" />
-    <PackageReference Include="System.Reflection.Emit" Version="4.0.1" />
-    <PackageReference Include="System.Reflection.Emit.Lightweight" Version="4.0.1" />
-  </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
+    <PackageReference Include="Microsoft.Data.SqlClient" Version="2.0.1" />
     <PackageReference Include="MinVer" Version="2.3.0">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="System.ComponentModel.Annotations" Version="4.7.0" />
-    <PackageReference Include="System.Data.SqlClient" Version="4.8.2" />
     <PackageReference Include="System.Reflection.Emit" Version="4.7.0" />
     <PackageReference Include="System.Reflection.Emit.Lightweight" Version="4.7.0" />
   </ItemGroup>
