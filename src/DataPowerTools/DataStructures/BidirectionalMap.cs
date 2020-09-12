@@ -18,64 +18,91 @@ namespace DataPowerTools.DataStructures
     /// </summary>
     /// <typeparam name="TLeft"></typeparam>
     /// <typeparam name="TRight"></typeparam>
-    internal class BidirectionalMap<TLeft, TRight> : ICollection<Tuple<TLeft, TRight>>
+    public class BidirectionalMap<TLeft, TRight> : ICollection<Tuple<TLeft, TRight>>
     {
-        private readonly ObservableCollection<Tuple<TLeft, TRight>> Mappings;
+        private readonly ICollection<Tuple<TLeft, TRight>> _mappings; //observable so that when collection changed then 
         private readonly Dictionary<TLeft, TRight> _leftValues;
         private readonly Dictionary<TRight, TLeft> _rightValues;
+
+
+        public BidirectionalMap(IEqualityComparer<TLeft> leftComparer = null, IEqualityComparer<TRight> rightComparer = null)
+        {
+            _leftValues = leftComparer == null
+                ? new Dictionary<TLeft, TRight>()
+                : new Dictionary<TLeft, TRight>(leftComparer);
+
+            _rightValues = rightComparer == null
+                ? new Dictionary<TRight, TLeft>()
+                : new Dictionary<TRight, TLeft>(rightComparer);
+
+            _mappings = new List<Tuple<TLeft, TRight>>();
+        }
 
         /// <summary>
         ///     Default constructor. Takes in a list of tuples that represent the mappings.
         /// </summary>
         /// <param name="mappings"></param>
         /// <param name="leftComparer"></param>
-        public BidirectionalMap(IEnumerable<Tuple<TLeft, TRight>> mappings, IEqualityComparer<TLeft> leftComparer = null)
+        /// <param name="rightComparer"></param>
+        public BidirectionalMap(IEnumerable<Tuple<TLeft, TRight>> mappings, 
+            IEqualityComparer<TLeft> leftComparer = null, 
+            IEqualityComparer<TRight> rightComparer = null) : this(leftComparer, rightComparer)
+        {
+            foreach (var mapping in mappings)
+            {
+                Add(mapping);
+            }
+        }
+
+        /// <summary>
+        ///     Default constructor. Takes in a list of tuples that represent the mappings.
+        /// </summary>
+        /// <param name="mappings"></param>
+        /// <param name="leftComparer"></param>
+        /// <param name="rightComparer"></param>
+        public BidirectionalMap(IEnumerable<KeyValuePair<TLeft, TRight>> mappings, 
+            IEqualityComparer<TLeft> leftComparer = null,
+            IEqualityComparer<TRight> rightComparer = null) : this(leftComparer, rightComparer)
         {
             _leftValues = leftComparer == null
                 ? new Dictionary<TLeft, TRight>()
                 : new Dictionary<TLeft, TRight>(leftComparer);
             _rightValues = new Dictionary<TRight, TLeft>();
-            Mappings = mappings.ToObservableCollection();
-            UpdateMappings();
-        }
 
-        public BidirectionalMap()
-        {
-            _leftValues = new Dictionary<TLeft, TRight>();
-            _rightValues = new Dictionary<TRight, TLeft>();
-            Mappings = new ObservableCollection<Tuple<TLeft, TRight>>();
-            Mappings.CollectionChanged += (sender, args) => UpdateMappings();
+            foreach (var keyValuePair in mappings)
+            {
+                Add(keyValuePair);
+            }
         }
-
 
         public TLeft this[TRight i] => GetLeft(i);
 
         public TRight this[TLeft i] => GetRight(i);
 
-        /// <summary>
-        ///     Update mappings.
-        /// </summary>
-        private void UpdateMappings()
+        public void Add(KeyValuePair<TLeft, TRight> keyValuePair)
         {
-            Tuple<TLeft, TRight> mappingItem = null;
+            Add(keyValuePair.Key, keyValuePair.Value);
+        }
+
+        public void Add(TLeft left, TRight right)
+        {
             try
             {
-                foreach (var mapItem in Mappings)
-                {
-                    mappingItem = mapItem;
-                    _leftValues.Add(mapItem.Item1, mapItem.Item2);
-                    _rightValues.Add(mapItem.Item2, mapItem.Item1);
-                }
+                _leftValues.Add(left, right);
+                _rightValues.Add(right, left);
+                _mappings.Add(new Tuple<TLeft, TRight>(left, right));
             }
             catch (Exception)
             {
-                if (mappingItem == null)
-                    throw new ItemsNotOneToOneException();
-
-                throw new ItemsNotOneToOneException($"[{mappingItem.Item1},{mappingItem.Item2}]");
+                throw new ItemsNotOneToOneException($"[{left},{right}]");
             }
         }
 
+        public void Add(Tuple<TLeft, TRight> mapItem)
+        {
+            Add(mapItem.Item1, mapItem.Item2);
+        }
+        
         /// <summary>
         ///     Returns true if right contains key.
         /// </summary>
@@ -170,45 +197,35 @@ namespace DataPowerTools.DataStructures
 
         IEnumerator IEnumerable.GetEnumerator()
         {
-            return Mappings.GetEnumerator();
+            return _mappings.GetEnumerator();
         }
 
         public IEnumerator<Tuple<TLeft, TRight>> GetEnumerator()
         {
-            return Mappings.AsEnumerable().GetEnumerator();
-        }
-
-        public void Add(Tuple<TLeft, TRight> item)
-        {
-            Mappings.Add(item);
+            return _mappings.AsEnumerable().GetEnumerator();
         }
 
         public void Clear()
         {
-            Mappings.Clear();
+            _mappings.Clear();
         }
 
         public bool Contains(Tuple<TLeft, TRight> item)
         {
-            return Mappings.Contains(item);
+            return _mappings.Contains(item);
         }
 
         public void CopyTo(Tuple<TLeft, TRight>[] array, int arrayIndex)
         {
-            Mappings.CopyTo(array, arrayIndex);
+            _mappings.CopyTo(array, arrayIndex);
         }
 
         public bool Remove(Tuple<TLeft, TRight> item)
         {
-            return Mappings.Remove(item);
+            return _mappings.Remove(item);
         }
 
-        public int Count => Mappings.Count;
+        public int Count => _mappings.Count;
         public bool IsReadOnly => false;
-
-        public void Add(TLeft left, TRight right)
-        {
-            this.Mappings.Add(new Tuple<TLeft, TRight>(left,right));
-        }
     }
 }
