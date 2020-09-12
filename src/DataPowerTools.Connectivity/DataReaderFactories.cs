@@ -5,6 +5,7 @@ using System.IO;
 using CsvDataReader;
 using System.Collections.Generic;
 using System.Linq;
+using DataPowerTools.Connectivity.Helpers;
 using DataPowerTools.Extensions;
 using ExcelDataReader;
 
@@ -43,7 +44,10 @@ namespace DataPowerTools.Connectivity
             {
                 case ".xls":
                 case ".xlsx":
-                    reader = Excel.GetDataReader(fileStream, fileName);
+                    reader = Excel.GetDataReader(fileStream, fileName, new HeaderReaderConfiguration()
+                    {
+                        UseHeaderRow = fileHasHeaders
+                    });
                     break;
 
                 default: //csv etc

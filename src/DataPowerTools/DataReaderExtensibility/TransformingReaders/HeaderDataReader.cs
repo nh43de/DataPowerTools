@@ -22,7 +22,7 @@ namespace DataPowerTools.Connectivity.Helpers
         /// <summary>
         /// Gets or sets a value indicating whether to use a row from the data as column names.
         /// </summary>
-        public bool UseHeaderRow { get; set; } = false;
+        public bool UseHeaderRow { get; set; } = true;
 
         /// <summary>
         /// Gets or sets a callback to determine which row is the header row. Only called when UseHeaderRow = true.
@@ -43,7 +43,7 @@ namespace DataPowerTools.Connectivity.Helpers
     /// <summary>
     /// Reads for headers in a data reader and applies column aliases. 
     /// </summary>
-    public class HeaderReaderAdapter : ExtensibleDataReaderBase<IDataReader>
+    public class HeaderDataReader : ExtensibleDataReaderBase<IDataReader>
     {
         public override int FieldCount => _columns.Value.Length;
 
@@ -78,7 +78,7 @@ namespace DataPowerTools.Connectivity.Helpers
 
 
 
-        public HeaderReaderAdapter(IDataReader dataReader, HeaderReaderConfiguration configuration) : base(dataReader)
+        public HeaderDataReader(IDataReader dataReader, HeaderReaderConfiguration configuration) : base(dataReader)
         {
             //build col info
             _columns = new Lazy<SimpleColumnInfo[]>(() =>

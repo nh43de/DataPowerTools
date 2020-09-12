@@ -6,6 +6,7 @@ using System.Data.Common;
 using System.Data.SqlClient;
 using System.Diagnostics;
 using System.Linq;
+using DataPowerTools.Connectivity.Helpers;
 using DataPowerTools.DataConnectivity;
 using DataPowerTools.DataReaderExtensibility.Columns;
 using DataPowerTools.DataReaderExtensibility.TransformingReaders;
@@ -28,10 +29,27 @@ namespace DataPowerTools.Extensions
         {
             return CreateTableSql.FromDataReader_Smart(outputTableName, reader, numberOfRowsToExamine);
         }
-         
+
 
         #region Data reader operations
-        
+
+        /// <summary>
+        /// Finds headers in the datareader and applies them.
+        /// </summary>
+        /// <typeparam name="TDataReader"></typeparam>
+        /// <param name="dataReader">Source data reader</param>
+        /// <param name="headerConfig">Configuration for header finding.</param>
+        /// <returns></returns>
+        public static IDataReader ApplyHeaders<TDataReader>(
+            this TDataReader dataReader,
+            HeaderReaderConfiguration headerConfig = null) where TDataReader : IDataReader
+        {
+            var d = new HeaderDataReader(dataReader, headerConfig ?? new HeaderReaderConfiguration());
+
+            return d;
+        }
+
+
         /// <summary>
         /// Renames columns.
         /// </summary>
