@@ -33,7 +33,7 @@ namespace DataPowerTools.Connectivity
         /// <returns></returns>
         public static IDataReader GetDataReader(string filePath)
         {
-            using var fs = new FileStream(filePath, FileMode.Open);
+            var fs = new FileStream(filePath, FileMode.Open);
 
             return ExcelReaderFactory.CreateReader(fs);
         }

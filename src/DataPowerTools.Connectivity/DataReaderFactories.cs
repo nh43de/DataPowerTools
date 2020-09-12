@@ -22,7 +22,7 @@ namespace DataPowerTools.Connectivity
         /// <returns></returns>
         public static IDataReader Default(string filePath, bool fileHasHeaders = true, char csvDelimiter = ',')
         {
-            using var fs = new FileStream(filePath, FileMode.Open);
+            var fs = new FileStream(filePath, FileMode.Open);
 
             return Default(Path.GetFileName(filePath), fs, fileHasHeaders, csvDelimiter);
         }
