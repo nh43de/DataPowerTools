@@ -2,9 +2,10 @@
 using System.Data.SQLite;
 using System.Linq;
 using DataPowerTools.Extensions;
+using DataPowerTools.Tests.Models;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace ExcelDataReader.Tests
+namespace DataPowerTools.Tests
 {
     [TestClass]
     public class DbMaterializationTests

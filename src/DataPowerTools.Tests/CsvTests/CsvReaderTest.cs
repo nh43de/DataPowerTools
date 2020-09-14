@@ -25,11 +25,11 @@
 
 using System;
 using System.IO;
-using System.Linq;
 using System.Text;
+using CsvDataReader;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace CsvDataReader.Tests
+namespace DataPowerTools.Tests.CsvTests
 {
     [TestClass]
     public class CsvReaderTest

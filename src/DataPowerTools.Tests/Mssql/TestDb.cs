@@ -1,6 +1,6 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace ExcelDataReader.Tests
+namespace DataPowerTools.Tests.Mssql
 {
     //[TestClass] //uncomment to enable
     public static class TestDb

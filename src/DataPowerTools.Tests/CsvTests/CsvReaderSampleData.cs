@@ -20,9 +20,10 @@
 //	ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using System;
+using CsvDataReader;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace CsvDataReader.Tests
+namespace DataPowerTools.Tests.CsvTests
 {
 	public class CsvReaderSampleData
 	{

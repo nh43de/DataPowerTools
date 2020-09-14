@@ -1,11 +1,7 @@
-﻿using System.Configuration;
-using System.Diagnostics;
-using System.Globalization;
+﻿using System.Globalization;
 using System.IO;
-using System.Reflection;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace ExcelDataReader.Tests
+namespace DataPowerTools.Tests
 {
     internal static class TestingDataHelper
     {

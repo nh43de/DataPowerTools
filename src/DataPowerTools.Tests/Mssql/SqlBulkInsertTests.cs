@@ -1,19 +1,11 @@
-﻿using System.Collections.Generic;
-using System.Data;
-using System.Data.SQLite;
+﻿using System.Data;
 using System.Linq;
-using System.Reflection;
-using System.Security.Cryptography;
-using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
 using DataPowerTools.DataConnectivity.Sql;
-using DataPowerTools.DataReaderExtensibility.TransformingReaders;
 using DataPowerTools.Extensions;
-using DataPowerTools.PowerTools;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace ExcelDataReader.Tests
+namespace DataPowerTools.Tests.Mssql
 {
     [TestClass]
     public class SqlBulkInsertTests

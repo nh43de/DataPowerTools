@@ -1,20 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data;
-using System.Data.Common;
-using Microsoft.Data.SqlClient;
-using System.Data.SQLite;
+﻿using System.Data.SQLite;
 using System.Linq;
-using System.Reflection;
-using System.Text;
 using System.Threading.Tasks;
-using DataPowerTools.DataConnectivity;
 using DataPowerTools.DataConnectivity.Sql;
 using DataPowerTools.Extensions;
 using DataPowerTools.PowerTools;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace ExcelDataReader.Tests
+namespace DataPowerTools.Tests
 {
     [TestClass]
     public class DbBulkInsertTests
@@ -66,7 +58,7 @@ namespace ExcelDataReader.Tests
 
             var csvData = tab.ToCsvString();
 
-            var r = Csv.ReadString(csvData);
+            var r = DataConnectivity.Csv.ReadString(csvData);
 
             await r.BulkInsert(conn, destinationtable, DatabaseEngine.Sqlite, new GenericBulkCopyOptions()
             {

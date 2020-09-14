@@ -1,17 +1,15 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Data;
 using System.Data.SQLite;
 using System.Linq;
-
-//TODO: uncomment these and test cases below to test excel functionality
-//using DataPowerTools.Connectivity;
-//using DataPowerTools.Connectivity.Extensions;
 using DataPowerTools.DataReaderExtensibility.TransformingReaders;
 using DataPowerTools.Extensions;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using DataPowerTools.Tests.Models;
+using Microsoft.VisualStudio.TestTools.UnitTesting; //TODO: uncomment these and test cases below to test excel functionality
+//using DataPowerTools.Connectivity;
+//using DataPowerTools.Connectivity.Extensions;
 
-namespace ExcelDataReader.Tests
+namespace DataPowerTools.Tests
 {
     [TestClass]
     public class DataPowerToolsTests

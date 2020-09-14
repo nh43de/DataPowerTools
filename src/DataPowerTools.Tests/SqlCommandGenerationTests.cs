@@ -1,18 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data;
-using System.Data.Common;
-using Microsoft.Data.SqlClient;
-using System.Data.SQLite;
-using System.Linq;
-using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
-using DataPowerTools.Extensions;
+﻿using System.Data.Common;
 using DataPowerTools.PowerTools;
+using Microsoft.Data.SqlClient;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace ExcelDataReader.Tests
+namespace DataPowerTools.Tests
 {
     [TestClass]
     public class SqlCommandGenerationTests

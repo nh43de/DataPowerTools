@@ -1,9 +1,8 @@
 ﻿using System;
-using System.Data.Common;
-using Microsoft.Data.SqlClient;
 using DataPowerTools.Extensions;
+using Microsoft.Data.SqlClient;
 
-namespace ExcelDataReader.Tests
+namespace DataPowerTools.Tests.Mssql
 {
     public class DatabaseTestHarness : IDisposable
     {

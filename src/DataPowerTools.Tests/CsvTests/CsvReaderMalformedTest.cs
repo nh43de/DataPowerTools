@@ -25,10 +25,11 @@
 
 using System.IO;
 using System.Text;
+using CsvDataReader;
 using CsvDataReader.Exceptions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace CsvDataReader.Tests
+namespace DataPowerTools.Tests.CsvTests
 {
 	[TestClass]
 	public class CsvReaderMalformedTest

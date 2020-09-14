@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using Newtonsoft.Json;
 
-namespace ExcelDataReader.Tests
+namespace DataPowerTools.Tests.Models
 {
     [Serializable]
     public class TestClass

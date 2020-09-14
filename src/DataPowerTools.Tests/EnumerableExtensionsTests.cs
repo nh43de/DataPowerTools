@@ -1,14 +1,8 @@
-﻿using System;
-using System.Data;
-using Microsoft.Data.SqlClient;
-using System.Data.SQLite;
-using System.IO;
-using System.Linq;
+﻿using System.Linq;
 using DataPowerTools.Extensions;
-using DataPowerTools.PowerTools;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace ExcelDataReader.Tests
+namespace DataPowerTools.Tests
 {
     [TestClass]
     public class EnumerableExtensionsTests

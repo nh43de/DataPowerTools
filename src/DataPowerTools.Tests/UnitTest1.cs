@@ -1,6 +1,6 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace DataPowerTools.Tests2
+namespace DataPowerTools.Tests
 {
     [TestClass]
     public class UnitTest1

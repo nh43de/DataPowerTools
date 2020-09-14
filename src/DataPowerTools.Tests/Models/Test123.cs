@@ -1,7 +1,7 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace ExcelDataReader.Tests
+namespace DataPowerTools.Tests.Models
 {
     [Serializable]
     public class Test123

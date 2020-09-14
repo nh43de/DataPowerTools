@@ -5,7 +5,7 @@ using System.Linq;
 using DataPowerTools.DataReaderExtensibility.TransformingReaders;
 using DataPowerTools.Extensions;
 using DataPowerTools.PowerTools;
-using ExcelDataReader.Tests;
+using DataPowerTools.Tests.Models;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace DataPowerTools.Tests

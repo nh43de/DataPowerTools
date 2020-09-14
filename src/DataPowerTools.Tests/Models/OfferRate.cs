@@ -1,6 +1,6 @@
 using System;
 
-namespace ExcelDataReader.Tests
+namespace DataPowerTools.Tests.Models
 {
     public class OfferRate
     {

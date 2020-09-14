@@ -1,7 +1,7 @@
-﻿using DataPowerTools;
+﻿using DataPowerTools.Tests.Models;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace ExcelDataReader.Tests
+namespace DataPowerTools.Tests
 {
     [TestClass]
     public class NullUtilsTests

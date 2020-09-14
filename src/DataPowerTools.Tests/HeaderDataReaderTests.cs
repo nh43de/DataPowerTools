@@ -1,22 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data;
-using System.Data.SQLite;
-using System.Dynamic;
-using System.IO;
+﻿using System.Data;
 using System.Linq;
 using DataPowerTools.Connectivity;
 using DataPowerTools.Connectivity.Helpers;
-using DataPowerTools.DataReaderExtensibility;
-using DataPowerTools.DataReaderExtensibility.Columns;
-using DataPowerTools.DataReaderExtensibility.TransformingReaders;
-using DataPowerTools.DataStructures;
 using DataPowerTools.Extensions;
-using DataPowerTools.Tests;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-
-namespace ExcelDataReader.Tests
+namespace DataPowerTools.Tests
 {
     [TestClass]
     public class HeaderDataReaderTests

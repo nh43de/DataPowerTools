@@ -1,12 +1,9 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using DataPowerTools.DataReaderExtensibility.TransformingReaders;
-using DataPowerTools.Extensions;
-using DataPowerTools.PowerTools;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace ExcelDataReader.Tests
+namespace DataPowerTools.Tests
 {
     [TestClass]
     public class DataTransformsTest
