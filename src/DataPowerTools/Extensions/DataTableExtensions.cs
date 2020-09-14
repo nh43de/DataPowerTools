@@ -33,7 +33,7 @@ namespace DataPowerTools.Extensions
         /// <returns></returns>
         public static IDataReader ToDataReader(this DataTable dataTable)
         {
-            return dataTable.CreateDataReader();
+            return dataTable.CreateDataReader().CountRows();
         }
 
         /// <summary>

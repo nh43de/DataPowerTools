@@ -35,7 +35,7 @@ namespace DataPowerTools.Tests
                         Col2 = 20,
                         Col3 = "abc",
                     }
-                }.Repeat(998).ToDataReader();
+                }.Repeat(98).ToDataReader();
 
                 var allData = r1.Union(r2).Union(r3);
 

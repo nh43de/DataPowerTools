@@ -70,6 +70,35 @@ namespace DataPowerTools.Extensions
             return d;
         }
 
+        /// <summary>
+        /// Finds headers in the datareader and applies them.
+        /// </summary>
+        /// <typeparam name="TDataReader"></typeparam>
+        /// <param name="dataReader">Source data reader</param>
+        /// <param name="headerRow">The row on which headers are.</param>
+        /// <returns></returns>
+        public static IDataReader ApplyHeaders<TDataReader>(
+            this TDataReader dataReader,
+            int headerRow) where TDataReader : IDataReader
+        {
+            if (headerRow == 0)
+                headerRow = 1;
+
+            var d = new HeaderDataReader(dataReader, new HeaderReaderConfiguration
+            {
+                UseHeaderRow = true,
+                ReadHeaderRow = reader =>
+                {
+                    for (int i = 0; i < headerRow; i++)
+                    {
+                        reader.Read();
+                    }
+                }
+            });
+
+            return d;
+        }
+
 
         /// <summary>
         /// Renames columns.
@@ -914,6 +943,7 @@ namespace DataPowerTools.Extensions
                 hascolumns = true;
             }
 
+            
             while (dr.Read())
             {
                 if (hascolumns == false)

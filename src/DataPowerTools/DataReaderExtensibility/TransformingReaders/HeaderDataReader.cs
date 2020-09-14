@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using DataPowerTools.DataReaderExtensibility.TransformingReaders;
 using DataPowerTools.DataStructures;
+using DataPowerTools.Extensions;
 
 namespace DataPowerTools.Connectivity.Helpers
 {
@@ -20,7 +21,7 @@ namespace DataPowerTools.Connectivity.Helpers
         public string EmptyColumnNamePrefix { get; set; } = "Column";
 
         /// <summary>
-        /// Gets or sets a value indicating whether to use a row from the data as column names.
+        /// Defaults to true. Whether to use headers at all
         /// </summary>
         public bool UseHeaderRow { get; set; } = true;
 
@@ -28,16 +29,6 @@ namespace DataPowerTools.Connectivity.Helpers
         /// Gets or sets a callback to determine which row is the header row. Only called when UseHeaderRow = true.
         /// </summary>
         public Action<IDataReader> ReadHeaderRow { get; set; }
-
-        /// <summary>
-        /// Gets or sets a callback to determine whether to include the current row in the DataTable.
-        /// </summary>
-        public Func<IDataReader, bool> FilterRow { get; set; }
-
-        /// <summary>
-        /// Gets or sets a callback to determine whether to include the specific column in the DataTable. Called once per column after reading the headers.
-        /// </summary>
-        public Func<IDataReader, int, bool> FilterColumn { get; set; }
     }
 
     /// <summary>
@@ -45,8 +36,10 @@ namespace DataPowerTools.Connectivity.Helpers
     /// </summary>
     public class HeaderDataReader : ExtensibleDataReaderBase<IDataReader>
     {
-        public override int FieldCount => _columns.Value.Length;
+        private readonly HeaderReaderConfiguration _configuration;
+        public override int FieldCount => _columnsLazy.Value.Length;
 
+        private bool _firstRead = true;
 
         public override string GetName(int i)
         {
@@ -71,19 +64,32 @@ namespace DataPowerTools.Connectivity.Helpers
         {
             return DataReader.GetValue(i);
         }
-        
-        private readonly Lazy<SimpleColumnInfo[]> _columns;
+
+        public override bool Read()
+        {
+            if (_firstRead)
+                HeaderInformation();
+
+            return DataReader.Read();
+        }
+
+        private SimpleColumnInfo[] _cols;
+
+        private readonly Lazy<SimpleColumnInfo[]> _columnsLazy;
 
         private readonly Lazy<BidirectionalMap<string, int>> _columnNamesToIndex;
 
 
+        public override DataTable GetSchemaTable() => throw new NotImplementedException();
 
         public HeaderDataReader(IDataReader dataReader, HeaderReaderConfiguration configuration) : base(dataReader)
         {
+            this._configuration = configuration;
+
             //build col info
-            _columns = new Lazy<SimpleColumnInfo[]>(() =>
+            _columnsLazy = new Lazy<SimpleColumnInfo[]>(() =>
             {
-                var d = GetHeaderInformation(configuration).ToArray();
+                var d = HeaderInformation();
 
                 return d;
             });
@@ -91,7 +97,7 @@ namespace DataPowerTools.Connectivity.Helpers
             //build col names index
             _columnNamesToIndex = new Lazy<BidirectionalMap<string, int>>(() =>
             {
-                var cols = _columns.Value
+                var cols = _columnsLazy.Value
                     .Select(c => new KeyValuePair<string, int>(c.ColumnName, c.Index))
                     .ToArray();
 
@@ -105,75 +111,71 @@ namespace DataPowerTools.Connectivity.Helpers
         /// <summary>
         /// Turns this into an excel data reader
         /// </summary>
-        /// <param name="configuration"></param>
         /// <returns></returns>
-        private IEnumerable<SimpleColumnInfo> GetHeaderInformation(HeaderReaderConfiguration configuration)
+        private SimpleColumnInfo[] HeaderInformation()
         {
+            if (_firstRead == false)
+                return _cols;
+
+            _firstRead = false;
+
             var first = true;
 
             var cols = new List<SimpleColumnInfo>();
 
-            while (DataReader.Read())
+            //if not using header rows then just generate new names, don't bother reading from the reader.
+            if (_configuration.UseHeaderRow == false)
             {
-                if (first)
+                for (var i = 0; i < DataReader.FieldCount; i++)
                 {
-                    if (configuration.UseHeaderRow && configuration.ReadHeaderRow != null)
+                    var name =  _configuration.EmptyColumnNamePrefix + i;
+
+                    // if a column already exists with the name append _i to the duplicates
+                    var columnName = GetUniqueColumnName(cols, name);
+
+                    var column = new SimpleColumnInfo
                     {
-                        configuration.ReadHeaderRow(DataReader);
-                    }
+                        ColumnName = columnName,
+                        ColumnDescription = name,
+                        Index = i
+                    };
 
-                    for (var i = 0; i < DataReader.FieldCount; i++)
-                    {
-                        if (configuration.FilterColumn != null && !configuration.FilterColumn(DataReader, i))
-                        {
-                            continue;
-                        }
-
-                        //
-                        var name = configuration.UseHeaderRow
-                            ? Convert.ToString(DataReader.GetValue(i))
-                            : null;
-
-                        if (string.IsNullOrEmpty(name))
-                        {
-                            name = configuration.EmptyColumnNamePrefix + i;
-                        }
-
-                        // if a column already exists with the name append _i to the duplicates
-                        var columnName = GetUniqueColumnName(cols, name);
-
-                        var column = new SimpleColumnInfo
-                        {
-                            ColumnName = columnName,
-                            ColumnDescription = name,
-                            Index = i
-                        };
-
-                        cols.Add(column);
-                    }
-
-                    first = false;
-
-                    if (configuration.UseHeaderRow)
-                    {
-                        continue;
-                    }
+                    cols.Add(column);
+                }
+            }
+            else
+            {
+                //otherwise yes we are finding a header row to apply
+                if (_configuration.UseHeaderRow && _configuration.ReadHeaderRow != null)
+                {
+                    _configuration.ReadHeaderRow(DataReader);
                 }
 
-                if (configuration.FilterRow != null && !configuration.FilterRow(DataReader))
+                for (var i = 0; i < DataReader.FieldCount; i++)
                 {
-                    continue;
-                }
+                    var name = Convert.ToString(DataReader.GetValue(i));
 
-                if (IsEmptyRow(DataReader))
-                {
-                    continue;
-                }
+                    if (string.IsNullOrEmpty(name))
+                    {
+                        name = _configuration.EmptyColumnNamePrefix + i;
+                    }
 
-                break;
+                    // if a column already exists with the name append _i to the duplicates
+                    var columnName = GetUniqueColumnName(cols, name);
+
+                    var column = new SimpleColumnInfo
+                    {
+                        ColumnName = columnName,
+                        ColumnDescription = name,
+                        Index = i
+                    };
+
+                    cols.Add(column);
+                }
             }
 
-            return cols;
+            _cols = cols.ToArray();
+            return _cols;
         }
 
         private static bool IsEmptyRow(IDataReader reader)
