@@ -702,7 +702,7 @@ namespace DataPowerTools.Extensions
 
         /// <summary>
         /// Yields an IDataReader as an enumerable. Property names must match column names exactly. 
-        /// This is slower than using FastMember but implicit casts are made.
+        /// This is slower than using FastMember but implicit casts are made, and you can specify a type factory.
         /// </summary>
         /// <param name="dr"></param>
         /// <param name="type"></param>
@@ -767,6 +767,9 @@ namespace DataPowerTools.Extensions
             }
         }
         
+
+
+        //TODO: warning: some duplicated code to above.
         /// <summary>
         /// Yields an IDataReader as an enumerable. Property names must match column names exactly.
         /// This is done using FastMember, and is roughly 20% faster. However, this is much more strict with type casting.
@@ -775,8 +778,9 @@ namespace DataPowerTools.Extensions
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="dr"></param>
+        /// <param name="typeFactory">The method used to create the type.</param>
         /// <returns></returns>
-        public static IEnumerable<T> Select<T>(this IDataReader dr) where T: class
+        public static IEnumerable<T> Select<T>(this IDataReader dr, Func<T> typeFactory = null) where T : class
         {
             var t = typeof(T);
 
@@ -793,44 +797,9 @@ namespace DataPowerTools.Extensions
                 var accessor = TypeAccessor.Create(t);
                 var props = accessor.GetMembers().Select(p => p.Name).ToArray();
 
-                while (dr.Read())
-                {
-                    var obj = accessor.CreateNew() as T;
-                    foreach (var prop in props)
-                        if (Equals(dr[prop], DBNull.Value) == false)
-                            accessor[obj, prop] = dr[prop];
-                    yield return obj;
-                }
-            }
-        }
-        
-        //TODO: warning: some duplicated code to above.
-        /// <summary>
-        /// Yields an IDataReader as an enumerable. Property names must match column names exactly.
-        /// This is done using FastMember, and is roughly 20% faster. However, this is much more strict with type casting.
-        /// Ie. the C# types should match the SQL type equivalents exactly. 
-        /// Even int/byte are not compatable with each other.
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="dr"></param>
-        /// <param name="typeFactory">The method used to create the type.</param>
-        /// <returns></returns>
-        public static IEnumerable<T> Select<T>(this IDataReader dr, Func<T> typeFactory) where T : class 
-        {
-            var t = typeof(T);
+                typeFactory ??= () => accessor.CreateNew() as T;
 
-            if (t.IsValueType || t == typeof(string))
-            {
-                while (dr.Read())
-                {
-                    var obj = Convert.ChangeType(dr[0], t);
-                    yield return (T)obj;
-                }
-            }
-            else
-            {
-                var accessor = TypeAccessor.Create(t);
-                var props = accessor.GetMembers().Select(p => p.Name).ToArray();
+
 
                 while (dr.Read())
                 {
@@ -1030,7 +999,7 @@ namespace DataPowerTools.Extensions
         /// <returns></returns>
         public static T[] ToArray<T>(this IDataReader dr) where T : class
         {
-            return dr.SelectNonStrict<T>().ToArray();
+            return dr.Select<T>().ToArray();
         }
 
         /// <summary>
