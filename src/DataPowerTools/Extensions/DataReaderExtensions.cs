@@ -19,6 +19,28 @@ namespace DataPowerTools.Extensions
     public static class DataReaderExtensions
     {
         /// <summary>
+        /// returns a datareader that will read the object as a single row.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="obj"></param>
+        /// <returns></returns>
+        public static IDataReader AsDataReader<T>(this T obj, bool ignoreNonStringReferenceTypes = true)
+        {
+            return obj.AsSingleEnumerable().ToDataReader(ignoreNonStringReferenceTypes);
+        }
+
+        /// <summary>
+        /// returns a datareader that will read the object as a single row.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="obj"></param>
+        /// <returns></returns>
+        public static IDataReader AsDataReader<T>(this T obj, string[] fieldNames)
+        {
+            return obj.AsSingleEnumerable().ToDataReader(fieldNames);
+        }
+        
+        /// <summary>
         /// Analyzes the rows in a DataReader and generates a CREATE TABLE statement from the data it finds.
         /// </summary>
         /// <param name="reader"></param>
@@ -29,9 +51,6 @@ namespace DataPowerTools.Extensions
         {
             return CreateTableSql.FromDataReader_Smart(outputTableName, reader, numberOfRowsToExamine);
         }
-
-
-
 
         #region Data reader operations
 
@@ -194,6 +213,23 @@ namespace DataPowerTools.Extensions
             };
 
             return new AddColumnsDataReader<T, TDataReader>(dataReader, new[] {a});
+        }
+
+        /// <summary>
+        /// Adds a column that is a row projection of the source.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <typeparam name="TDataReader"></typeparam>
+        /// <param name="dataReader"></param>
+        /// <param name="secondDataReader"></param>
+        /// <returns></returns>
+        public static IDataReader Union<TDataReader>(this TDataReader dataReader,
+            TDataReader secondDataReader) where TDataReader : IDataReader
+        //from extended data reader
+        {
+            var a = new UnionDataReader<TDataReader>(dataReader, secondDataReader);
+
+            return a;
         }
 
         /// <summary>
@@ -744,7 +780,7 @@ namespace DataPowerTools.Extensions
         {
             var t = typeof(T);
 
-            if (t.IsValueType || t == typeof(string))
+            if (t.IsSimpleType())
             {
                 while (dr.Read())
                 {
@@ -994,7 +1030,7 @@ namespace DataPowerTools.Extensions
         /// <returns></returns>
         public static T[] ToArray<T>(this IDataReader dr) where T : class
         {
-            return dr.Select<T>().ToArray();
+            return dr.SelectNonStrict<T>().ToArray();
         }
 
         /// <summary>

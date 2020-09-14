@@ -6,6 +6,7 @@ using System.Data;
 using System.Data.Common;
 using System.Diagnostics;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using DataPowerTools.Csv;
 using DataPowerTools.DataConnectivity.Sql;
@@ -42,6 +43,17 @@ namespace DataPowerTools.Extensions
         //    BulkUploadSqlServer(items, cs, destinationTable, bulkInsertOptions, members);
         //}
 
+
+        /// <summary>
+        /// Returns the object specified as an enumerable that returns itself.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="obj"></param>
+        /// <returns></returns>
+        public static IEnumerable<T> AsSingleEnumerable<T>(this T obj)
+        {
+            return new[] { obj };
+        }
 
         /// <summary>
         /// Enumerates an IEnumerable a specified number of times.

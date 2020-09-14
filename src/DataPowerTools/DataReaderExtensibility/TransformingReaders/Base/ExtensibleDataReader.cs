@@ -5,7 +5,7 @@ namespace DataPowerTools.DataReaderExtensibility.TransformingReaders
 {
     public abstract class ExtensibleDataReader<TDataReader> : IDataReader where TDataReader : IDataReader
     {
-        public readonly TDataReader DataReader;
+        public TDataReader DataReader { get; protected set; }
 
 
         protected ExtensibleDataReader(TDataReader dataReader)
