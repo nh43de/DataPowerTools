@@ -5,7 +5,9 @@ using System.Data.SQLite;
 using System.Dynamic;
 using System.IO;
 using System.Linq;
+using DataPowerTools.Connectivity;
 using DataPowerTools.Connectivity.Helpers;
+using DataPowerTools.DataReaderExtensibility;
 using DataPowerTools.DataReaderExtensibility.Columns;
 using DataPowerTools.DataReaderExtensibility.TransformingReaders;
 using DataPowerTools.DataStructures;
@@ -87,6 +89,31 @@ namespace ExcelDataReader.Tests
 
             Assert.AreEqual("1", dt.Rows[0][0].ToString());
             Assert.AreEqual("100", dt.Rows[99][0].ToString());
+        }
+
+
+        [TestMethod]
+        public void TestHeaderDataReaderExcel()
+        {
+            var rr = Excel.GetDataReader(TestingDataHelper.GetTestWorkbook("Tbas.xlsx"), "Tbas.xlsx", new HeaderReaderConfiguration
+            {
+                HeaderRow = 2
+            });
+
+            var dt = rr.ToDataTable();
+
+            Assert.AreEqual(2, dt.Rows.Count);
+
+            Assert.AreEqual("TbaTradeId", dt.Columns[0].ColumnName);
+            Assert.AreEqual("Trade Date", dt.Columns[1].ColumnName);
+            Assert.AreEqual("Cusip", dt.Columns[2].ColumnName);
+
+            Assert.AreEqual("TbaTradeId", rr.GetName(0));
+            Assert.AreEqual("Trade Date", rr.GetName(1));
+            Assert.AreEqual("Cusip", rr.GetName(2));
+
+            Assert.AreEqual("0", dt.Rows[0][0].ToString());
+            Assert.AreEqual("1", dt.Rows[1][0].ToString());
         }
     }
 }

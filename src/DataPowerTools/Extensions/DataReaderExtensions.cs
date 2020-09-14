@@ -87,13 +87,7 @@ namespace DataPowerTools.Extensions
             var d = new HeaderDataReader(dataReader, new HeaderReaderConfiguration
             {
                 UseHeaderRow = true,
-                ReadHeaderRow = reader =>
-                {
-                    for (int i = 0; i < headerRow; i++)
-                    {
-                        reader.Read();
-                    }
-                }
+                HeaderRow = headerRow
             });
 
             return d;
@@ -935,7 +929,7 @@ namespace DataPowerTools.Extensions
                         ColumnName = string.IsNullOrWhiteSpace(basicDataColumnInfo.ColumnName)
                             ? "Column" + i
                             : basicDataColumnInfo.ColumnName,
-                        DataType = basicDataColumnInfo.FieldType.GetNonNullableType() //get non nullable type
+                        DataType = (basicDataColumnInfo.FieldType ?? typeof(object)).GetNonNullableType() //get non nullable type
                     });
                     i++;
                 }

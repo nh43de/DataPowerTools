@@ -9,6 +9,14 @@ namespace DataPowerTools.Connectivity
 {
     public static class Excel
     {
+
+#if NETSTANDARD2_0
+        static Excel()
+        {
+            System.Text.Encoding.RegisterProvider(System.Text.CodePagesEncodingProvider.Instance);
+        }
+#endif
+
         /// <summary>
         /// Gets a datareader from an excel stream (can be xls or xlsx).
         /// </summary>

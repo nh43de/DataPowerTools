@@ -26,6 +26,11 @@ namespace DataPowerTools.Connectivity.Helpers
         public bool UseHeaderRow { get; set; } = true;
 
         /// <summary>
+        /// Row (1-indexed) that the header is on.
+        /// </summary>
+        public int HeaderRow { get; set; } = 1;
+
+        /// <summary>
         /// Gets or sets a callback to determine which row is the header row. Only called when UseHeaderRow = true.
         /// </summary>
         public Action<IDataReader> ReadHeaderRow { get; set; }
@@ -149,6 +154,15 @@ namespace DataPowerTools.Connectivity.Helpers
                 if (_configuration.UseHeaderRow && _configuration.ReadHeaderRow != null)
                 {
                     _configuration.ReadHeaderRow(DataReader);
+                }
+                else if (_configuration.UseHeaderRow)
+                {
+                    var headerRows = _configuration.HeaderRow;
+
+                    for (int i = 0; i < headerRows; i++)
+                    {
+                        DataReader.Read();
+                    }
                 }
 
                 for (var i = 0; i < DataReader.FieldCount; i++)
