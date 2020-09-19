@@ -12,6 +12,7 @@
     <PackageReleaseNotes></PackageReleaseNotes>
     <Copyright>Copyright 2017</Copyright>
     <RepositoryType>git</RepositoryType>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <RepositoryUrl>https://github.com/nh43de/DataPowerTools</RepositoryUrl>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>..\..\DataPowerTools.snk</AssemblyOriginatorKeyFile>
