@@ -19,14 +19,16 @@ namespace DataPowerTools.DataReaderExtensibility.Columns
         
         public static TypedDataColumnInfo[] GetTypedDataColumnInfo(this Type dataType)
         {
-            var r = dataType.GetColumnInfo().Select(col => new TypedDataColumnInfo
+            var r = dataType
+                .GetColumnInfo()
+                .Select(col => new TypedDataColumnInfo
             {
                 Ordinal = col.Ordinal,
-                ColumnName = col.ColumnName,
+                ColumnName = col.ColumnName, //from schema annotations
                 DataType = col.FieldType
-            });
+            }).ToArray();
             
-            return r.ToArray();
+            return r;
         }
     }
 }

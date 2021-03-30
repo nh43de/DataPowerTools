@@ -75,6 +75,44 @@ namespace DataPowerTools.Tests
         }
 
         [TestMethod]
+        public async Task TestMapToTypeWithAlias()
+        {
+            var conn = new SQLiteConnection("Data Source=:memory:");
+            conn.Open();
+
+            var r = new[]
+            {
+                new Test123
+                {
+                    Col1 = 10,
+                    Col2 = 20,
+                    Col3 = "abc",
+                }
+            }.Repeat(10).ToArray();
+
+            await conn.CreateTableFor(r, "DestinationTable");
+
+            var r2 = new[]
+            {
+                new
+                {
+                    Col1 = "10",
+                    Col2 = "20",
+                    NewCol3 = "abc",
+                }
+            }.Repeat(100).ToArray();
+
+            var d = r2
+                .ToDataReader()
+                //.MapToType(typeof(Test123), DataTransformGroups.DefaultConvert)
+                .Select<Test123>()
+                .ToArray();
+
+            conn.CloseAndDispose();
+        }
+
+
+        [TestMethod]
         public async Task TestBulkInsertUsingCsv()
         {
             //

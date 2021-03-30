@@ -64,7 +64,7 @@ namespace DataPowerTools.Extensions
         /// <param name="to"></param>
         /// <param name="colInfo"></param>
         /// <returns></returns>
-        private static bool CompareTo<T>(this T self, T to, ColumnDisplayInformation[] colInfo) where T : class
+        private static bool CompareTo<T>(this T self, T to, CsharpTypeColumnInformation[] colInfo) where T : class
         {
             if (self != null && to != null)
             {
@@ -83,7 +83,7 @@ namespace DataPowerTools.Extensions
         /// <param name="to"></param>
         /// <param name="colInfo"></param>
         /// <returns></returns>
-        private static ComparisonResult[] Compare<T>(this T self, T to, ColumnDisplayInformation[] colInfo) where T : class
+        private static ComparisonResult[] Compare<T>(this T self, T to, CsharpTypeColumnInformation[] colInfo) where T : class
         {
             if (self != null && to != null)
             {

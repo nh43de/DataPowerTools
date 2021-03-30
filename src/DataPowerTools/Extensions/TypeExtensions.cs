@@ -48,7 +48,7 @@ namespace DataPowerTools.Extensions
         /// </summary>
         /// <param name="columnPropertyInfo"></param>
         /// <returns></returns>
-        public static ColumnDisplayInformation GetColumnFieldInfo(this PropertyInfo columnPropertyInfo)
+        public static CsharpTypeColumnInformation GetColumnFieldInfo(this PropertyInfo columnPropertyInfo)
         {
             var colType = columnPropertyInfo.PropertyType;
          
@@ -64,7 +64,7 @@ namespace DataPowerTools.Extensions
                 ? columnAttribute.ConstructorArguments[0].Value?.ToString()
                 : null;
             
-            return new ColumnDisplayInformation
+            return new CsharpTypeColumnInformation
             {
                 FieldType = colType,
                 ColumnName = columnPropertyInfo.Name,
@@ -112,7 +112,7 @@ namespace DataPowerTools.Extensions
         /// <param name="type"></param>
         /// <param name="propNames">Property names to only include.</param>
         /// <returns></returns>
-        public static ColumnDisplayInformation[] GetColumnInfo(this Type type, string[] propNames)
+        public static CsharpTypeColumnInformation[] GetColumnInfo(this Type type, string[] propNames)
         {
             //TODO: ??
 
@@ -137,7 +137,7 @@ namespace DataPowerTools.Extensions
         /// <param name="type"></param>
         /// <param name="ignoreNonStringReferenceTypes">Ignores</param>
         /// <returns></returns>
-        public static ColumnDisplayInformation[] GetColumnInfo(this Type type, bool ignoreNonStringReferenceTypes = true)
+        public static CsharpTypeColumnInformation[] GetColumnInfo(this Type type, bool ignoreNonStringReferenceTypes = true)
         {
             var props = type.GetProperties()
                 .Select(GetColumnFieldInfo)

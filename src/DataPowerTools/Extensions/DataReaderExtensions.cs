@@ -604,14 +604,22 @@ namespace DataPowerTools.Extensions
         /// <param name="destinationType"></param>
         /// <param name="transformGroup">Specify the transform group available in the DataTransformGroups static class.</param>
         /// <returns></returns>
-        public static SmartDataReader<TDataReader> MapToType<TDataReader>(this TDataReader dataReader, Type destinationType, DataTransformGroup transformGroup = null) where TDataReader : IDataReader
+        public static SmartDataReader<IDataReader> MapToType<TDataReader>(this TDataReader dataReader, Type destinationType, DataTransformGroup transformGroup = null) where TDataReader : IDataReader
         {
+            //var dr = dataReader.ApplyColumnsAliases(destinationType);
+
+            var aliases = destinationType
+                .GetColumnInfo()
+                .ToDictionary(p => p.DisplayName ?? p.ColumnName,
+                    p => p.ColumnName);
+
+            var dr = dataReader.ApplyColumnsAliases(aliases);
+
             var destinationColumns = destinationType.GetTypedDataColumnInfo();
 
-            return new SmartDataReader<TDataReader>(dataReader, destinationColumns, transformGroup ?? DataTransformGroups.None);
+            return new SmartDataReader<IDataReader>(dr, destinationColumns, transformGroup ?? DataTransformGroups.None);
         }
-
-
+        
         /// <summary>
         /// Applies a mapping and tranformation based on a SQL destination. DataTranformationGroups determine how
         /// tranformations are mapped to destination types.

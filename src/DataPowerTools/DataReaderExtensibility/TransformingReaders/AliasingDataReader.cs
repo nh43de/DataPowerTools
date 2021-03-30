@@ -30,7 +30,10 @@ namespace DataPowerTools.DataReaderExtensibility.TransformingReaders
             _allColumnAliases = new Lazy<Dictionary<string, string>>(() =>
             {
                 var r = _fieldInfo.Value
-                    .ToDictionary(fi => columnAliases.ContainsKey(fi.ColumnName) ? columnAliases[fi.ColumnName] : fi.ColumnName, fi => fi.ColumnName);
+                    .ToDictionary(fi => columnAliases.ContainsKey(fi.ColumnName)
+                            ? columnAliases[fi.ColumnName]
+                            : fi.ColumnName,
+                        fi => fi.ColumnName);
 
                 return r;
             });
