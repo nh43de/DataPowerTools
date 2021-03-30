@@ -7,44 +7,17 @@ DataPowerTools are tools for dealing with changing between IEnumerable, IDataRea
 
 It also provides a powerful API for filtering and object materialization.
 
-### Features
-
-- Coming soon
-
-- Debaser integration?
-
-### Getting Starting
+### Getting Started
 
 1. Install DataPowerTools nuget.
 2. Use methods and extensions.
 
-### Examples
-
-#### Bulk Inserting into LiteDB
-
-
-
-#### Changing and IDataReader into an IEnumerable
-
-
-
-
-
-
-### TODO:
-
-- Move SQL generation stuff to separate repo
-
-
 ### Features
 
-Date string parsing
-Shallow comparisons
-Bulk inserts
-
-
-Coming soon!
-
- - Fit excel data to SQL table
- - Fit any data to SQL table
-  - upload of the excel sheet and fit table as unit test
+- Date string parsing
+- Shallow comparisons
+- Bulk inserts
+- Fit table/CSV to SQL table
+- SQLite Bulk operations
+- Minimal dependencies
+- Easily convert between IEnumerable <-> IDataReader <-> DataTable
