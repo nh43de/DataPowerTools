@@ -7,7 +7,7 @@ namespace DataPowerTools.DataReaderExtensibility.TransformingReaders
     /// Disposes underlying disposables upon datareader disposal.
     /// </summary>
     /// <typeparam name="TDataReader"></typeparam>
-    public class DisposingDataReader<TDataReader> : ExtensibleDataReader<TDataReader> 
+    public class DisposingDataReader<TDataReader> : ExtensibleDataReader<TDataReader>, IDisposableDataReader
         where TDataReader : IDataReader
     {
         private readonly IDisposable[] _disposables;

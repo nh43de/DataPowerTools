@@ -19,6 +19,22 @@ namespace DataPowerTools.Extensions
     public static class DataReaderExtensions
     {
         /// <summary>
+        /// Writes datareader to CSV.
+        /// </summary>
+        public static void WriteCsv(this IDataReader reader, string outputFile)
+        {
+            Csv.Write(reader, outputFile);
+        }
+
+        /// <summary>
+        /// Writes datareader to CSV.
+        /// </summary>
+        public static string AsCsv(this IDataReader reader, bool writeHeaders = true)
+        {
+            return Csv.WriteString(reader);
+        }
+
+        /// <summary>
         /// returns a datareader that will read the object as a single row.
         /// </summary>
         /// <typeparam name="T"></typeparam>

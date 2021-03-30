@@ -65,7 +65,7 @@ namespace DataPowerTools.Extensions
 
             var objects = dt.Rows.OfType<DataRow>().Select(r => r.ItemArray);
 
-            DataConnectivity.Csv.Write(objects, headers, outputFile);
+            Csv.Write(objects, headers, outputFile);
         }
         
         /// <summary>

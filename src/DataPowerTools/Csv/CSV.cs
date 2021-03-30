@@ -5,22 +5,39 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using CsvDataReader;
+using DataPowerTools.DataReaderExtensibility.TransformingReaders;
 using DataPowerTools.Extensions;
 
-namespace DataPowerTools.DataConnectivity
+// ReSharper disable once CheckNamespace
+namespace DataPowerTools
 {
-
-    //TODO: move writer logic to SimpleCSV
+    //TODO: move obselete logic to use SimpleCSV
     public static class Csv
     {
-        public static IDataReader GetDataReader(string filePath, char csvDelimiter = ',', bool fileHasHeaders = true) // int headerOffsetRows = 1)
+        public static IDisposableDataReader CreateDataReader(string filePath, char csvDelimiter = ',', bool fileHasHeaders = true) // int headerOffsetRows = 1)
         {
-            return new CsvReader(new StreamReader(filePath), fileHasHeaders, csvDelimiter);
+            var dr = new CsvReader(new StreamReader(filePath), fileHasHeaders, csvDelimiter);
+            return new DisposingDataReader<CsvReader>(dr);
         }
 
-        public static IDataReader GetDataReader(Stream fileStream, char csvDelimiter = ',', bool fileHasHeaders = true) // int headerOffsetRows = 1)
+        public static IDisposableDataReader CreateDataReader(Stream fileStream, char csvDelimiter = ',', bool fileHasHeaders = true) // int headerOffsetRows = 1)
         {
-            return new CsvReader(new StreamReader(fileStream), fileHasHeaders, csvDelimiter);
+            var dr = new CsvReader(new StreamReader(fileStream), fileHasHeaders, csvDelimiter);
+            return new DisposingDataReader<CsvReader>(dr);
+        }
+
+        /// <summary>
+        /// Opens a CSV file and returns a data reader.
+        /// </summary>
+        /// <param name="filePath"></param>
+        /// <param name="hasHeaders">Whether the first row in the file has headers.</param>
+        /// <param name="delimiter">Field delimiter e.g. '|' or ','</param>
+        /// <returns></returns>
+        public static IDisposableDataReader CreateDataReader(string filePath, bool hasHeaders = true, char delimiter = ',')
+        {
+            var dr = new CsvReader(File.OpenText(filePath), hasHeaders, delimiter);
+
+            return new DisposingDataReader<CsvReader>(dr);
         }
 
         public static DataSet GetDataSet(string filePath, char csvDelimiter = ',', bool fileHasHeaders = true) // int headerOffsetRows = 1)
@@ -29,6 +46,7 @@ namespace DataPowerTools.DataConnectivity
 
             return a.ToDataSet(null, a.GetFieldHeaders());
         }
+
         public static DataSet GetDataSet(Stream fileStream, char csvDelimiter = ',', bool fileHasHeaders = true) // int headerOffsetRows = 1)
         {
             var a = new CsvReader(new StreamReader(fileStream), fileHasHeaders, csvDelimiter);
@@ -42,6 +60,7 @@ namespace DataPowerTools.DataConnectivity
         /// <param name="rowObjects"></param>
         /// <param name="headers"></param>
         /// <param name="outputFile"></param>
+        [Obsolete("Not recommended for new use.")]
         public static void Write(IEnumerable<object[]> rowObjects, IEnumerable<string> headers, string outputFile)
         {
             var ts = File.OpenWrite(outputFile);
@@ -70,19 +89,7 @@ namespace DataPowerTools.DataConnectivity
                 }
             }
         }
-
-        /// <summary>
-        /// Opens a CSV file and returns a data reader.
-        /// </summary>
-        /// <param name="filePath"></param>
-        /// <param name="hasHeaders">Whether the first row in the file has headers.</param>
-        /// <param name="delimiter">Field delimiter e.g. '|' or ','</param>
-        /// <returns></returns>
-        public static IDataReader Read(string filePath, bool hasHeaders = true, char delimiter = ',')
-        {
-            return new CsvReader(File.OpenText(filePath), true, delimiter);
-        }
-
+        
         /// <summary>
         /// Opens a CSV string and returns a data reader for it.
         /// </summary>
@@ -90,9 +97,11 @@ namespace DataPowerTools.DataConnectivity
         /// <param name="hasHeaders">Whether the first row in the file has headers.</param>
         /// <param name="delimiter">Field delimiter e.g. '|' or ','</param>
         /// <returns></returns>
-        public static IDataReader ReadString(string data, bool hasHeaders = true, char delimiter = ',')
+        public static IDisposableDataReader ReadString(string data, bool hasHeaders = true, char delimiter = ',')
         {
-            return new CsvReader(new StringReader(data), true, delimiter);
+            var dr = new CsvReader(new StringReader(data), hasHeaders, delimiter);
+            
+            return new DisposingDataReader<CsvReader>(dr);
         }
 
         /// <summary>
@@ -101,6 +110,7 @@ namespace DataPowerTools.DataConnectivity
         /// <param name="reader"></param>
         /// <param name="outputFile"></param>
         /// <param name="writeHeaders">Whether to write the headers.</param>
+        [Obsolete("Not recommended for new use.")]
         public static void Write(IDataReader reader, string outputFile, bool writeHeaders = true)
         {
             var ts = File.OpenWrite(outputFile);
@@ -130,30 +140,38 @@ namespace DataPowerTools.DataConnectivity
 
                 isInitialized = true;
             }
-
             using (ts)
             using (sw)
             {
-                while (reader.Read())
+                try
                 {
-                    if (isInitialized == false)
-                        Initialize();
-                    
-                    var row = new object[fieldCount];
-                    reader.GetValues(row);
-                    var rowStr = string.Join(",", row.Select(i => @"""" + i?.ToString() + @""""));
-                    sb.Append(rowStr + Environment.NewLine);
-                    sw.Write(sb.ToString());
-                    sb.Clear();
+                    while (reader.Read())
+                    {
+                        if (isInitialized == false)
+                            Initialize();
+
+                        var row = new object[fieldCount];
+                        reader.GetValues(row);
+                        var rowStr = string.Join(",", row.Select(i => @"""" + i?.ToString() + @""""));
+                        sb.Append(rowStr + Environment.NewLine);
+                        sw.Write(sb.ToString());
+                        sb.Clear();
+                    }
+                }
+                finally
+                {
+                    sw.Flush();
+                    sw.Close();
                 }
             }
         }
 
         /// <summary>
-        /// Writes the reader to CSV.
+        /// Returns a CSV string.
         /// </summary>
         /// <param name="reader"></param>
         /// <param name="writeHeaders">Whether to write the headers.</param>
+        [Obsolete("Not recommended for new use.")]
         public static string WriteString(IDataReader reader, bool writeHeaders = true)
         {
             //TODO: WARNING: duplicated to above
@@ -226,7 +244,7 @@ namespace DataPowerTools.DataConnectivity
         /// <param name="delimiter"></param>
         /// <param name="qualifier"></param>
         /// <returns></returns>
-        [Obsolete]
+        [Obsolete("Not recommended for new use.")]
         public static IEnumerable<IList<string>> Parse(string content, char delimiter, char qualifier)
         {
             using (var reader = new StringReader(content))
@@ -243,7 +261,7 @@ namespace DataPowerTools.DataConnectivity
         /// <param name="delimiter"></param>
         /// <param name="qualifier"></param>
         /// <returns></returns>
-        [Obsolete]
+        [Obsolete("Not recommended for new use.")]
         public static IEnumerable<IList<string>> Parse(TextReader reader, char delimiter, char qualifier)
         {
             var inQuote = false;

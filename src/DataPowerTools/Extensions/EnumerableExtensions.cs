@@ -1,19 +1,12 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Data;
-using System.Data.Common;
 using System.Diagnostics;
 using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Threading.Tasks;
-using DataPowerTools.Csv;
-using DataPowerTools.DataConnectivity.Sql;
 using DataPowerTools.DataStructures;
 using DataPowerTools.FastMember;
 using DataPowerTools.PowerTools;
-using Sqlite.Extensions;
 
 namespace DataPowerTools.Extensions
 {
