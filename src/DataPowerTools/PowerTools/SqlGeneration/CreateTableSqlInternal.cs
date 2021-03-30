@@ -39,6 +39,27 @@ namespace DataPowerTools.PowerTools
         
         private static Dictionary<Type, string> DataMapper => new Dictionary<Type, string>
         {
+            /*
+            from debaser
+
+                {typeof(bool), new ColumnInfo(SqlDbType.Bit)},
+                {typeof(byte), new ColumnInfo(SqlDbType.TinyInt)},
+                {typeof(short), new ColumnInfo(SqlDbType.SmallInt)},
+                {typeof(int), new ColumnInfo(SqlDbType.Int)},
+                {typeof(long), new ColumnInfo(SqlDbType.BigInt)},
+
+                {typeof(decimal), new ColumnInfo(SqlDbType.Decimal)},
+                {typeof(double), new ColumnInfo(SqlDbType.Float)},
+                {typeof(float), new ColumnInfo(SqlDbType.Real)},
+
+                {typeof(string), new ColumnInfo(SqlDbType.NVarChar)},
+
+                {typeof(DateTime), new ColumnInfo(SqlDbType.DateTime2)},
+                {typeof(DateTimeOffset), new ColumnInfo(SqlDbType.DateTimeOffset)},
+
+                {typeof(Guid), new ColumnInfo(SqlDbType.UniqueIdentifier)},
+
+             */
             {typeof(int), "BIGINT"},
             {typeof(string), "NVARCHAR(500)"},
             {typeof(bool), "BIT"},

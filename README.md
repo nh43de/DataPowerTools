@@ -41,3 +41,10 @@ It also provides a powerful API for filtering and object materialization.
 Date string parsing
 Shallow comparisons
 Bulk inserts
+
+
+Coming soon!
+
+ - Fit excel data to SQL table
+ - Fit any data to SQL table
+  - upload of the excel sheet and fit table as unit test
