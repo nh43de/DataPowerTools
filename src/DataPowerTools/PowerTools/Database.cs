@@ -308,7 +308,7 @@ FROM    [sys].[foreign_keys] [foreign_keys01]
             {
                 try
                 {
-                    var b = a.Select<TableHierarchy>().ToList();
+                    var b = a.SelectStrict<TableHierarchy>().ToList();
                     return b;
                 }
                 catch (Exception e)

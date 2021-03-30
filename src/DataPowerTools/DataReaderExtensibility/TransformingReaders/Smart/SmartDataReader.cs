@@ -50,7 +50,7 @@ namespace DataPowerTools.DataReaderExtensibility.TransformingReaders
 
         private object TransformObject(object o, string name)
         {
-            if (_mappingInfoLazy.IsValueCreated)
+            if (_mappingInfoLazy.Value != null)
             {
                 var transformOrdinal = _mappingInfoLazy.Value.SourceColumnNameToDestinationOrdinal[name];
                 return transformOrdinal == null
@@ -65,9 +65,7 @@ namespace DataPowerTools.DataReaderExtensibility.TransformingReaders
         {
             if (_mappingInfoLazy.Value != null)
             {
-                var mappingsInfo = _mappingInfoLazy.Value;
-
-                var transformIndex = mappingsInfo.SourceOrdinalToDestinationOrdinal[sourceIndex];
+                var transformIndex = _mappingInfoLazy.Value.SourceOrdinalToDestinationOrdinal[sourceIndex];
 
                 return transformIndex == null
                     ? o

@@ -2,8 +2,10 @@
 using System.Linq;
 using System.Threading.Tasks;
 using DataPowerTools.DataConnectivity.Sql;
+using DataPowerTools.DataReaderExtensibility.TransformingReaders;
 using DataPowerTools.Extensions;
 using DataPowerTools.PowerTools;
+using DataPowerTools.Tests.Models;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace DataPowerTools.Tests
@@ -34,6 +36,44 @@ namespace DataPowerTools.Tests
             conn.CloseAndDispose();
         }
 
+        
+        [TestMethod]
+        public async Task TestMapToType()
+        {
+            var conn = new SQLiteConnection("Data Source=:memory:");
+            conn.Open();
+
+            var r = new[]
+            {
+                new Test123
+                {
+                    Col1 = 10,
+                    Col2 = 20,
+                    Col3 = "abc",
+                }
+            }.Repeat(10).ToArray();
+
+            await conn.CreateTableFor(r, "DestinationTable");
+            
+            var r2 = new[]
+            {
+                new
+                {
+                    Col1 = "10",
+                    Col2 = "20",
+                    Col3 = "abc",
+                }
+            }.Repeat(100).ToArray();
+
+            var d = r2
+                .ToDataReader()
+                //.MapToType(typeof(Test123), DataTransformGroups.DefaultConvert)
+                .Select<Test123>()
+                .ToArray();
+
+            conn.CloseAndDispose();
+        }
+
         [TestMethod]
         public async Task TestBulkInsertUsingCsv()
         {
@@ -58,7 +98,7 @@ namespace DataPowerTools.Tests
 
             var csvData = tab.ToCsvString();
 
-            var r = DataConnectivity.Csv.ReadString(csvData);
+            var r = Csv.ReadString(csvData);
 
             await r.BulkInsert(conn, destinationtable, DatabaseEngine.Sqlite, new GenericBulkCopyOptions()
             {

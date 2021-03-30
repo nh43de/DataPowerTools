@@ -14,7 +14,7 @@ namespace DataPowerTools.Extensions
         /// <param name="reader"></param>
         /// <param name="useStrict"></param>
         public DataReaderEnumerable(IDataReader reader, bool useStrict = false) 
-            : base(reader, dr => useStrict ? dr.Select<T>() : dr.SelectNonStrict<T>())
+            : base(reader, dr => useStrict ? dr.SelectStrict<T>() : dr.SelectNonStrict<T>())
         {
         }
     }

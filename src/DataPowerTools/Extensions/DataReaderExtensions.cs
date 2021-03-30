@@ -40,7 +40,7 @@ namespace DataPowerTools.Extensions
         /// <typeparam name="T"></typeparam>
         /// <param name="obj"></param>
         /// <returns></returns>
-        public static IDataReader AsDataReader<T>(this T obj, bool ignoreNonStringReferenceTypes = true)
+        public static IDataReader AsSingleRowDataReader<T>(this T obj, bool ignoreNonStringReferenceTypes = true)
         {
             return obj.AsSingleEnumerable().ToDataReader(ignoreNonStringReferenceTypes);
         }
@@ -51,7 +51,7 @@ namespace DataPowerTools.Extensions
         /// <typeparam name="T"></typeparam>
         /// <param name="obj"></param>
         /// <returns></returns>
-        public static IDataReader AsDataReader<T>(this T obj, string[] fieldNames)
+        public static IDataReader AsSingleRowDataReader<T>(this T obj, string[] fieldNames)
         {
             return obj.AsSingleEnumerable().ToDataReader(fieldNames);
         }
@@ -597,6 +597,22 @@ namespace DataPowerTools.Extensions
         }
         
         /// <summary>
+        /// Gets a Smart data reader based on a destination type and applies transformation group.
+        /// </summary>
+        /// <typeparam name="TDataReader"></typeparam>
+        /// <param name="dataReader"></param>
+        /// <param name="destinationType"></param>
+        /// <param name="transformGroup">Specify the transform group available in the DataTransformGroups static class.</param>
+        /// <returns></returns>
+        public static SmartDataReader<TDataReader> MapToType<TDataReader>(this TDataReader dataReader, Type destinationType, DataTransformGroup transformGroup = null) where TDataReader : IDataReader
+        {
+            var destinationColumns = destinationType.GetTypedDataColumnInfo();
+
+            return new SmartDataReader<TDataReader>(dataReader, destinationColumns, transformGroup ?? DataTransformGroups.None);
+        }
+
+
+        /// <summary>
         /// Applies a mapping and tranformation based on a SQL destination. DataTranformationGroups determine how
         /// tranformations are mapped to destination types.
         /// Column renaming/reordering/aliasing is also setup automatically.
@@ -805,21 +821,50 @@ namespace DataPowerTools.Extensions
                 }
             }
         }
+
+
+        /// <summary>
+        /// Yields an IDataReader as an enumerable, manually specifing how to return a new T from a DataReader. Property names must match column names exactly.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="reader"></param>
+        /// <param name="projection"></param>
+        /// <returns></returns>
+        public static IEnumerable<T> Select<T>(this IDataReader reader,
+            Func<IDataReader, T> projection)
+        {
+            while (reader.Read())
+                yield return projection(reader);
+        }
+
+        /// <summary>
+        /// Select function for data readers. Will apply default convert operations to fit it to a type.
+        /// </summary>
+        /// <typeparam name="T">Data type.</typeparam>
+        /// <param name="dr">Source data reader.</param>
+        /// <param name="typeFactory">The default constructor for the type.</param>
+        /// <param name="transformGroup">The transform group to apply.</param>
+        /// <returns></returns>
+        public static IEnumerable<T> Select<T>(this IDataReader dr, Func<T> typeFactory = null, DataTransformGroup transformGroup = null) where T : class
+        {
+            var d = dr
+                .MapToType(typeof(T), transformGroup ?? DataTransformGroups.DefaultConvert);
+
+            return d.SelectStrict<T>(typeFactory);
+        }
         
-
-
         //TODO: warning: some duplicated code to above.
         /// <summary>
-        /// Yields an IDataReader as an enumerable. Property names must match column names exactly.
+        /// Strict select function. Yields an IDataReader as an enumerable. Property names must match column names exactly.
         /// This is done using FastMember, and is roughly 20% faster. However, this is much more strict with type casting.
         /// Ie. the C# types should match the SQL type equivalents exactly. 
         /// Even int/byte are not compatable with each other.
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="dr"></param>
-        /// <param name="typeFactory">The method used to create the type.</param>
+        /// <param name="typeFactory">Default factory for new instances of the type.</param>
         /// <returns></returns>
-        public static IEnumerable<T> Select<T>(this IDataReader dr, Func<T> typeFactory = null) where T : class
+        public static IEnumerable<T> SelectStrict<T>(this IDataReader dr, Func<T> typeFactory = null) where T : class
         {
             var t = typeof(T);
 
@@ -828,7 +873,7 @@ namespace DataPowerTools.Extensions
                 while (dr.Read())
                 {
                     var obj = Convert.ChangeType(dr[0], t);
-                    yield return (T)obj;
+                    yield return (T) obj;
                 }
             }
             else
@@ -837,8 +882,6 @@ namespace DataPowerTools.Extensions
                 var props = accessor.GetMembers().Select(p => p.Name).ToArray();
 
                 typeFactory ??= () => accessor.CreateNew() as T;
-
-
 
                 while (dr.Read())
                 {
@@ -852,7 +895,7 @@ namespace DataPowerTools.Extensions
                 }
             }
         }
-
+        
         /// <summary>
         /// Routes the current row count to the Depth property. Good for using on sql queries where Depth does not signify row count.
         /// </summary>
@@ -875,20 +918,6 @@ namespace DataPowerTools.Extensions
                 action(reader);
         }
         
-        /// <summary>
-        /// Yields an IDataReader as an enumerable, manually specifing how to return a new T from a DataReader. Property names must match column names exactly.
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="reader"></param>
-        /// <param name="projection"></param>
-        /// <returns></returns>
-        public static IEnumerable<T> Select<T>(this IDataReader reader,
-            Func<IDataReader, T> projection)
-        {
-            while (reader.Read())
-                yield return projection(reader);
-        }
-
         /// <summary>
         /// Executes reader to DataSet.
         /// </summary>
@@ -1028,7 +1057,7 @@ namespace DataPowerTools.Extensions
         /// <returns></returns>
         public static List<T> ToList<T>(this IDataReader dr) where T : class
         {
-            return dr.Select<T>().ToList();
+            return dr.SelectStrict<T>().ToList();
         }
 
         /// <summary>
@@ -1039,7 +1068,7 @@ namespace DataPowerTools.Extensions
         /// <returns></returns>
         public static T[] ToArray<T>(this IDataReader dr) where T : class
         {
-            return dr.Select<T>().ToArray();
+            return dr.SelectStrict<T>().ToArray();
         }
 
         /// <summary>

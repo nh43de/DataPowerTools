@@ -1,13 +1,13 @@
 using System;
 using System.Data;
+using System.Linq;
+using DataPowerTools.Extensions;
 
 namespace DataPowerTools.DataReaderExtensibility.Columns
 {
-    [Obsolete]
     public static class DataColumnInfoExtensions
     {
-        [Obsolete]
-        public static TypedDataColumnInfo FromDataColumn(this DataColumn dataColumn)
+        public static TypedDataColumnInfo ToTypedDataColumnInfo(this DataColumn dataColumn)
         {
             return new TypedDataColumnInfo
             {
@@ -15,6 +15,18 @@ namespace DataPowerTools.DataReaderExtensibility.Columns
                 ColumnName = dataColumn.ColumnName,
                 DataType = dataColumn.DataType
             };
+        }
+        
+        public static TypedDataColumnInfo[] GetTypedDataColumnInfo(this Type dataType)
+        {
+            var r = dataType.GetColumnInfo().Select(col => new TypedDataColumnInfo
+            {
+                Ordinal = col.Ordinal,
+                ColumnName = col.ColumnName,
+                DataType = col.FieldType
+            });
+            
+            return r.ToArray();
         }
     }
 }

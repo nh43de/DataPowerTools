@@ -19,14 +19,14 @@ namespace DataPowerTools.Tests
                     Col1 = (string) null,
                     Col2 = (string) null,
                     Col3 = "abc",
-                }.AsDataReader();
+                }.AsSingleRowDataReader();
 
                 var r2 = new
                 {
                     Col1 = "Header1",
                     Col2 = "Header2",
                     Col3 = "Header3",
-                }.AsDataReader();
+                }.AsSingleRowDataReader();
 
                 var r3 = 
                     Enumerable.Range(1, 100).Select(i => new
