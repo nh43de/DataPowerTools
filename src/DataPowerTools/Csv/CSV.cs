@@ -9,8 +9,33 @@ using DataPowerTools.Extensions;
 
 namespace DataPowerTools.DataConnectivity
 {
+
+    //TODO: move writer logic to SimpleCSV
     public static class Csv
     {
+        public static IDataReader GetDataReader(string filePath, char csvDelimiter = ',', bool fileHasHeaders = true) // int headerOffsetRows = 1)
+        {
+            return new CsvReader(new StreamReader(filePath), fileHasHeaders, csvDelimiter);
+        }
+
+        public static IDataReader GetDataReader(Stream fileStream, char csvDelimiter = ',', bool fileHasHeaders = true) // int headerOffsetRows = 1)
+        {
+            return new CsvReader(new StreamReader(fileStream), fileHasHeaders, csvDelimiter);
+        }
+
+        public static DataSet GetDataSet(string filePath, char csvDelimiter = ',', bool fileHasHeaders = true) // int headerOffsetRows = 1)
+        {
+            var a = new CsvReader(new StreamReader(filePath), fileHasHeaders, csvDelimiter);
+
+            return a.ToDataSet(null, a.GetFieldHeaders());
+        }
+        public static DataSet GetDataSet(Stream fileStream, char csvDelimiter = ',', bool fileHasHeaders = true) // int headerOffsetRows = 1)
+        {
+            var a = new CsvReader(new StreamReader(fileStream), fileHasHeaders, csvDelimiter);
+
+            return a.ToDataSet(null, a.GetFieldHeaders());
+        }
+
         /// <summary>
         /// Writes an enumerable object array to CSV.
         /// </summary>
@@ -119,7 +144,6 @@ namespace DataPowerTools.DataConnectivity
                     var rowStr = string.Join(",", row.Select(i => @"""" + i?.ToString() + @""""));
                     sb.Append(rowStr + Environment.NewLine);
                     sw.Write(sb.ToString());
-
                     sb.Clear();
                 }
             }
