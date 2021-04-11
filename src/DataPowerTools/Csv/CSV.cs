@@ -7,19 +7,20 @@ using System.Text;
 using CsvDataReader;
 using DataPowerTools.DataReaderExtensibility.TransformingReaders;
 using DataPowerTools.Extensions;
+using SimpleCSV;
 
 // ReSharper disable once CheckNamespace
 namespace DataPowerTools
 {
-    //TODO: move obselete logic to use SimpleCSV
     public static class Csv
     {
         public static IDataReader CreateDataReader(string filePath, char csvDelimiter = ',', bool fileHasHeaders = true) // int headerOffsetRows = 1)
         {
             var dr = new CsvReader(new StreamReader(filePath), fileHasHeaders, csvDelimiter);
+            
             return dr;
         }
-
+        
         public static IDataReader CreateDataReader(Stream fileStream, char csvDelimiter = ',', bool fileHasHeaders = true) // int headerOffsetRows = 1)
         {
             var dr = new CsvReader(new StreamReader(fileStream), fileHasHeaders, csvDelimiter);
@@ -54,41 +55,91 @@ namespace DataPowerTools
             return a.ToDataSet(null, a.GetFieldHeaders());
         }
 
-        /// <summary>
-        /// Writes an enumerable object array to CSV.
-        /// </summary>
-        /// <param name="rowObjects"></param>
-        /// <param name="headers"></param>
-        /// <param name="outputFile"></param>
+
         public static void Write(IEnumerable<object[]> rowObjects, IEnumerable<string> headers, string outputFile)
         {
             var ts = File.OpenWrite(outputFile);
             var sw = new StreamWriter(ts);
-            var sb = new StringBuilder(1024);
 
+            using var csvWriter = new CSVWriter(sw);
+            
             using (ts)
             using (sw)
             {
-                foreach (var col in headers)
-                    sb.Append("\"" + col + "\",");
-
-                sb.Remove(sb.Length - 1, 1);
-                sb.Append(Environment.NewLine);
-
-                sw.Write(sb.ToString());
-                sb.Clear();
-
+                csvWriter.WriteNext(headers.ToArray());
+                
                 foreach (var row in rowObjects)
                 {
-                    //TODO: this could be sped-up by not building this string in the heap
-                    var rowStr = string.Join(",", row.Select(i => @"""" + i?.ToString() + @""""));
-                    sb.Append(rowStr + Environment.NewLine);
-                    sw.Write(sb.ToString());
-                    sb.Clear();
+                    var vals = row.Select(i => i?.ToString()).ToArray();
+
+                    csvWriter.WriteNext(vals);
                 }
             }
         }
         
+        public static void Write(IDataReader reader, string outputFile, bool writeHeaders = true)
+        {
+            using var ts = File.OpenWrite(outputFile);
+            using var sw = new StreamWriter(ts);
+            Write(reader, sw, writeHeaders);
+        }
+
+        public static void Write(IDataReader reader, TextWriter sw, bool writeHeaders = true)
+        {
+            var isInitialized = false;
+            var fieldCount = 0;
+
+            using var csvWriter = new CSVWriter(sw);
+            
+            void Initialize()
+            {
+                var fieldHeaders = reader.GetFieldNames().ToArray();
+
+                if (writeHeaders)
+                {
+                    csvWriter.WriteNext(fieldHeaders);
+                }
+
+                fieldCount = reader.FieldCount;
+
+                isInitialized = true;
+            }
+            using (sw)
+            {
+                try
+                {
+                    while (reader.Read())
+                    {
+                        if (isInitialized == false)
+                            Initialize();
+
+                        var row = new object[fieldCount];
+                        reader.GetValues(row);
+
+                        csvWriter.WriteNext(row.Select(o => o?.ToString()).ToArray());
+                    }
+                }
+                finally
+                {
+                    sw.Flush();
+                    sw.Close();
+                }
+            }
+        }
+        
+        public static string WriteString(IDataReader reader, bool writeHeaders = true)
+        {
+            using var sw = new StringWriter();
+            using var csvWriter = new CSVWriter(sw);
+
+            Write(reader, sw, writeHeaders);
+
+            return sw.ToString();
+        }
+
+        //public static void Write<T>(IEnumerable<T> rowObjects, IEnumerable<string> headers, string outputFile) { //not implemented }
+         
+
         /// <summary>
         /// Opens a CSV string and returns a data reader for it.
         /// </summary>
@@ -103,137 +154,9 @@ namespace DataPowerTools
             return new DisposingDataReader<CsvReader>(dr);
         }
 
-        /// <summary>
-        /// Writes the reader to CSV.
-        /// </summary>
-        /// <param name="reader"></param>
-        /// <param name="outputFile"></param>
-        /// <param name="writeHeaders">Whether to write the headers.</param>
-        [Obsolete("Not recommended for new use.")]
-        public static void Write(IDataReader reader, string outputFile, bool writeHeaders = true)
-        {
-            var ts = File.OpenWrite(outputFile);
-            var sw = new StreamWriter(ts);
-            var sb = new StringBuilder(1024);
-            
-            var isInitialized = false;
-            var fieldCount = 0;
-
-            void Initialize()
-            {
-                var fieldHeaders = reader.GetFieldNames().ToArray();
-
-                if (writeHeaders)
-                {
-                    foreach (var col in fieldHeaders)
-                        sb.Append("\"" + col + "\",");
-                    
-                    sb.Remove(sb.Length - 1, 1);
-                    sb.Append(Environment.NewLine);
-
-                    sw.Write(sb.ToString());
-                    sb.Clear();
-                }
-
-                fieldCount = reader.FieldCount;
-
-                isInitialized = true;
-            }
-            using (ts)
-            using (sw)
-            {
-                try
-                {
-                    while (reader.Read())
-                    {
-                        if (isInitialized == false)
-                            Initialize();
-
-                        var row = new object[fieldCount];
-                        reader.GetValues(row);
-                        var rowStr = string.Join(",", row.Select(i => @"""" + i?.ToString() + @""""));
-                        sb.Append(rowStr + Environment.NewLine);
-                        sw.Write(sb.ToString());
-                        sb.Clear();
-                    }
-                }
-                finally
-                {
-                    sw.Flush();
-                    sw.Close();
-                }
-            }
-        }
-
-        /// <summary>
-        /// Returns a CSV string.
-        /// </summary>
-        /// <param name="reader"></param>
-        /// <param name="writeHeaders">Whether to write the headers.</param>
-        public static string WriteString(IDataReader reader, bool writeHeaders = true)
-        {
-            //TODO: WARNING: duplicated to above
-
-            var sb = new StringBuilder(1024);
-
-            var isInitialized = false;
-            var fieldCount = 0;
-
-            void Initialize()
-            {
-                var fieldHeaders = reader.GetFieldNames().ToArray();
-
-                if (writeHeaders)
-                {
-                    foreach (var col in fieldHeaders)
-                        sb.Append("\"" + col + "\",");
-
-                    sb.Remove(sb.Length - 1, 1);
-                    sb.Append(Environment.NewLine);
-                }
-
-                fieldCount = reader.FieldCount;
-
-                isInitialized = true;
-            }
-
-            while (reader.Read())
-            {
-                if (isInitialized == false)
-                    Initialize();
-
-                var row = new object[fieldCount];
-                reader.GetValues(row);
-                var rowStr = string.Join(",", row.Select(i => @"""" + i?.ToString() + @""""));
-                sb.Append(rowStr + Environment.NewLine);
-            }
-            
-            return sb.ToString();
-        }
-
-        //TODO: needs to be support streaming to disk
 
 
-        //public static void Write<T>(IEnumerable<T> rowObjects, IEnumerable<string> headers, string outputFile)
-        //{
-        //    var props = typeof(T).GetProperties().Select(p => p.Name).ToArray();
 
-        //    var sb = new StringBuilder(1024 * 5);
-
-        //    foreach (var col in headers)
-        //        sb.Append("\"" + col + "\",");
-
-        //    sb.Remove(sb.Length - 1, 1);
-        //    sb.Append(Environment.NewLine);
-
-        //    foreach (var row in rowObjects)
-        //    {
-        //        var rowStr = string.Join(",", row.Select(i => @"""" + i.ToString() + @""""));
-        //        sb.Append(rowStr + Environment.NewLine);
-        //    }
-
-        //    File.WriteAllText(outputFile, sb.ToString());
-        //}
 
         /// <summary>
         ///     CSV-parses a string. Semi-obsolete.

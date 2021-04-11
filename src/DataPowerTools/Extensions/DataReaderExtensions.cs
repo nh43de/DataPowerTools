@@ -1109,7 +1109,7 @@ namespace DataPowerTools.Extensions
         /// <returns></returns>
         public static List<T> ToList<T>(this IDataReader dr) where T : class
         {
-            return dr.SelectStrict<T>().ToList();
+            return dr.Select<T>().ToList();
         }
 
         /// <summary>
@@ -1120,7 +1120,7 @@ namespace DataPowerTools.Extensions
         /// <returns></returns>
         public static T[] ToArray<T>(this IDataReader dr) where T : class
         {
-            return dr.SelectStrict<T>().ToArray();
+            return dr.Select<T>().ToArray();
         }
 
         /// <summary>
