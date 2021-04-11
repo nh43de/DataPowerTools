@@ -20,6 +20,29 @@ namespace DataPowerTools.Tests
 
         }
 
+        public  class TestNullableBool
+        {
+            public int Id { get; set; }
+            public bool? BoolValue { get; set; }
+        }
+
+
+        [TestMethod]
+        public void TestNullMaterialization()
+        {
+            var d = new
+            {
+                Id = "100",
+                BoolValue = ""
+            }.AsSingleRowDataReader();
+
+            var r = d.Select<TestNullableBool>().ToArray();
+
+            Assert.AreEqual(null, r[0].BoolValue);
+        }
+
+
+
         [TestMethod]
         public void TestDiagnostics()
         {

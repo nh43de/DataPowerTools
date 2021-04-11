@@ -271,6 +271,17 @@ namespace DataPowerTools.Extensions
         }
 
         /// <summary>
+        /// Returns whether this type is nullable generic type (Nullable`T).
+        /// </summary>
+        /// <param name="type"></param>
+        /// <returns></returns>
+        public static bool IsNullableGenericType(this Type type)
+        {
+            return (type.IsGenericType &&
+                    (type.GetGenericTypeDefinition() == typeof(Nullable<>)));
+        }
+
+        /// <summary>
         /// Generates a CREATE TABLE statement from a type definition, where the 
         /// </summary>
         /// <param name="t"></param>

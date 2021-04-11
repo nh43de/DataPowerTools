@@ -254,6 +254,12 @@ namespace DataPowerTools.Extensions
             if (value == null && type.IsValueType)
                 return type.GetDefaultValue(); // Extension method internally handles caching
 
+            if (type.IsNullableGenericType()
+                && value is string v
+                && string.IsNullOrWhiteSpace(v)) {
+                return null;
+            }
+            
             var underlyingType = Nullable.GetUnderlyingType(type) ?? type;
 
             // Handle Enums
