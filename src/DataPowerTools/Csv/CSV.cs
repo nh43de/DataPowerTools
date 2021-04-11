@@ -58,7 +58,8 @@ namespace DataPowerTools
 
         public static void Write(IEnumerable<object[]> rowObjects, IEnumerable<string> headers, string outputFile)
         {
-            var ts = File.OpenWrite(outputFile);
+            var ts = File.Open(outputFile, FileMode.Create);
+            
             var sw = new StreamWriter(ts);
 
             using var csvWriter = new CSVWriter(sw);
@@ -79,7 +80,7 @@ namespace DataPowerTools
         
         public static void Write(IDataReader reader, string outputFile, bool writeHeaders = true)
         {
-            using var ts = File.OpenWrite(outputFile);
+            using var ts = File.Open(outputFile, FileMode.Create);
             using var sw = new StreamWriter(ts);
             Write(reader, sw, writeHeaders);
         }
