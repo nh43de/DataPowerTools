@@ -23,7 +23,7 @@ namespace DataPowerTools.DataReaderExtensibility.TransformingReaders
         public SmartDataReader(TDataReader dataReader, TypedDataColumnInfo[] destinationColumns,
             DataTransformGroup dataTransformGroup = null) : base(dataReader)
         {
-            dataTransformGroup = dataTransformGroup ?? DataTransformGroups.Default;
+            dataTransformGroup ??= DataTransformGroups.Default;
 
             DataTransformsInDestinationOrder =
                 destinationColumns.Select(destCol => dataTransformGroup(destCol.DataType)).ToArray();

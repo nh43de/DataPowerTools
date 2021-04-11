@@ -88,25 +88,6 @@ namespace DataPowerTools.Extensions
         }
 
         /// <summary>
-        /// Gets the non-nullable type (used when dealing with DataTables which do not support nullable types)
-        /// </summary>
-        /// <param name="colFieldType"></param>
-        /// <returns></returns>
-        public static Type GetNonNullableType(this Type colFieldType)
-        {
-            if (colFieldType == null)
-                return null;
-
-            var colType = colFieldType;
-
-            //if nullable type get root type
-            if (colType.IsGenericType && (colType.GetGenericTypeDefinition() == typeof(Nullable<>)))
-                colType = colType.GetGenericArguments()[0];
-
-            return colType;
-        }
-        
-        /// <summary>
         /// Returns all column-type information about a type, enumerating all properties (and properties only).
         /// </summary>
         /// <param name="type"></param>
@@ -243,14 +224,18 @@ namespace DataPowerTools.Extensions
         {
             return type.IsValueType ? Activator.CreateInstance(type) : null;
         }
-
+        
         /// <summary>
-        /// Gets the underlying nullable type.
+        /// Gets the underlying nullable type for a Nullable`1 generic type, or
+        /// if it is not a nullable type it will return the type.
         /// </summary>
         /// <param name="t"></param>
         /// <returns></returns>
-        public static Type GetNullableType(this Type t)
+        public static Type GetNonNullableType(this Type t)
         {
+            if (t == null)
+                return null;
+            
             var returnType = t;
             if (t.IsGenericType && (t.GetGenericTypeDefinition() == typeof(Nullable<>)))
                 returnType = Nullable.GetUnderlyingType(t);

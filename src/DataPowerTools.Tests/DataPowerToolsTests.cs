@@ -30,15 +30,32 @@ namespace DataPowerTools.Tests
         [TestMethod]
         public void TestNullMaterialization()
         {
-            var d = new
-            {
-                Id = "100",
-                BoolValue = ""
-            }.AsSingleRowDataReader();
+            var d =
+                new[]
+                    {
+                        new
+                        {
+                            Id = "100",
+                            BoolValue = "0"
+                        },
+                        new
+                        {
+                            Id = "200",
+                            BoolValue = ""
+                        },
+                        new
+                        {
+                            Id = "300",
+                            BoolValue = "1"
+                        }
+                    }
+                    .ToDataReader();
 
             var r = d.Select<TestNullableBool>().ToArray();
 
-            Assert.AreEqual(null, r[0].BoolValue);
+            Assert.AreEqual(false, r[0].BoolValue);
+            Assert.AreEqual(null, r[1].BoolValue);
+            Assert.AreEqual(true, r[2].BoolValue);
         }
 
 

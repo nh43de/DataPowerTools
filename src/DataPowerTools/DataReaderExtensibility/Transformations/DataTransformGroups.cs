@@ -25,6 +25,9 @@ namespace DataPowerTools.DataReaderExtensibility.TransformingReaders
         /// <returns></returns>
         public static DataTransform Default(Type destinationType)
         {
+            if (destinationType.IsNullableGenericType())
+                destinationType = destinationType.GetNonNullableType();
+
             if (destinationType == typeof(string))
                 return DataTransforms.None;
             if (destinationType == typeof(bool))

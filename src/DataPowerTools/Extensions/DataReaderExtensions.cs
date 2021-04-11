@@ -889,7 +889,7 @@ namespace DataPowerTools.Extensions
             while (reader.Read())
                 yield return projection(reader);
         }
-
+        
         /// <summary>
         /// Select function for data readers. Will apply default convert operations to fit it to a type.
         /// </summary>
@@ -901,7 +901,7 @@ namespace DataPowerTools.Extensions
         public static IEnumerable<T> Select<T>(this IDataReader dr, Func<T> typeFactory = null, DataTransformGroup transformGroup = null) where T : class
         {
             var d = dr
-                .MapToType(typeof(T), transformGroup ?? DataTransformGroups.DefaultConvert);
+                .MapToType(typeof(T), transformGroup ?? DataTransformGroups.Default);
 
             return d.SelectStrict<T>(typeFactory);
         }
