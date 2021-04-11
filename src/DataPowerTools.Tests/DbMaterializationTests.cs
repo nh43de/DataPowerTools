@@ -1,8 +1,11 @@
 ﻿using System.Collections.Generic;
 using System.Data.SQLite;
 using System.Linq;
+using System.Threading.Tasks;
 using DataPowerTools.Extensions;
+using DataPowerTools.PowerTools;
 using DataPowerTools.Tests.Models;
+using DataPowerTools.Tests.ReaderTests;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace DataPowerTools.Tests
@@ -10,6 +13,30 @@ namespace DataPowerTools.Tests
     [TestClass]
     public class DbMaterializationTests
     {
+        [TestMethod]
+        public async Task TestExecuteReader()
+        {
+            var d = new SQLiteConnection("Data Source=:memory:");
+            d.Open();
+
+            d.ExecuteSql("CREATE TABLE Test123 ( Col1 int, Col2 decimal(3,4), Col3 varchar(255) )");
+
+            var dr = TestDataHelpers.GetSampleDataReader(DataReaderSource.ObjectReader, 3);
+
+            await dr.BulkInsert(d, "Test123", DatabaseEngine.Sqlite);
+
+            var dr2 = d.ExecuteReader("SELECT * FROM Test123");
+
+
+
+            var rr = dr2.SelectStrict<Test123>().ToArray();
+
+            Assert.AreEqual(3, rr.Length);
+
+            d.Close();
+            d.Dispose();
+        }
+        
         [TestMethod]
         public void TestExecuteObject()
         {

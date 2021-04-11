@@ -8,13 +8,9 @@ namespace DataPowerTools.DataReaderExtensibility.TransformingReaders
     /// </summary>
     public class RowCountingDataReader<TDataReader> : ExtensibleDataReader<TDataReader> where TDataReader : IDataReader
     {
-        private readonly IProgress<int> _progress;
         private int _i = 0;
 
-        public RowCountingDataReader(TDataReader dataReader, IProgress<int> progress = null) : base(dataReader)
-        {
-            _progress = progress;
-        }
+        public RowCountingDataReader(TDataReader dataReader) : base(dataReader) { }
 
         public override bool Read()
         {
@@ -22,9 +18,7 @@ namespace DataPowerTools.DataReaderExtensibility.TransformingReaders
 
             if (d)
                 _i++;
-
-            _progress?.Report(_i);
-
+            
             return d;
         }
 

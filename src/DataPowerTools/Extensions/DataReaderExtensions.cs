@@ -450,7 +450,7 @@ namespace DataPowerTools.Extensions
 
         /// <summary>
         ///     Tries to get column names from IDataReader. If it is unsuccessful it will default to generic column names
-        ///     "Column1", "Column2", ...
+        ///     "Column1", "Column2", ... https://github.com/haf/System.Data.SQLite/blob/master/System.Data.SQLite/SQLiteDataReader.cs
         /// </summary>
         /// <param name="reader"></param>
         /// <returns></returns>
@@ -656,6 +656,30 @@ namespace DataPowerTools.Extensions
         {
             return new SmartDataReader<TDataReader>(dataReader, destinationColumnInfo, transformGroup ?? DataTransformGroups.None);
         }
+        
+        /// <summary>
+        /// Calls a progress callback on each row or modulus of row count. Will also notify on last record.
+        /// </summary>
+        /// <param name="reader"></param>
+        /// <param name="progress">Progress to notify that a row was read.</param>
+        /// <param name="count">Modulus of the row count to notify on. E.g. for every count records will notify. If null will notify on every row. Will also notify on last record.</param>
+        /// <returns></returns>
+        public static IDataReader NotifyOn<TDataReader>(this TDataReader reader, IProgress<int> progress, int? count = null) where TDataReader : IDataReader
+        {
+            return new NotifyingDataReader<TDataReader>(reader, progress.Report, count);
+        }
+
+        /// <summary>
+        /// Calls a progress callback on each row or modulus of row count. Will also notify on last record.
+        /// </summary>
+        /// <param name="reader"></param>
+        /// <param name="callback">Callback to notify that a row was read.</param>
+        /// <param name="count">Modulus of the row count to notify on. E.g. for every count records will notify. If null will notify on every row. Will also notify on last record.</param>
+        /// <returns></returns>
+        public static IDataReader NotifyOn<TDataReader>(this TDataReader reader, Action<int> callback, int? count = null) where TDataReader : IDataReader
+        {
+            return new NotifyingDataReader<TDataReader>(reader, callback, count);
+        }
 
         /// <summary>
         /// Prints the current values of an IDataReader.
@@ -675,7 +699,28 @@ namespace DataPowerTools.Extensions
 
             return string.Join(", ", fields.Select(p => $"{{'{p.Nm}': '{p.Val}'}}"));
         }
-        
+
+
+        public static void ReadToEnd(this IDataReader dr)
+        {
+            while (dr.Read()) { }
+        }
+
+        /// <summary>
+        /// Fast-forwards to the end of the data reader by calling .REad
+        /// </summary>
+        /// <param name="dr"></param>
+        /// <param name="count"></param>
+        public static void Read(this IDataReader dr, int count)
+        {
+            var i = 0;
+
+            while (i < count && dr.Read())
+            {
+                i++;
+            }
+        }
+
         /// <summary>
         /// Gets rows as enumerable of object[].  This is slower.
         /// </summary>

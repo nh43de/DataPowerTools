@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using DataPowerTools.DataReaderExtensibility.TransformingReaders;
 using DataPowerTools.Extensions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -8,6 +9,25 @@ namespace DataPowerTools.Tests
     [TestClass]
     public class DataReaderExtensionsTests
     {
+        [TestMethod]
+        public void TestReadMultiple()
+        {
+            var r3 =
+                Enumerable.Range(1, 100).Select(i => new
+                    {
+                        Col1 = i
+                    })
+                    .ToDataReader();
+
+            r3.Read();
+
+            Assert.AreEqual(1, r3["Col1"]);
+            
+            r3.Read(3);
+
+            Assert.AreEqual(4, r3["Col1"]);
+        }
+        
         [TestMethod]
         public void TestProjection()
         {
