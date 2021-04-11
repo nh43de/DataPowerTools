@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Data;
 using System.Security;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -7,10 +8,22 @@ using DataPowerTools.Strings;
 namespace DataPowerTools.Extensions
 {
     //TODO: add as sql command
-    internal static class StringExtensions
+    public static class StringExtensions
     {
         public static readonly Regex IndentRegex = new Regex("^", RegexOptions.Compiled | RegexOptions.Multiline);
 
+        /// <summary>
+        /// Opens the file path specified as a CSV.
+        /// </summary>
+        /// <param name="strPath"></param>
+        /// <param name="csvDelimiter"></param>
+        /// <param name="fileHasHeaders"></param>
+        /// <returns></returns>
+        public static IDataReader OpenCsvFile(this string strPath, char csvDelimiter = ',', bool fileHasHeaders = true)
+        {
+            return Csv.CreateDataReader(strPath, csvDelimiter, fileHasHeaders);
+        }
+        
         /// <summary>
         /// Uses default date from string provider to parse a date from a string. Returns a short date string mm/dd/yy
         /// </summary>

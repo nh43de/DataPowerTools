@@ -910,7 +910,7 @@ namespace DataPowerTools.Extensions
         /// Strict select function. Yields an IDataReader as an enumerable. Property names must match column names exactly.
         /// This is done using FastMember, and is roughly 20% faster. However, this is much more strict with type casting.
         /// Ie. the C# types should match the SQL type equivalents exactly. 
-        /// Even int/byte are not compatable with each other.
+        /// Even int/byte are not compatible with each other.
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="dr"></param>
