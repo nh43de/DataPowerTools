@@ -89,14 +89,45 @@ namespace DataPowerTools.DataReaderExtensibility.TransformingReaders
             return d / 10000.0m;
         };
 
+        public static readonly DataTransform TransformNull = value =>
+        {
+            // Handle DBNull
+            if (value == DBNull.Value)
+                value = null;
+
+            // Handle value type conversion of null to the values types default value
+            //if (value == null && type.IsValueType)
+            //    return type.GetDefaultValue(); // Extension method internally handles caching
+
+            if (value is string v && string.IsNullOrWhiteSpace(v))
+            {
+                return null;
+            }
+
+            return value;
+        };
+
+
         public static readonly DataTransform TransformGuid = o =>
         {
             if (string.IsNullOrWhiteSpace(o?.ToString()))
             {
                 return null;
             }
+            
+            if (o is string s)
+            {
+                var r = Guid.Parse(s);
+                return r;
+            }
+            if (o is byte[] bytes)
+            {
+                var r = new Guid(bytes);
+                return r;
+            }
 
-            return Guid.Parse(o.ToString());
+            return null;
+
         };
 
         public static readonly DataTransform ToStringTransform = o => o?.ToString();

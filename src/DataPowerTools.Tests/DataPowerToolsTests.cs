@@ -20,10 +20,16 @@ namespace DataPowerTools.Tests
 
         }
 
-        public  class TestNullableBool
+        public class TestNullableBool
         {
             public int Id { get; set; }
             public bool? BoolValue { get; set; }
+        }
+
+        public class TestNullableDouble
+        {
+            public int Id { get; set; }
+            public double? DoubleValue { get; set; }
         }
 
 
@@ -56,6 +62,37 @@ namespace DataPowerTools.Tests
             Assert.AreEqual(false, r[0].BoolValue);
             Assert.AreEqual(null, r[1].BoolValue);
             Assert.AreEqual(true, r[2].BoolValue);
+        }
+
+        [TestMethod]
+        public void TestNullableDoubleMaterialization()
+        {
+            var d =
+                new[]
+                    {
+                        new
+                        {
+                            Id = 100,
+                            DoubleValue = (double?)0.0
+                        },
+                        new
+                        {
+                            Id = 200,
+                            DoubleValue = (double?)null
+                        },
+                        new
+                        {
+                            Id = 300,
+                            DoubleValue = (double?)1.0
+                        }
+                    }
+                    .ToDataReader();
+
+            var r = d.Select<TestNullableDouble>().ToArray();
+
+            Assert.AreEqual(0.0, r[0].DoubleValue);
+            Assert.AreEqual(null, r[1].DoubleValue);
+            Assert.AreEqual(1.0, r[2].DoubleValue);
         }
 
 

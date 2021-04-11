@@ -895,15 +895,14 @@ namespace DataPowerTools.Extensions
         /// </summary>
         /// <typeparam name="T">Data type.</typeparam>
         /// <param name="dr">Source data reader.</param>
-        /// <param name="typeFactory">The default constructor for the type.</param>
         /// <param name="transformGroup">The transform group to apply.</param>
         /// <returns></returns>
-        public static IEnumerable<T> Select<T>(this IDataReader dr, Func<T> typeFactory = null, DataTransformGroup transformGroup = null) where T : class
+        public static IEnumerable<T> Select<T>(this IDataReader dr, DataTransformGroup transformGroup = null) where T : class
         {
             var d = dr
                 .MapToType(typeof(T), transformGroup ?? DataTransformGroups.Default);
 
-            return d.SelectStrict<T>(typeFactory);
+            return d.SelectStrict<T>();
         }
         
         //TODO: warning: some duplicated code to above.

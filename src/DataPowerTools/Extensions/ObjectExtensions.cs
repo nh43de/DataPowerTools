@@ -1,10 +1,8 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Data.Common;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Reflection;
 using DataPowerTools.FastMember;
 using DataPowerTools.PowerTools;
 
@@ -251,8 +249,8 @@ namespace DataPowerTools.Extensions
                 value = null;
 
             // Handle value type conversion of null to the values types default value
-            if (value == null && type.IsValueType)
-                return type.GetDefaultValue(); // Extension method internally handles caching
+            //if (value == null && type.IsValueType)
+            //    return type.GetDefaultValue(); // Extension method internally handles caching
 
             if (type.IsNullableGenericType()
                 && value is string v
@@ -263,7 +261,7 @@ namespace DataPowerTools.Extensions
             var underlyingType = Nullable.GetUnderlyingType(type) ?? type;
 
             // Handle Enums
-            if (underlyingType.IsEnum)
+            if (value != null && underlyingType.IsEnum && value.GetType() != type)
             {
                 try
                 {
@@ -282,13 +280,13 @@ namespace DataPowerTools.Extensions
                 // Handle Guids
                 if (underlyingType == typeof(Guid))
                 {
-                    if (value is string)
+                    if (value is string s)
                     {
-                        value = new Guid(value as string);
+                        value = new Guid(s);
                     }
-                    if (value is byte[])
+                    if (value is byte[] bytes)
                     {
-                        value = new Guid(value as byte[]);
+                        value = new Guid(bytes);
                     }
                 }
 
