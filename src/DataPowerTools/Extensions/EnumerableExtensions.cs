@@ -257,7 +257,7 @@ namespace DataPowerTools.Extensions
         /// <param name="enumerable"></param>
         /// <param name="tParams"></param>
         /// <returns></returns>
-        public static IEnumerable<T> Except<T>(this IEnumerable<T> enumerable, params T[] tParams)
+        public static IEnumerable<T> ExceptParams<T>(this IEnumerable<T> enumerable, params T[] tParams)
         {
             return enumerable.Except(tParams as IEnumerable<T>);
         }
@@ -269,7 +269,7 @@ namespace DataPowerTools.Extensions
         /// <param name="enumerable"></param>
         /// <param name="tParams"></param>
         /// <returns></returns>
-        public static IEnumerable<T> Union<T>(this IEnumerable<T> enumerable, params T[] tParams)
+        public static IEnumerable<T> UnionParams<T>(this IEnumerable<T> enumerable, params T[] tParams)
         {
             return enumerable.Union(tParams as IEnumerable<T>);
         }
