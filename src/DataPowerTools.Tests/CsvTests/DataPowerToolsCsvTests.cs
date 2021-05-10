@@ -41,8 +41,8 @@ namespace DataPowerTools.Tests.CsvTests
             var finalData = rr.ToArray<TestString>();
 
             Assert.AreEqual(escapedString, finalData[0].StringValue);
-            Assert.AreEqual("", finalData[1].StringValue);
-            Assert.AreEqual("", finalData[2].StringValue);
+            Assert.AreEqual(null, finalData[1].StringValue);
+            Assert.AreEqual(null, finalData[2].StringValue);
         }
     }
 }
