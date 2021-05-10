@@ -1,4 +1,5 @@
 ﻿using System.Data.SQLite;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using DataPowerTools.DataConnectivity.Sql;
@@ -13,6 +14,45 @@ namespace DataPowerTools.Tests
     [TestClass]
     public class DbBulkInsertTests
     {
+        [TestMethod]
+        public async Task TestInsertBulk()
+        {
+            var conn = new SQLiteConnection("Data Source=:memory:");
+            conn.Open();
+
+            var r = new[]
+            {
+                new 
+                {
+                    Col1 = 10,
+                    Col2 = 20,
+                    Col3 = "abc",
+                }
+            }.Repeat(100000);
+
+            await conn.CreateTableFor(r, "DestinationTable");
+
+            var d = new Stopwatch();
+            d.Start();
+
+            var tran = conn.BeginTransaction();
+
+            await r.BulkInsert(
+                conn,
+                "DestinationTable",
+                DatabaseEngine.Sqlite,
+                new GenericBulkCopyOptions
+                {
+                    BatchSize = 1
+                });
+
+            d.Stop();
+
+            tran.Commit();
+
+            conn.CloseAndDispose();
+        }
+        
         [TestMethod]
         public async Task TestInsert()
         {
