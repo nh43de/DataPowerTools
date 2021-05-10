@@ -10,7 +10,7 @@ namespace DataPowerTools.DataReaderExtensibility.TransformingReaders
     ///     A smart data reader extends an IDataReader. It adapts reader output to source data, transforming it based on
     ///     destination data type.
     /// </summary>
-    public class SmartDataReader<TDataReader> : ExtensibleDataReader<TDataReader> where TDataReader : IDataReader
+    public class SmartDataReader<TDataReader> : ExtensibleDataReader<TDataReader>, IDiagnosticDataReader where TDataReader : IDataReader
     {
         /// <summary>
         ///     Value: ( Source ordinal ) -> ( TransformOrdinal )
@@ -41,6 +41,11 @@ namespace DataPowerTools.DataReaderExtensibility.TransformingReaders
         public override object this[int i] => TransformObject(DataReader[i], i);
 
         public override object this[string name] => TransformObject(DataReader[name], name);
+        
+        public string GetReaderDiagnosticInfo()
+        {
+            return this.PrintDiagnostics();
+        }
 
         public override object GetValue(int i)
         {
