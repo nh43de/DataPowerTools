@@ -595,7 +595,7 @@ namespace DataPowerTools.Extensions
                 return MapToSqlDestination<TDataReader>(dataReader, destinationTable, a, transformGroup);
             }
         }
-        
+
         /// <summary>
         /// Gets a Smart data reader based on a destination type and applies transformation group.
         /// </summary>
@@ -603,13 +603,14 @@ namespace DataPowerTools.Extensions
         /// <param name="dataReader"></param>
         /// <param name="destinationType"></param>
         /// <param name="transformGroup">Specify the transform group available in the DataTransformGroups static class.</param>
+        /// <param name="ignoreNonStringReferenceTypes"></param>
         /// <returns></returns>
-        public static SmartDataReader<IDataReader> MapToType<TDataReader>(this TDataReader dataReader, Type destinationType, DataTransformGroup transformGroup = null) where TDataReader : IDataReader
+        public static SmartDataReader<IDataReader> MapToType<TDataReader>(this TDataReader dataReader, Type destinationType, DataTransformGroup transformGroup = null, bool ignoreNonStringReferenceTypes = true) where TDataReader : IDataReader
         {
             //var dr = dataReader.ApplyColumnsAliases(destinationType);
 
             var aliases = destinationType
-                .GetColumnInfo()
+                .GetColumnInfo(ignoreNonStringReferenceTypes)
                 .ToDictionary(p => p.DisplayName ?? p.ColumnName,
                     p => p.ColumnName);
 
@@ -877,7 +878,7 @@ namespace DataPowerTools.Extensions
 
 
         /// <summary>
-        /// Yields an IDataReader as an enumerable, manually specifing how to return a new T from a DataReader. Property names must match column names exactly.
+        /// Yields an IDataReader as an enumerable, manually specifying how to return a new T from a DataReader. Property names must match column names exactly.
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="reader"></param>
@@ -901,8 +902,8 @@ namespace DataPowerTools.Extensions
         {
             var d = dr
                 .MapToType(typeof(T), transformGroup ?? DataTransformGroups.Default);
-
-            return d.SelectStrict<T>();
+            
+            return d.SelectNonStrict<T>(true);
         }
         
         //TODO: warning: some duplicated code to above.
@@ -915,8 +916,9 @@ namespace DataPowerTools.Extensions
         /// <typeparam name="T"></typeparam>
         /// <param name="dr"></param>
         /// <param name="typeFactory">Default factory for new instances of the type.</param>
+        /// <param name="properties"></param>
         /// <returns></returns>
-        public static IEnumerable<T> SelectStrict<T>(this IDataReader dr, Func<T> typeFactory = null) where T : class
+        public static IEnumerable<T> SelectStrict<T>(this IDataReader dr, Func<T> typeFactory = null, string[] properties = null) where T : class
         {
             var t = typeof(T);
 
@@ -931,7 +933,7 @@ namespace DataPowerTools.Extensions
             else
             {
                 var accessor = TypeAccessor.Create(t);
-                var props = accessor.GetMembers().Select(p => p.Name).ToArray();
+                var props = properties ?? accessor.GetMembers().Select(p => p.Name).ToArray();
 
                 typeFactory ??= () => accessor.CreateNew() as T;
 

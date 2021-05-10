@@ -2,6 +2,7 @@
 using System.Data.SQLite;
 using System.Linq;
 using System.Threading.Tasks;
+using DataPowerTools.DataReaderExtensibility.TransformingReaders;
 using DataPowerTools.Extensions;
 using DataPowerTools.PowerTools;
 using DataPowerTools.Tests.Models;
@@ -13,6 +14,46 @@ namespace DataPowerTools.Tests
     [TestClass]
     public class DbMaterializationTests
     {
+        [TestMethod]
+        public async Task TestInsertBulkWithNavigationProperty()
+        {
+            var conn = new SQLiteConnection("Data Source=:memory:");
+            conn.Open();
+
+            var r = new[]
+            {
+                new Test123
+                {
+                    Col1 = 10,
+                    Col2 = 20.1m,
+                    Col3 = "abc",
+                }
+            };
+
+            await conn.CreateTableFor(r.ToDataReader(), "DestinationTable");
+
+            var rr = r
+                .ToDataReader()
+                .Select<Test123WithRef>(DataTransformGroups.Default)
+                .ToArray();
+
+
+            //await r
+            //    .ToDataReader()
+            //    .Select<Test123WithRef>(DataTransformGroups.Default)
+            //    .BulkInsert(
+            //        conn,
+            //        "DestinationTable",
+            //        DatabaseEngine.Sqlite,
+            //        new GenericBulkCopyOptions
+            //        {
+            //            BatchSize = 1
+            //        });
+
+            conn.CloseAndDispose();
+        }
+
+
         [TestMethod]
         public async Task TestExecuteReader()
         {
