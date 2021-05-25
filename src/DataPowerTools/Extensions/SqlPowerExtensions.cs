@@ -555,6 +555,8 @@ namespace DataPowerTools.Extensions
         /// <returns></returns>
         public static async Task ExecuteSqlAsync(this DbConnection sqlc, string sql, DbTransaction transaction = null, CancellationToken? token = null)
         {
+            //TODO: convention: open conection if closed, and close again if closed
+
             using (var cmd = sqlc.CreateSqlCommand(sql))
             {
                 cmd.Transaction = transaction;
@@ -570,6 +572,8 @@ namespace DataPowerTools.Extensions
         /// <param name="transaction"></param>
         public static void ExecuteSql(this DbConnection sqlc, string sql, DbTransaction transaction = null)
         {
+            //TODO: convention: open conection if closed, and close again if closed
+
             using (var cmd = sqlc.CreateSqlCommand(sql))
             {
                 cmd.Transaction = transaction;

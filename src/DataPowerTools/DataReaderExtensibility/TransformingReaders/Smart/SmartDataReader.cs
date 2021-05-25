@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using DataPowerTools.DataReaderExtensibility.Columns;
@@ -26,7 +27,10 @@ namespace DataPowerTools.DataReaderExtensibility.TransformingReaders
             dataTransformGroup ??= DataTransformGroups.Default;
 
             DataTransformsInDestinationOrder =
-                destinationColumns.Select(destCol => dataTransformGroup(destCol.DataType)).ToArray();
+                destinationColumns
+                    .StuffToArray(p => p.Ordinal)
+                    .Select(destCol => destCol == null ? null : dataTransformGroup(destCol.DataType))
+                    .ToArray();
 
             _mappingInfoLazy = new Lazy<ColumnMappingInfo>(() => dataReader.GetColumnMappings(destinationColumns));
         }

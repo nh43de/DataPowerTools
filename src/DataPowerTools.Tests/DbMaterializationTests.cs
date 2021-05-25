@@ -22,11 +22,12 @@ namespace DataPowerTools.Tests
 
             var r = new[]
             {
-                new Test123
+                new Test123WithId
                 {
+                    Test123Id = 1,
                     Col1 = 10,
                     Col2 = 20.1m,
-                    Col3 = "abc",
+                    Col3 = "abc"
                 }
             };
 

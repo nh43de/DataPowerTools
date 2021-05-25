@@ -22,11 +22,11 @@ namespace DataPowerTools.DataReaderExtensibility.Columns
             var r = dataType
                 .GetColumnInfo()
                 .Select(col => new TypedDataColumnInfo
-            {
-                Ordinal = col.Ordinal,
-                ColumnName = col.ColumnName, //from schema annotations
-                DataType = col.FieldType
-            }).ToArray();
+                {
+                    Ordinal = col.Ordinal,
+                    ColumnName = col.ColumnName, //from schema annotations
+                    DataType = col.FieldType
+                }).ToArray();
             
             return r;
         }

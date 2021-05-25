@@ -51,7 +51,7 @@ namespace DataPowerTools.Extensions
                         var srcCol = smartDataReader.ColumnMappingInfo.SourceColumns[sourceOrdinal];
 
                         var srcColName = srcCol.ColumnName;
-                        var srcColType = srcCol.FieldType.Name;
+                        var srcColType = srcCol.FieldType?.Name; //TODO: test this with inserting a null into non-null destination
                         var srcColVal = TryGet(() => smartDataReader.DataReader[sourceOrdinal]?.ToString() ?? "<null>", out string e1, "<none>");
 
                         var sourceStr = $"{sourceOrdinal}. [{srcColName}] ({srcColType}) '{srcColVal}'";

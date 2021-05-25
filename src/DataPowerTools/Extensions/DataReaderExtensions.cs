@@ -622,8 +622,8 @@ namespace DataPowerTools.Extensions
         }
         
         /// <summary>
-        /// Applies a mapping and tranformation based on a SQL destination. DataTranformationGroups determine how
-        /// tranformations are mapped to destination types.
+        /// Applies a mapping and transformation based on a SQL destination. DataTransformationGroups determine how
+        /// transformations are mapped to destination types.
         /// Column renaming/reordering/aliasing is also setup automatically.
         /// </summary>
         /// <param name="dataReader"></param>
@@ -855,7 +855,7 @@ namespace DataPowerTools.Extensions
                         }
                         catch (Exception e)
                         {
-                            throw new Exception($"Source does not contain a value for property '{propName}'");
+                            throw new Exception($"Source does not contain a value for property '{propName}' or some other error occurred. See inner exception for details.", e);
                         }
 
                         try

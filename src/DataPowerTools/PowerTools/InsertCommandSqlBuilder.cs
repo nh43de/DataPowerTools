@@ -95,6 +95,7 @@ namespace DataPowerTools.PowerTools
         /// </summary>
         public DbCommand AppendInsertCommand(DbCommand dbCommand, IDictionary<string, object> columnNamesAndValues, string sqlInsertStatementTemplate, string tableName, KeywordEscapeMethod keywordEscapeMethod = KeywordEscapeMethod.None)
         {
+            //TODO: performance optimization: would have better performance if parameter values were changed instead of rebuilding the command every time (https://docs.microsoft.com/en-us/dotnet/standard/data/sqlite/bulk-insert)
             //TODO: do we really want this a dictionary?? seems like a waste to do all that hashing when building it
 
             if (columnNamesAndValues == null)

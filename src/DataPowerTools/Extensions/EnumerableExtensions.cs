@@ -68,6 +68,32 @@ namespace DataPowerTools.Extensions
         }
 
         /// <summary>
+        /// Takes a source enumerable and a function that maps the item to an ordinal, and creates a new array based on this mapping.
+        /// E.g. [{"B", 1}, {"A", 0}, {"C", 2}] and mapping function f:{x,y}->y, results in an array [{"A", 0}, {"B", 1}, {"C", 2}]
+        /// Repeat ordinal values are not checked. 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="source"></param>
+        /// <param name="ordinalSelector"></param>
+        /// <returns></returns>
+        public static T[] StuffToArray<T>(this IEnumerable<T> source, Func<T, int> ordinalSelector)
+        {
+            var sourceArray = source as T[] ?? source.ToArray();
+            var numberOfItems = sourceArray.Max(ordinalSelector);
+
+            var r = new T[numberOfItems+1];
+
+            foreach (var x in sourceArray)
+            {
+                var ordinal = ordinalSelector(x);
+
+                r[ordinal] = x;
+            }
+
+            return r;
+        }
+
+        /// <summary>
         /// Yield an enumerable that is the boolean inverse (!) of the source boolean enumerable. E.g. [1011] => [0100]
         /// </summary>
         /// <param name="enumerable"></param>

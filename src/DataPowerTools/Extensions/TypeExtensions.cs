@@ -63,13 +63,16 @@ namespace DataPowerTools.Extensions
             var displayColName = (columnAttribute?.ConstructorArguments?.Any() ?? false)
                 ? columnAttribute.ConstructorArguments[0].Value?.ToString()
                 : null;
-            
+
+            var isNonStringReferenceType = !(!colType.IsClass && !colType.IsInterface || colType == typeof(string));
+
             return new CsharpTypeColumnInformation
             {
                 FieldType = colType,
                 ColumnName = columnPropertyInfo.Name,
                 DisplayName = displayColName,
-                PropertyInfo = columnPropertyInfo
+                PropertyInfo = columnPropertyInfo,
+                IsNonStringReferenceType = isNonStringReferenceType
             };
         }
 
@@ -130,7 +133,7 @@ namespace DataPowerTools.Extensions
 
             if (ignoreNonStringReferenceTypes)
             {
-                props = props.Where(p => !p.FieldType.IsClass && !p.FieldType.IsInterface || p.FieldType == typeof(string));
+                props = props.Where(p => p.IsNonStringReferenceType == false);
             }
 
             return props.ToArray();
