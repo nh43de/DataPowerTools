@@ -94,6 +94,27 @@ namespace DataPowerTools.Extensions
         }
 
         /// <summary>
+        /// Chooses n elements from an array at random without duplicates.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="arr"></param>
+        /// <param name="n"></param>
+        /// <returns></returns>
+        public static IEnumerable<T> ChooseRandom<T>(this T[] arr, int n)
+        {
+            var rng = new Random();
+
+            var sample = Enumerable
+                .Range(0, n)
+                .Select(x => rng.Next(0, 1 + arr.Length - n))
+                .OrderBy(x => x)
+                .Select((x, i) => arr[x + i])
+                .ToArray();
+
+            return sample;
+        }
+
+        /// <summary>
         /// Yield an enumerable that is the boolean inverse (!) of the source boolean enumerable. E.g. [1011] => [0100]
         /// </summary>
         /// <param name="enumerable"></param>
