@@ -14,13 +14,30 @@ namespace DataPowerTools
 {
     public static class Csv
     {
+        //TODO: missing this implementation args: public static void Write<T>(IEnumerable<T> rowObjects, IEnumerable<string> headers, string outputFile) { //not implemented }
+        
+        /// <summary>
+        /// Opens a file and returns a data reader that reads the CSV.
+        /// </summary>
+        /// <param name="filePath"></param>
+        /// <param name="csvDelimiter"></param>
+        /// <param name="fileHasHeaders"></param>
+        /// <returns></returns>
         public static IDataReader CreateDataReader(string filePath, char csvDelimiter = ',', bool fileHasHeaders = true) // int headerOffsetRows = 1)
         {
             var dr = new CsvReader(new StreamReader(filePath), fileHasHeaders, csvDelimiter);
             
             return dr;
         }
-        
+
+        /// <summary>
+        /// Opens a fileStream and returns a data reader that reads the CSV.
+        /// </summary>
+        /// <param name="fileStream"></param>
+        /// <param name="csvDelimiter"></param>
+        /// <param name="fileHasHeaders"></param>
+        /// <returns></returns>
+        /// <returns></returns>
         public static IDataReader CreateDataReader(Stream fileStream, char csvDelimiter = ',', bool fileHasHeaders = true) // int headerOffsetRows = 1)
         {
             var dr = new CsvReader(new StreamReader(fileStream), fileHasHeaders, csvDelimiter);
@@ -40,7 +57,14 @@ namespace DataPowerTools
 
             return dr;
         }
-
+        
+        /// <summary>
+        /// Reads a CSV file into a DataSet.
+        /// </summary>
+        /// <param name="filePath"></param>
+        /// <param name="csvDelimiter"></param>
+        /// <param name="fileHasHeaders"></param>
+        /// <returns></returns>
         public static DataSet GetDataSet(string filePath, char csvDelimiter = ',', bool fileHasHeaders = true) // int headerOffsetRows = 1)
         {
             using var a = new CsvReader(new StreamReader(filePath), fileHasHeaders, csvDelimiter);
@@ -48,6 +72,13 @@ namespace DataPowerTools
             return a.ToDataSet(null, a.GetFieldHeaders());
         }
 
+        /// <summary>
+        /// Gets a DataSet by reading a CSV file stream.
+        /// </summary>
+        /// <param name="fileStream"></param>
+        /// <param name="csvDelimiter"></param>
+        /// <param name="fileHasHeaders"></param>
+        /// <returns></returns>
         public static DataSet GetDataSet(Stream fileStream, char csvDelimiter = ',', bool fileHasHeaders = true) // int headerOffsetRows = 1)
         {
             using var a = new CsvReader(new StreamReader(fileStream), fileHasHeaders, csvDelimiter);
@@ -55,7 +86,12 @@ namespace DataPowerTools
             return a.ToDataSet(null, a.GetFieldHeaders());
         }
 
-
+        /// <summary>
+        /// Writes an enumerable of object arrays into a file.
+        /// </summary>
+        /// <param name="rowObjects"></param>
+        /// <param name="headers"></param>
+        /// <param name="outputFile"></param>
         public static void Write(IEnumerable<object[]> rowObjects, IEnumerable<string> headers, string outputFile)
         {
             var ts = File.Open(outputFile, FileMode.Create);
@@ -78,6 +114,12 @@ namespace DataPowerTools
             }
         }
         
+        /// <summary>
+        /// Writes an IDataReader to a CSV file onto disk (streaming operation).
+        /// </summary>
+        /// <param name="reader"></param>
+        /// <param name="outputFile"></param>
+        /// <param name="writeHeaders"></param>
         public static void Write(IDataReader reader, string outputFile, bool writeHeaders = true)
         {
             using var ts = File.Open(outputFile, FileMode.Create);
@@ -85,6 +127,12 @@ namespace DataPowerTools
             Write(reader, sw, writeHeaders);
         }
 
+        /// <summary>
+        /// Writes IDataReader to a TextWriter stream.
+        /// </summary>
+        /// <param name="reader"></param>
+        /// <param name="sw"></param>
+        /// <param name="writeHeaders"></param>
         public static void Write(IDataReader reader, TextWriter sw, bool writeHeaders = true)
         {
             var isInitialized = false;
@@ -128,6 +176,12 @@ namespace DataPowerTools
             }
         }
         
+        /// <summary>
+        /// Writes an IDataReader to a CSV string.
+        /// </summary>
+        /// <param name="reader"></param>
+        /// <param name="writeHeaders"></param>
+        /// <returns></returns>
         public static string WriteString(IDataReader reader, bool writeHeaders = true)
         {
             using var sw = new StringWriter();
@@ -137,9 +191,6 @@ namespace DataPowerTools
 
             return sw.ToString();
         }
-
-        //public static void Write<T>(IEnumerable<T> rowObjects, IEnumerable<string> headers, string outputFile) { //not implemented }
-         
 
         /// <summary>
         /// Opens a CSV string and returns a data reader for it.
@@ -154,11 +205,7 @@ namespace DataPowerTools
             
             return dr;
         }
-
-
-
-
-
+        
         /// <summary>
         ///     CSV-parses a string. Semi-obsolete.
         /// </summary>
@@ -166,7 +213,8 @@ namespace DataPowerTools
         /// <param name="delimiter"></param>
         /// <param name="qualifier"></param>
         /// <returns></returns>
-        public static IEnumerable<IList<string>> Parse(string content, char delimiter, char qualifier)
+        [Obsolete("Parse handling is poor - shouldn't really use this.")]
+        public static IEnumerable<string[]> Parse(string content, char delimiter, char qualifier)
         {
             using (var reader = new StringReader(content))
             {
@@ -182,7 +230,8 @@ namespace DataPowerTools
         /// <param name="delimiter"></param>
         /// <param name="qualifier"></param>
         /// <returns></returns>
-        public static IEnumerable<IList<string>> Parse(TextReader reader, char delimiter, char qualifier)
+        [Obsolete("Parse handling is poor - shouldn't really use this - to be replaced with a better implementation.")]
+        public static IEnumerable<string[]> Parse(TextReader reader, char delimiter, char qualifier)
         {
             var inQuote = false;
             var record = new List<string>();
@@ -213,7 +262,7 @@ namespace DataPowerTools
                         }
 
                         if (record.Count > 0)
-                            yield return record;
+                            yield return record.ToArray();
 
                         record = new List<string>(record.Count);
                     }
@@ -265,7 +314,7 @@ namespace DataPowerTools
                 record.Add(sb.ToString());
 
             if (record.Count > 0)
-                yield return record;
+                yield return record.ToArray();
         }
     }
 }
