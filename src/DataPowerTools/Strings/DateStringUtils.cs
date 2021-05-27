@@ -45,7 +45,7 @@ namespace DataPowerTools.Strings
         public static DateTime GetDateFromRegex(string str, string regex, bool ifNoDayThenEndOfMonth = true)
         {
             var m = new Regex(regex, RegexOptions.IgnoreCase).Match(str);
-
+            // (?<month>[a-z]+)[- _]+(?<year>[0-9]+)
             int dayInt;
             int monthInt;
             int yearInt;
