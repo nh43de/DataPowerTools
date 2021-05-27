@@ -701,14 +701,17 @@ namespace DataPowerTools.Extensions
             return string.Join(", ", fields.Select(p => $"{{'{p.Nm}': '{p.Val}'}}"));
         }
 
-
+        /// <summary>
+        /// Fast-forwards to the end of the data reader by repeatedly calling .Read()
+        /// </summary>
+        /// <param name="dr"></param>
         public static void ReadToEnd(this IDataReader dr)
         {
             while (dr.Read()) { }
         }
 
         /// <summary>
-        /// Fast-forwards to the end of the data reader by calling .REad
+        /// Reads a set number of times by calling .Read()
         /// </summary>
         /// <param name="dr"></param>
         /// <param name="count"></param>
@@ -722,6 +725,36 @@ namespace DataPowerTools.Extensions
             }
         }
 
+        /// <summary>
+        /// Fast-forwards to the end of the data reader by repeatedly calling .Read()
+        /// </summary>
+        /// <param name="dr"></param>
+        /// <param name="rowAction"></param>
+        public static void ReadToEnd(this IDataReader dr, Action<IDataReader> rowAction)
+        {
+            while (dr.Read())
+            {
+                rowAction(dr);
+            }
+        }
+
+        /// <summary>
+        /// Reads a set number of times by calling .Read()
+        /// </summary>
+        /// <param name="dr"></param>
+        /// <param name="count"></param>
+        /// <param name="rowAction"></param>
+        public static void Read(this IDataReader dr, int count, Action<IDataReader> rowAction)
+        {
+            var i = 0;
+
+            while (i < count && dr.Read())
+            {
+                rowAction(dr);
+                i++;
+            }
+        }
+        
         /// <summary>
         /// Gets rows as enumerable of object[].  This is slower.
         /// </summary>
@@ -807,8 +840,7 @@ namespace DataPowerTools.Extensions
 
             return SelectNonStrict(dr, type, newObjectFactory, props);
         }
-
-
+        
         /// <summary>
         /// Yields an IDataReader as an enumerable. Property names must match column names exactly. 
         /// This is slower than using FastMember but implicit casts are made, and you can specify a type factory.
