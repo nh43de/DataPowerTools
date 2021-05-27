@@ -152,7 +152,7 @@ namespace DataPowerTools
         {
             var dr = new CsvReader(new StringReader(data), hasHeaders, delimiter);
             
-            return new DisposingDataReader<CsvReader>(dr);
+            return dr;
         }
 
 

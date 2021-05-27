@@ -35,6 +35,18 @@ namespace DataPowerTools.Extensions
         }
         
         /// <summary>
+        /// Reads a CSV string into an IDataReader
+        /// </summary>
+        /// <param name="data"></param>
+        /// <param name="csvDelimiter"></param>
+        /// <param name="hasHeaders"></param>
+        /// <returns></returns>
+        public static IDataReader ReadCsvString(this string data, char csvDelimiter = ',', bool hasHeaders = true)
+        {
+            return Csv.ReadString(data, hasHeaders, csvDelimiter);
+        }
+
+        /// <summary>
         /// Indent each line using tabs.
         /// </summary>
         /// <param name="str"></param>
