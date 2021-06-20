@@ -10,6 +10,7 @@ using DataPowerTools.Connectivity.Helpers;
 using DataPowerTools.DataConnectivity;
 using DataPowerTools.DataReaderExtensibility.Columns;
 using DataPowerTools.DataReaderExtensibility.TransformingReaders;
+using DataPowerTools.Extensions.Objects;
 using DataPowerTools.FastMember;
 using DataPowerTools.PowerTools;
 using DataPowerTools.Strings;

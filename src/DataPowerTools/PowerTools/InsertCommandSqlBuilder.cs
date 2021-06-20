@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using DataPowerTools.Extensions;
+using DataPowerTools.Extensions.Objects;
 
 namespace DataPowerTools.PowerTools
 {

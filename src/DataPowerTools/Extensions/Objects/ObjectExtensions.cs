@@ -6,7 +6,7 @@ using System.Linq.Expressions;
 using DataPowerTools.FastMember;
 using DataPowerTools.PowerTools;
 
-namespace DataPowerTools.Extensions
+namespace DataPowerTools.Extensions.Objects
 {
     //TODO: remove a lot of this or make internal
     //TODO: add a "type reflection scope" IDisposable to cache the type accessors for the functions that support using type accessors
@@ -16,7 +16,7 @@ namespace DataPowerTools.Extensions
     /// <summary>
     /// <see cref="object" /> extensions.
     /// </summary>
-    internal static class ObjectExtensions
+    public static class ObjectExtensions
     {
         /// <summary>
         /// Copies all public, readable properties from the source object to the

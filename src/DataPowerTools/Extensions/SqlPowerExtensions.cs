@@ -7,6 +7,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using DataPowerTools.DataReaderExtensibility.TransformingReaders;
+using DataPowerTools.Extensions.Objects;
 
 namespace DataPowerTools.Extensions
 {

@@ -1,5 +1,6 @@
 ﻿using System;
 using DataPowerTools.Extensions;
+using DataPowerTools.Extensions.Objects;
 
 namespace DataPowerTools.DataReaderExtensibility.TransformingReaders
 {
