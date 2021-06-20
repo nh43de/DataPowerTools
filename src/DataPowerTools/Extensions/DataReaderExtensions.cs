@@ -727,6 +727,18 @@ namespace DataPowerTools.Extensions
         }
 
         /// <summary>
+        /// Reads a set number of times by calling .Read()
+        /// </summary>
+        /// <param name="dr"></param>
+        /// <param name="count"></param>
+        public static IDataReader ReadAndReturn(this IDataReader dr, int count = 1)
+        {
+            dr.Read(count);
+
+            return dr;
+        }
+
+        /// <summary>
         /// Fast-forwards to the end of the data reader by repeatedly calling .Read()
         /// </summary>
         /// <param name="dr"></param>
