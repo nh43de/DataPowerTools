@@ -923,7 +923,7 @@ namespace DataPowerTools.Extensions
 
 
         /// <summary>
-        /// Yields an IDataReader as an enumerable, manually specifying how to return a new T from a DataReader. Property names must match column names exactly.
+        /// Yields an IDataReader as an enumerable, manually specifying how to return a new T from a DataReader. Property names must match column names exactly. Formerly .Select()
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="reader"></param>
@@ -937,7 +937,7 @@ namespace DataPowerTools.Extensions
         }
         
         /// <summary>
-        /// Select function for data readers. Will apply default convert operations to fit it to a type.
+        /// Select function for data readers. Will apply default convert operations to fit it to a type. Formerly .Select()
         /// </summary>
         /// <typeparam name="T">Data type.</typeparam>
         /// <param name="dr">Source data reader.</param>
