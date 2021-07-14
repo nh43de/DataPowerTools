@@ -108,7 +108,7 @@ namespace DataPowerTools.Tests
             var d = r2
                 .ToDataReader()
                 //.MapToType(typeof(Test123), DataTransformGroups.DefaultConvert)
-                .Select<Test123>()
+                .SelectRows<Test123>()
                 .ToArray();
 
             conn.CloseAndDispose();
@@ -145,7 +145,7 @@ namespace DataPowerTools.Tests
             var d = r2
                 .ToDataReader()
                 //.MapToType(typeof(Test123), DataTransformGroups.DefaultConvert)
-                .Select<Test123>()
+                .SelectRows<Test123>()
                 .ToArray();
 
             conn.CloseAndDispose();

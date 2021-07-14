@@ -35,7 +35,7 @@ namespace DataPowerTools.Tests
 
             var rr = r
                 .ToDataReader()
-                .Select<Test123WithRef>(DataTransformGroups.Default)
+                .SelectRows<Test123WithRef>(DataTransformGroups.Default)
                 .ToArray();
 
 

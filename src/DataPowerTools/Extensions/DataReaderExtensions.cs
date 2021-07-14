@@ -929,7 +929,7 @@ namespace DataPowerTools.Extensions
         /// <param name="reader"></param>
         /// <param name="projection"></param>
         /// <returns></returns>
-        public static IEnumerable<T> Select<T>(this IDataReader reader,
+        public static IEnumerable<T> SelectRows<T>(this IDataReader reader,
             Func<IDataReader, T> projection)
         {
             while (reader.Read())
@@ -943,7 +943,7 @@ namespace DataPowerTools.Extensions
         /// <param name="dr">Source data reader.</param>
         /// <param name="transformGroup">The transform group to apply.</param>
         /// <returns></returns>
-        public static IEnumerable<T> Select<T>(this IDataReader dr, DataTransformGroup transformGroup = null) where T : class
+        public static IEnumerable<T> SelectRows<T>(this IDataReader dr, DataTransformGroup transformGroup = null) where T : class
         {
             var d = dr
                 .MapToType(typeof(T), transformGroup ?? DataTransformGroups.Default);
@@ -1006,6 +1006,17 @@ namespace DataPowerTools.Extensions
         }
 
         /// <summary>
+        /// Synchronously executes an action on the IDataReader for every row.
+        /// </summary>
+        /// <param name="reader"></param>
+        /// <param name="action"></param>
+        public static IDataReader Do<TDataReader>(this TDataReader reader,
+            Action<TDataReader> action) where TDataReader : IDataReader
+        {
+            return new ActionDataReader<TDataReader>(reader, action);
+        }
+        
+        /// <summary>
         /// Executes an action on the datareader.
         /// </summary>
         /// <param name="reader"></param>
@@ -1013,8 +1024,7 @@ namespace DataPowerTools.Extensions
         public static void Each(this IDataReader reader,
             Action<IDataReader> action)
         {
-            while (reader.Read())
-                action(reader);
+            reader.ReadToEnd(action);
         }
         
         /// <summary>
@@ -1156,7 +1166,7 @@ namespace DataPowerTools.Extensions
         /// <returns></returns>
         public static List<T> ToList<T>(this IDataReader dr) where T : class
         {
-            return dr.Select<T>().ToList();
+            return dr.SelectRows<T>().ToList();
         }
 
         /// <summary>
@@ -1167,7 +1177,7 @@ namespace DataPowerTools.Extensions
         /// <returns></returns>
         public static T[] ToArray<T>(this IDataReader dr) where T : class
         {
-            return dr.Select<T>().ToArray();
+            return dr.SelectRows<T>().ToArray();
         }
 
         /// <summary>

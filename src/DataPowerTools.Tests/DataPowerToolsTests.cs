@@ -33,6 +33,20 @@ namespace DataPowerTools.Tests
         }
 
 
+
+        [TestMethod]
+        public void TestSingleRowObjectMaterialization()
+        {
+            var d = new Test1234();
+
+            var r = d.AsSingleRowDataReader();
+                
+                r.Read();
+            
+            var rr = r.GetFieldValues().Select(p => p.ColumnName + ": " + p.Value).ToArray();
+        }
+
+
         [TestMethod]
         public void TestNullMaterialization()
         {
@@ -57,7 +71,7 @@ namespace DataPowerTools.Tests
                     }
                     .ToDataReader();
 
-            var r = d.Select<TestNullableBool>().ToArray();
+            var r = d.SelectRows<TestNullableBool>().ToArray();
 
             Assert.AreEqual(false, r[0].BoolValue);
             Assert.AreEqual(null, r[1].BoolValue);
@@ -88,7 +102,7 @@ namespace DataPowerTools.Tests
                     }
                     .ToDataReader();
 
-            var r = d.Select<TestNullableDouble>().ToArray();
+            var r = d.SelectRows<TestNullableDouble>().ToArray();
 
             Assert.AreEqual(0.0, r[0].DoubleValue);
             Assert.AreEqual(null, r[1].DoubleValue);
