@@ -92,17 +92,20 @@ namespace DataPowerTools.Tests
         }
 
         [TestMethod]
-        public void Test()
+        public void TestSmartDataReaderConversions()
         {
             var d = Test123.GetTest123s2();
 
             var clientId = Guid.NewGuid();
-
             var dt = DateTime.Now;
+            var dc = "";
+            var ga = "0.02";
 
             var dr = d.ToDataReader()
                 .AddColumn("ClientId", row => clientId)
-                .AddColumn("Rd", row => dt);
+                .AddColumn("Rd", row => dt)
+                .AddColumn("Dc", row => dc)
+                .AddColumn("Ga", row => ga);
             
             var destinationColumns = new TypedDataColumnInfo[]
             {
@@ -117,6 +120,18 @@ namespace DataPowerTools.Tests
                     DataType = typeof(Guid),
                     Ordinal = 4,
                     ColumnName = "ClientId"
+                },
+                new TypedDataColumnInfo
+                {
+                    DataType = typeof(decimal),
+                    Ordinal = 8,
+                    ColumnName = "Dc"
+                },
+                new TypedDataColumnInfo
+                {
+                    DataType = typeof(decimal),
+                    Ordinal = 3,
+                    ColumnName = "Ga"
                 }
             };
             
@@ -128,6 +143,8 @@ namespace DataPowerTools.Tests
 
             Assert.AreEqual(clientId.ToString(), r["ClientId"].ToString());
             Assert.AreEqual(dt.ToString(), r["Rd"].ToString());
+            Assert.AreEqual(null, r["Dc"]);
+            Assert.AreEqual(0.02m,  Convert.ToDecimal(r["Ga"].ToString()));
         }
     }
 }

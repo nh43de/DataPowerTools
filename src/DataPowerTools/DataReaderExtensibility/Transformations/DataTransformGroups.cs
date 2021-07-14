@@ -81,7 +81,7 @@ namespace DataPowerTools.DataReaderExtensibility.TransformingReaders
                 return DataTransforms.TransformBoolean;
 
             if (destinationType == typeof(decimal) || destinationType == typeof(double) || destinationType == typeof(float))
-                return o => Convert.ChangeType(DataTransforms.TransformDecimal(o), destinationType);
+                return DataTransforms.TransformDecimal; //o => Convert.ChangeType(DataTransforms.TransformDecimal(o), destinationType);
 
             if (destinationType == typeof(int))
                 return DataTransforms.TransformInt;
