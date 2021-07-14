@@ -119,11 +119,11 @@ namespace DataPowerTools.DataReaderExtensibility.TransformingReaders
 
                     if (destCol != null)
                     {
-                        throw new Exception($"Error converting value '{srcValue}' at field {i} [{ColumnMappingInfo.SourceColumns[i].ColumnName}] to [{destCol.DataType.Name}] type");
+                        throw new Exception($"Error converting value '{srcValue}' at field {i} [{ColumnMappingInfo.SourceColumns[i].ColumnName}] to [{destCol.DataType.Name}] type", e);
                     }
                 }
 
-                throw new Exception($"Error getting field values on field {i} [{ColumnMappingInfo.SourceColumns[i].ColumnName}] value '{srcValue}'");
+                throw new Exception($"Error getting field values on field {i} [{ColumnMappingInfo.SourceColumns[i].ColumnName}] value '{srcValue}'", e);
             }
 
 
