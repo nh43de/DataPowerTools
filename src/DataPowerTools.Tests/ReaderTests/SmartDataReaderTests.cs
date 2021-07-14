@@ -1,8 +1,11 @@
-﻿using System.Data;
+﻿using System;
+using System.Data;
+using System.Globalization;
 using System.Linq;
 using DataPowerTools.DataReaderExtensibility.Columns;
 using DataPowerTools.DataReaderExtensibility.TransformingReaders;
 using DataPowerTools.Extensions;
+using DataPowerTools.Tests.Models;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace DataPowerTools.Tests
@@ -21,7 +24,7 @@ namespace DataPowerTools.Tests
         {
             var r = new[]
             {
-                new 
+                new
                 {
                     Col301 = "abc",
                     Col200 = 20,
@@ -60,12 +63,12 @@ namespace DataPowerTools.Tests
                 }
             });
 
-            Assert.IsTrue(sr.ColumnMappingInfo.NonStringDestinationSourceOrdinals.ToHashSet().IsSubsetOf(new[] {4, 5}));
+            Assert.IsTrue(sr.ColumnMappingInfo.NonStringDestinationSourceOrdinals.ToHashSet().IsSubsetOf(new[] { 4, 5 }));
 
             Assert.IsTrue(sr.ColumnMappingInfo.DestinationColumns.Length == 3);
 
             var col1 = sr.ColumnMappingInfo.Mappings.First(m => m.SourceField.ColumnName == "Col1" &&
-                                                     m.DestinationField.ColumnName == "Col1");
+                                                                m.DestinationField.ColumnName == "Col1");
 
             Assert.IsTrue(col1.SourceField.Ordinal == 4 && col1.DestinationField.Ordinal == 2);
 
@@ -86,6 +89,45 @@ namespace DataPowerTools.Tests
             Assert.AreEqual(sr[0], "abc");
             Assert.AreEqual(sr[1], 20);
             Assert.AreEqual(sr[2], 20);
+        }
+
+        [TestMethod]
+        public void Test()
+        {
+            var d = Test123.GetTest123s2();
+
+            var clientId = Guid.NewGuid();
+
+            var dt = DateTime.Now;
+
+            var dr = d.ToDataReader()
+                .AddColumn("ClientId", row => clientId)
+                .AddColumn("Rd", row => dt);
+            
+            var destinationColumns = new TypedDataColumnInfo[]
+            {
+                new TypedDataColumnInfo
+                {
+                    DataType = typeof(DateTime),
+                    Ordinal = 15,
+                    ColumnName = "Rd"
+                },
+                new TypedDataColumnInfo
+                {
+                    DataType = typeof(Guid),
+                    Ordinal = 4,
+                    ColumnName = "ClientId"
+                }
+            };
+            
+            var s = new SmartDataReader<IDataReader>(dr, destinationColumns, DataTransformGroups.Default);
+
+            var r = s.CountRows();
+
+            r.ReadToEnd();
+
+            Assert.AreEqual(clientId.ToString(), r["ClientId"].ToString());
+            Assert.AreEqual(dt.ToString(), r["Rd"].ToString());
         }
     }
 }

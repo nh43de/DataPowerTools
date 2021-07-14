@@ -126,8 +126,12 @@ namespace DataPowerTools.DataReaderExtensibility.TransformingReaders
                 return r;
             }
 
-            return null;
+            if (o is Guid)
+            {
+                return o;
+            }
 
+            throw new Exception("Could not parse Guid '" + o.ToString() + "'");
         };
 
         public static readonly DataTransform ToStringTransform = o => o?.ToString();
