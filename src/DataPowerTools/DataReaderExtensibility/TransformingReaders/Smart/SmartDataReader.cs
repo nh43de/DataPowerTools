@@ -87,13 +87,46 @@ namespace DataPowerTools.DataReaderExtensibility.TransformingReaders
         public override int GetValues(object[] values)
         {
             var i = 0;
-            for (; i < FieldCount; i++)
+
+            try
             {
-                if (values.Length <= i)
-                    return i;
-                values[i] = GetValue(i);
+                for (; i < FieldCount; i++)
+                {
+                    if (values.Length <= i)
+                        return i;
+                    values[i] = GetValue(i);
+                }
+                return i;
             }
-            return i;
+            catch (Exception e)
+            {
+                var srcValue = "";
+
+                try
+                {
+                    srcValue = DataReader.GetValue(i).ToString();
+                }
+                catch (Exception e1)
+                {
+                    throw new Exception($"Error retrieving from underlying data reader, field {i} [{ColumnMappingInfo.SourceColumns[i].ColumnName}]", e1);
+                }
+                
+                var destColIndex = ColumnMappingInfo.SourceOrdinalToDestinationOrdinal[i];
+
+                if (destColIndex.HasValue)
+                {
+                    var destCol = ColumnMappingInfo.DestinationColumns[destColIndex.Value];
+
+                    if (destCol != null)
+                    {
+                        throw new Exception($"Error converting value '{srcValue}' at field {i} [{ColumnMappingInfo.SourceColumns[i].ColumnName}] to [{destCol.DataType.Name}] type");
+                    }
+                }
+
+                throw new Exception($"Error getting field values on field {i} [{ColumnMappingInfo.SourceColumns[i].ColumnName}] value '{srcValue}'");
+            }
+
+
 
             //var rtn = DataReader.GetValues(values);
 
