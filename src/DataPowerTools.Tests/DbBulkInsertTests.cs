@@ -14,6 +14,41 @@ namespace DataPowerTools.Tests
     [TestClass]
     public class DbBulkInsertTests
     {
+        //private static string GetDbConnStr =  $"";
+        
+        //[TestMethod]
+        //public async Task TestInsertSqlServer()
+        //{
+        //    var conn = GetDbConnStr.CreateSqlConnection();
+        //    //conn.Open();
+
+        //    var r = new[]
+        //    {
+        //        new
+        //        {
+        //            Col1 = 10,
+        //            Col2 = 20,
+        //            Col3 = "abc",
+        //        }
+        //    }.Repeat(10);
+
+        //    if(await conn.TableExistsAsync("DestinationTable") == false)
+        //        await conn.CreateTableFor(r, "DestinationTable");
+            
+        //    await r.BulkInsert(
+        //        conn,
+        //        "DestinationTable",
+        //        DatabaseEngine.SqlServer);
+
+        //    conn.ExecuteSql("TRUNCATE TABLE DestinationTable");
+
+        //    var count = conn.ExecuteScalar<int>("SELECT COUNT(*) FROM DestinationTable");
+
+        //    Assert.AreEqual(10, count);
+            
+        //    conn.CloseAndDispose();
+        //}
+        
         [TestMethod]
         public async Task TestInsertBulk()
         {
@@ -45,6 +80,10 @@ namespace DataPowerTools.Tests
                 {
                     BatchSize = 1
                 });
+
+            var count = conn.ExecuteScalar<int>("SELECT COUNT(*) FROM DestinationTable");
+
+            Assert.AreEqual(100000, count);
 
             d.Stop();
 

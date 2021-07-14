@@ -56,9 +56,8 @@ namespace Sqlite.Extensions
                 throw new ArgumentNullException(nameof(destinationTableName));
 
             if (Connection.State == ConnectionState.Closed)
-                Connection.Open();
-
-
+                await Connection.OpenAsync();
+            
             var sqlBuilder = new InsertCommandSqlBuilder(databaseEngine);
             
             var currentBatch = 0;
@@ -73,7 +72,7 @@ namespace Sqlite.Extensions
                     continue; //otherwise send to db
                 
                 using (cmd)
-                    cmd.ExecuteNonQuery();
+                    await cmd.ExecuteNonQueryAsync();
 
                 cmd = GetDbCommand();
 

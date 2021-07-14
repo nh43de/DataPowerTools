@@ -3,6 +3,16 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace DataPowerTools.Tests.Models
 {
+
+    /*
+     CREATE TABLE [Test123] (
+        [Col1] INT     NOT NULL,
+        [Col2] DECIMAL NULL,
+        [Col3] VARCHAR(50)
+    );
+     */
+
+
     [Serializable]
     public class Test123
     {
