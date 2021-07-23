@@ -35,15 +35,44 @@ namespace DataPowerTools.Extensions
             IEnumerable<string> members = null
         )
         {
-            members = members ??
-                typeof(T).GetProperties().Where(p =>
-                        (p.GetGetMethod().IsVirtual == false) && p.GetGetMethod().IsPublic && //TODO: this will have to change if we use dynamic proxies (we use this to skip navigation properties)
-                        (p.GetIndexParameters().Length == 0)).Select(p => p.Name).ToArray();
+            members ??= GetMembers<T>();
 
             var uploadReader = items.ToDataReader(members?.ToArray());
 
             uploadReader.BulkInsertSqlServer(connectionString, destinationTable, sqlServerBulkInsertOptions ?? new SqlServerBulkInsertOptions());
         }
+
+        /// <summary>
+        /// Bulk upload enumerable using a connection string.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="items"></param>
+        /// <param name="connection"></param>
+        /// <param name="destinationTable"></param>
+        /// <param name="sqlServerBulkInsertOptions"></param>
+        /// <param name="members"></param>
+        public static void BulkUploadSqlServer<T>(
+            this IEnumerable<T> items,
+            SqlConnection connection,
+            string destinationTable,
+            SqlServerBulkInsertOptions sqlServerBulkInsertOptions = null,
+            IEnumerable<string> members = null
+        )
+        {
+            members ??= GetMembers<T>();
+
+            var uploadReader = items.ToDataReader(members?.ToArray());
+
+            uploadReader.BulkInsertSqlServer(connection, destinationTable, sqlServerBulkInsertOptions ?? new SqlServerBulkInsertOptions());
+        }
+        
+        private static string[] GetMembers<T>()
+        {
+            return typeof(T).GetProperties().Where(p =>
+                (p.GetGetMethod().IsVirtual == false) && p.GetGetMethod().IsPublic && //TODO: this will have to change if we use dynamic proxies (we use this to skip navigation properties)
+                (p.GetIndexParameters().Length == 0)).Select(p => p.Name).ToArray();
+        }
+
 
         /// <summary>
         /// Bulk insert data table using connection string.
