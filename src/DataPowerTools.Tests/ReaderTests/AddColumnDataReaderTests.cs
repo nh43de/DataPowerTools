@@ -45,24 +45,5 @@ namespace DataPowerTools.Tests
             Assert.AreEqual(clientId.ToString(), dr["ClientId"].ToString());
             Assert.AreEqual(dt.ToString(), dr["Rd"].ToString());
         }
-        
-        [TestMethod]
-        public void TestAddFilter()
-        {
-            var d = Test123.GetTest123s2();
-
-            var clientId = Guid.NewGuid();
-            var dt = DateTime.Now;
-
-            var dr = d.ToDataReader()
-                .AddColumn("ClientId", row => clientId)
-                .AddColumn("Rd", row => dt)
-                .Where(row => row["Col1"].ToString() == "111");
-
-            dr.ReadToEnd();
-
-            Assert.AreEqual(clientId.ToString(), dr["ClientId"].ToString());
-            Assert.AreEqual(dt.ToString(), dr["Rd"].ToString());
-        }
     }
 }
