@@ -225,7 +225,7 @@ namespace DataPowerTools.PowerTools
 
                     var drInfo = dataReaderInfoFac();
 
-                    var dataReader = drInfo.DataReader;
+                    using var dataReader = drInfo.DataReader;
 
                     var readerFieldNames = dataReader.GetFieldNames();
 
