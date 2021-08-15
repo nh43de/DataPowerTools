@@ -30,7 +30,7 @@ namespace DataPowerTools.Extensions
         /// <param name="destinationTable"></param>
         /// <param name="databaseEngine"></param>
         /// <param name="bulkInsertOptions"></param>
-        public static async Task BulkInsert<T>(
+        public static async Task BulkInsertUsingInsertStatements<T>(
             this IEnumerable<T> items,
             DbConnection dbConnection,
             string destinationTable,
@@ -50,7 +50,7 @@ namespace DataPowerTools.Extensions
         /// <param name="connection"></param>
         /// <param name="databaseEngine"></param>
         /// <param name="bulkInsertOptions"></param>
-        public static async Task BulkInsert(
+        public static async Task BulkInsertUsingInsertStatements(
             this DataTable data,
             DbConnection connection,
             string destinationTableName,
@@ -70,7 +70,7 @@ namespace DataPowerTools.Extensions
         /// <param name="destinationTableName"></param>
         /// <param name="databaseEngine"></param>
         /// <param name="bulkInsertOptions"></param>
-        public static async Task BulkInsert(
+        public static async Task BulkInsertUsingInsertStatements(
             this IDataReader dataReader, 
             DbConnection connection, 
             string destinationTableName,

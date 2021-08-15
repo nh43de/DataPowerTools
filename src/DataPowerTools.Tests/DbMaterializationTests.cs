@@ -65,7 +65,7 @@ namespace DataPowerTools.Tests
 
             var dr = TestDataHelpers.GetSampleDataReader(DataReaderSource.ObjectReader, 3);
 
-            await dr.BulkInsert(d, "Test123", DatabaseEngine.Sqlite);
+            await dr.BulkInsertUsingInsertStatements(d, "Test123", DatabaseEngine.Sqlite);
 
             var dr2 = d.ExecuteReader("SELECT * FROM Test123");
 

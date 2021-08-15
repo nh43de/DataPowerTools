@@ -72,7 +72,7 @@ namespace DataPowerTools.Tests
 
             var tran = conn.BeginTransaction();
 
-            await r.BulkInsert(
+            await r.BulkInsertUsingInsertStatements(
                 conn,
                 "DestinationTable",
                 DatabaseEngine.Sqlite,
@@ -217,7 +217,7 @@ namespace DataPowerTools.Tests
 
             var r = Csv.ReadString(csvData);
 
-            await r.BulkInsert(conn, destinationtable, DatabaseEngine.Sqlite, new GenericBulkCopyOptions()
+            await r.BulkInsertUsingInsertStatements(conn, destinationtable, DatabaseEngine.Sqlite, new GenericBulkCopyOptions()
             {
                 BatchSize = 1
             });
@@ -245,7 +245,7 @@ namespace DataPowerTools.Tests
 
             await conn.CreateTableFor(r, destinationtable);
 
-            await r.BulkInsert(conn, destinationtable, DatabaseEngine.Sqlite, new GenericBulkCopyOptions()
+            await r.BulkInsertUsingInsertStatements(conn, destinationtable, DatabaseEngine.Sqlite, new GenericBulkCopyOptions()
             {
                 BatchSize = 1
             });
@@ -273,7 +273,7 @@ namespace DataPowerTools.Tests
 
             await conn.CreateTableFor(r, destinationtable);
 
-            await r.BulkInsert(conn, destinationtable, DatabaseEngine.Sqlite);
+            await r.BulkInsertUsingInsertStatements(conn, destinationtable, DatabaseEngine.Sqlite);
 
             conn.CloseAndDispose();
         }
