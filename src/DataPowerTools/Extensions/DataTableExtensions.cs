@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
 using System.Linq;
@@ -104,12 +105,13 @@ namespace DataPowerTools.Extensions
 
         /// <summary>
         /// Generates a table for the enumerable by fitting the data to a best fit table and executing it against the connection.
+        /// <param name="commandBuilder">Configures the command before executing, e.g. to add command timeout.</param>
         /// </summary>
-        public static async Task CreateTableFor(this DataTable dataTable, DbConnection connection, string tableName, int? rowLimit = null, CancellationToken token = default(CancellationToken))
+        public static async Task CreateTableFor(this DataTable dataTable, DbConnection connection, string tableName, int? rowLimit = null, Action<DbCommand> commandBuilder = null, CancellationToken token = default(CancellationToken))
         {
             var sql = dataTable.ToDataReader().FitToCreateTableSql(tableName, rowLimit);
 
-            await connection.ExecuteSqlAsync(sql, null, token);
+            await connection.ExecuteSqlAsync(sql, null, commandBuilder, token);
         }
 
         /// <summary>

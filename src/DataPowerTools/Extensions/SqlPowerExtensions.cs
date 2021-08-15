@@ -93,14 +93,17 @@ namespace DataPowerTools.Extensions
         /// </summary>
         /// <param name="sqlc"></param>
         /// <param name="sql"></param>
+        /// <param name="commandBuilder">To pass in options to the command (e.g. set command timeouts, etc.)</param>
         /// <returns></returns>
-        public static IDataReader ExecuteReader(this DbConnection sqlc, string sql)
+        public static IDataReader ExecuteReader(this DbConnection sqlc, string sql, Action<DbCommand> commandBuilder = null)
         {
             var cmd = sqlc.CreateSqlCommand(sql);
 
+            commandBuilder?.Invoke(cmd);
+
             return new DisposingDataReader<IDataReader>(cmd.ExecuteReader(), cmd);
         }
-        
+
         #endregion
 
         #region list
@@ -112,11 +115,13 @@ namespace DataPowerTools.Extensions
         /// <param name="sqlc"></param>
         /// <param name="sql"></param>
         /// <param name="maxRows"></param>
+        /// <param name="commandBuilder">Configures the command before executing, e.g. to add command timeout.</param>
         /// <returns></returns>
-        public static List<T> ExecuteList<T>(this DbConnection sqlc, string sql, int? maxRows = null) where T : class
+        public static List<T> ExecuteList<T>(this DbConnection sqlc, string sql, int? maxRows = null, Action<DbCommand> commandBuilder = null) where T : class
         {
             using (var cmd = sqlc.CreateSqlCommand(sql))
             {
+                commandBuilder?.Invoke(cmd);
                 return cmd.ExecuteList<T>(maxRows);
             }
         }
@@ -136,7 +141,7 @@ namespace DataPowerTools.Extensions
         #endregion
 
         #region array
-        
+
         /// <summary>
         /// Executes to array.
         /// </summary>
@@ -144,11 +149,13 @@ namespace DataPowerTools.Extensions
         /// <param name="sqlc"></param>
         /// <param name="sql"></param>
         /// <param name="maxRows"></param>
+        /// <param name="commandBuilder">Configures the command before executing, e.g. to add command timeout.</param>
         /// <returns></returns>
-        public static T[] ExecuteArray<T>(this DbConnection sqlc, string sql, int? maxRows = null) where T : class
+        public static T[] ExecuteArray<T>(this DbConnection sqlc, string sql, int? maxRows = null, Action<DbCommand> commandBuilder = null) where T : class
         {
             using (var cmd = sqlc.CreateSqlCommand(sql))
             {
+                commandBuilder?.Invoke(cmd);
                 return cmd.ExecuteArray<T>(maxRows);
             }
         }
@@ -175,15 +182,17 @@ namespace DataPowerTools.Extensions
         /// <typeparam name="T"></typeparam>
         /// <typeparam name="TKey"></typeparam>
         /// <typeparam name="TElement"></typeparam>
-        /// <param name="cmd"></param>
+        /// <param name="sqlc"></param>
         /// <param name="keySelector"></param>
         /// <param name="elementSelector"></param>
         /// <param name="maxRows"></param>
+        /// <param name="commandBuilder">Configures the command before executing, e.g. to add command timeout.</param>
         /// <returns></returns>
-        public static Dictionary<TKey, TElement> ExecuteDictionary<T, TKey, TElement>(this DbConnection sqlc, string sql, Func<T, TKey> keySelector, Func<T, TElement> elementSelector, int? maxRows = null) where T : class
+        public static Dictionary<TKey, TElement> ExecuteDictionary<T, TKey, TElement>(this DbConnection sqlc, string sql, Func<T, TKey> keySelector, Func<T, TElement> elementSelector, int? maxRows = null, Action<DbCommand> commandBuilder = null) where T : class
         {
             using (var cmd = sqlc.CreateSqlCommand(sql))
             {
+                commandBuilder?.Invoke(cmd);
                 return cmd.ExecuteDictionary(keySelector, elementSelector, maxRows);
             }
         }
@@ -216,12 +225,14 @@ namespace DataPowerTools.Extensions
         /// <param name="sql"></param>
         /// <param name="maxRows"></param>
         /// <param name="name"></param>
+        /// <param name="commandBuilder">Configures the command before executing, e.g. to add command timeout.</param>
         /// <returns></returns>
-        public static DataTable ExecuteToDataTable(this DbConnection sqlc, string sql, int? maxRows = null, string name = null)
+        public static DataTable ExecuteToDataTable(this DbConnection sqlc, string sql, int? maxRows = null, string name = null, Action<DbCommand> commandBuilder = null)
         {
             using (var cmd = sqlc.CreateSqlCommand(sql))
             {
-                return cmd.ExecuteToDataTable(maxRows);
+                commandBuilder?.Invoke(cmd);
+                return cmd.ExecuteToDataTable(maxRows, name);
             }
         }
 
@@ -252,11 +263,13 @@ namespace DataPowerTools.Extensions
         /// <param name="sql"></param>
         /// <param name="dataSetName"></param>
         /// <param name="dataTableNames">The names to assign to the datatables.</param>
+        /// <param name="commandBuilder">Configures the command before executing, e.g. to add command timeout.</param>
         /// <returns></returns>
-        public static DataSet ExecuteToDataSet(this DbConnection sqlc, string sql, string dataSetName = null, string[] dataTableNames = null)
+        public static DataSet ExecuteToDataSet(this DbConnection sqlc, string sql, string dataSetName = null, string[] dataTableNames = null, Action<DbCommand> commandBuilder = null)
         {
             using (var cmd = sqlc.CreateSqlCommand(sql))
             {
+                commandBuilder?.Invoke(cmd);
                 return cmd.ExecuteToDataSet(dataSetName, dataTableNames);
             }
         }
@@ -290,13 +303,15 @@ namespace DataPowerTools.Extensions
         /// <returns></returns>
         public static IDisposableEnumerable<T> ExecuteToEnumerable<T>(this DbCommand command, int? maxRows = null) where T: class
         {
+            //TODO: need to dispose the enumerable structure and underlying reader when finished reading, otherwise will end up with multiple open result sets after reader finished reading
+
             IDataReader r = command.ExecuteReader();
 
             if (maxRows != null)
             {
                 r = r.LimitRows(maxRows.Value);
             }
-            
+
             return new DataReaderEnumerable<T>(r, false);
         }
 
@@ -356,13 +371,14 @@ namespace DataPowerTools.Extensions
         /// <param name="connectionString"></param>
         /// <param name="sql"></param>
         /// <param name="token"></param>
+        /// <param name="commandBuilder">Configures the command before executing, e.g. to add command timeout.</param>
         /// <returns></returns>
-        public static async Task<T> ExecuteScalarAsync<T>(this string connectionString, string sql, CancellationToken? token = null)
+        public static async Task<T> ExecuteScalarAsync<T>(this string connectionString, string sql, Action<DbCommand> commandBuilder = null, CancellationToken? token = null)
         {
             using (var sqlc = new SqlConnection(connectionString))
             {
                 sqlc.Open();
-                return await sqlc.ExecuteScalarAsync<T>(sql, token);
+                return await sqlc.ExecuteScalarAsync<T>(sql, commandBuilder, token);
             }
         }
 
@@ -386,11 +402,13 @@ namespace DataPowerTools.Extensions
         /// <param name="sqlc"></param>
         /// <param name="sql"></param>
         /// <param name="token"></param>
+        /// <param name="commandBuilder">Configures the command before executing, e.g. to add command timeout.</param>
         /// <returns></returns>
-        public static async Task<T> ExecuteScalarAsync<T>(this DbConnection sqlc, string sql, CancellationToken? token = null)
+        public static async Task<T> ExecuteScalarAsync<T>(this DbConnection sqlc, string sql, Action<DbCommand> commandBuilder = null, CancellationToken? token = null)
         {
             using (var cmd = sqlc.CreateSqlCommand(sql))
             {
+                commandBuilder?.Invoke(cmd);
                 return await cmd.ExecuteScalarAsync<T>(token ?? CancellationToken.None);
             }
         }
@@ -400,10 +418,12 @@ namespace DataPowerTools.Extensions
         /// </summary>
         /// <param name="sqlc"></param>
         /// <param name="sql"></param>
-        public static T ExecuteScalar<T>(this DbConnection sqlc, string sql)
+        /// <param name="commandBuilder">Configures the command before executing, e.g. to add command timeout.</param>
+        public static T ExecuteScalar<T>(this DbConnection sqlc, string sql, Action<DbCommand> commandBuilder = null)
         {
             using (var cmd = sqlc.CreateSqlCommand(sql))
             {
+                commandBuilder?.Invoke(cmd);
                 return cmd.ExecuteScalar<T>();
             }
         }
@@ -438,13 +458,14 @@ namespace DataPowerTools.Extensions
         /// <param name="connectionString"></param>
         /// <param name="sql"></param>
         /// <param name="token"></param>
+        /// <param name="commandBuilder">Configures the command before executing, e.g. to add command timeout.</param>
         /// <returns></returns>
-        public static async Task<T> ExecuteObjectAsync<T>(this string connectionString, string sql, CancellationToken? token = null) where T : class
+        public static async Task<T> ExecuteObjectAsync<T>(this string connectionString, string sql, Action<DbCommand> commandBuilder = null, CancellationToken? token = null) where T : class
         {
             using (var sqlc = new SqlConnection(connectionString))
             {
                 sqlc.Open();
-                return await sqlc.ExecuteObjectAsync<T>(sql, token);
+                return await sqlc.ExecuteObjectAsync<T>(sql, commandBuilder, token);
             }
         }
 
@@ -453,12 +474,13 @@ namespace DataPowerTools.Extensions
         /// </summary>
         /// <param name="connectionString"></param>
         /// <param name="sql"></param>
-        public static T ExecuteObject<T>(this string connectionString, string sql) where T : class
+        /// <param name="commandBuilder">Configures the command before executing, e.g. to add command timeout.</param>
+        public static T ExecuteObject<T>(this string connectionString, string sql, Action<DbCommand> commandBuilder = null) where T : class
         {
             using (var sqlc = new SqlConnection(connectionString))
             {
                 sqlc.Open();
-                return sqlc.ExecuteObject<T>(sql);
+                return sqlc.ExecuteObject<T>(sql, commandBuilder);
             }
         }
 
@@ -468,12 +490,14 @@ namespace DataPowerTools.Extensions
         /// <param name="sqlc"></param>
         /// <param name="sql"></param>
         /// <param name="token"></param>
+        /// <param name="commandBuilder">Configures the command before executing, e.g. to add command timeout.</param>
         /// <returns></returns>
-        public static async Task<T> ExecuteObjectAsync<T>(this DbConnection sqlc, string sql, CancellationToken? token = null) where T : class
+        public static async Task<T> ExecuteObjectAsync<T>(this DbConnection sqlc, string sql, Action<DbCommand> commandBuilder = null, CancellationToken? token = null) where T : class
         {
             using (var cmd = sqlc.CreateSqlCommand(sql))
             {
-                return await cmd.ExecuteObjectAsync<T>();
+                commandBuilder?.Invoke(cmd);
+                return await cmd.ExecuteObjectAsync<T>(token);
             }
         }
 
@@ -482,10 +506,12 @@ namespace DataPowerTools.Extensions
         /// </summary>
         /// <param name="sqlc"></param>
         /// <param name="sql"></param>
-        public static T ExecuteObject<T>(this DbConnection sqlc, string sql) where T : class
+        /// <param name="commandBuilder">Configures the command before executing, e.g. to add command timeout.</param>
+        public static T ExecuteObject<T>(this DbConnection sqlc, string sql, Action<DbCommand> commandBuilder = null) where T : class
         {
             using (var cmd = sqlc.CreateSqlCommand(sql))
             {
+                commandBuilder?.Invoke(cmd);
                 return cmd.ExecuteObject<T>();
             }
         }
@@ -498,7 +524,7 @@ namespace DataPowerTools.Extensions
         /// <returns></returns>
         public static async Task<T> ExecuteObjectAsync<T>(this DbCommand cmd, CancellationToken? token = null) where T: class 
         {
-            return (await cmd.ExecuteToEnumerableAsync<T>()).FirstOrDefault();
+            return (await cmd.ExecuteToEnumerableAsync<T>(token)).FirstOrDefault();
         }
 
         /// <summary>
@@ -509,7 +535,7 @@ namespace DataPowerTools.Extensions
         {
             return cmd.ExecuteToEnumerable<T>().FirstOrDefault();
         }
-        
+
         #endregion
 
         #region non-query
@@ -521,13 +547,14 @@ namespace DataPowerTools.Extensions
         /// <param name="sql"></param>
         /// <param name="transaction"></param>
         /// <param name="token"></param>
+        /// <param name="commandBuilder">Configures the command before executing, e.g. to add command timeout.</param>
         /// <returns></returns>
-        public static async Task ExecuteSqlAsync(this string connectionString, string sql, DbTransaction transaction = null, CancellationToken? token = null)
+        public static async Task ExecuteSqlAsync(this string connectionString, string sql, DbTransaction transaction = null, Action<DbCommand> commandBuilder = null, CancellationToken? token = null)
         {
             using (var sqlc = new SqlConnection(connectionString))
             {
                 sqlc.Open();
-                await sqlc.ExecuteSqlAsync(sql, transaction, token);
+                await sqlc.ExecuteSqlAsync(sql, transaction, commandBuilder, token);
             }
         }
 
@@ -553,14 +580,16 @@ namespace DataPowerTools.Extensions
         /// <param name="sql"></param>
         /// <param name="transaction"></param>
         /// <param name="token"></param>
+        /// <param name="commandBuilder">Configures the command before executing, e.g. to add command timeout.</param>
         /// <returns></returns>
-        public static async Task ExecuteSqlAsync(this DbConnection sqlc, string sql, DbTransaction transaction = null, CancellationToken? token = null)
+        public static async Task ExecuteSqlAsync(this DbConnection sqlc, string sql, DbTransaction transaction = null, Action<DbCommand> commandBuilder = null, CancellationToken? token = null)
         {
             //TODO: convention: open conection if closed, and close again if closed
 
             using (var cmd = sqlc.CreateSqlCommand(sql))
             {
                 cmd.Transaction = transaction;
+                commandBuilder?.Invoke(cmd);
                 await cmd.ExecuteNonQueryAsync(token ?? CancellationToken.None);
             }
         }
@@ -571,15 +600,27 @@ namespace DataPowerTools.Extensions
         /// <param name="sqlc"></param>
         /// <param name="sql"></param>
         /// <param name="transaction"></param>
-        public static void ExecuteSql(this DbConnection sqlc, string sql, DbTransaction transaction = null)
+        /// <param name="commandBuilder">Configures the command before executing, e.g. to add command timeout.</param>
+        public static void ExecuteSql(this DbConnection sqlc, string sql, DbTransaction transaction = null, Action<DbCommand> commandBuilder = null)
         {
-            //TODO: convention: open conection if closed, and close again if closed
-
             using (var cmd = sqlc.CreateSqlCommand(sql))
             {
                 cmd.Transaction = transaction;
+                commandBuilder?.Invoke(cmd);
                 cmd.ExecuteNonQuery();
             }
+        }
+
+        public static async Task OpenIfClosedAsync(this DbConnection sqlc)
+        {
+            if (sqlc.State != ConnectionState.Open)
+                await sqlc.OpenAsync();
+        }
+
+        public static void OpenIfClosed(this DbConnection sqlc)
+        {
+            if (sqlc.State != ConnectionState.Open)
+                sqlc.Open();
         }
 
         #endregion
