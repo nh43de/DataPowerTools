@@ -8,5 +8,7 @@ namespace DataPowerTools.DataConnectivity.Sql
         public SqlBulkCopyOptions SqlBulkCopyOptions { get; set; } = SqlBulkCopyOptions.TableLock |
                                                                      SqlBulkCopyOptions.FireTriggers;
         public SqlTransaction SqlTransaction { get; set; }
+
+        public new int BatchSize { get; set; } = 2000;
     }
 }
