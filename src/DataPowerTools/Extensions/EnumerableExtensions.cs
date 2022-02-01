@@ -259,7 +259,7 @@ namespace DataPowerTools.Extensions
         /// <param name="enumerable"></param>
         /// <param name="separator"></param>
         /// <returns></returns>
-        internal static string JoinStr<T>(this IEnumerable<T> enumerable, string separator = ", ") //TODO: rename to join string
+        public static string JoinStr<T>(this IEnumerable<T> enumerable, string separator = ", ") //TODO: rename to join string
         {
             return string.Join(separator, enumerable);
         }
