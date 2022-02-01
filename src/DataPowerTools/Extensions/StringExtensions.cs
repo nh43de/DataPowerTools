@@ -4,6 +4,7 @@ using System.Security;
 using System.Text;
 using System.Text.RegularExpressions;
 using DataPowerTools.Strings;
+using Newtonsoft.Json.Linq;
 
 namespace DataPowerTools.Extensions
 {
@@ -66,6 +67,19 @@ namespace DataPowerTools.Extensions
         public static string Indent(this string str, string indentionStr)
         {
             return IndentRegex.Replace(str, indentionStr);
+        }
+
+        public static bool IsValidJson(this string obj)
+        {
+            try
+            {
+                JObject.Parse(obj);
+                return true;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
         }
     }
 }

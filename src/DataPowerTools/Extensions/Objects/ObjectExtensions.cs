@@ -308,15 +308,7 @@ namespace DataPowerTools.Extensions.Objects
         {
             return ConvertTo<int>(obj);
         }
-
-        /// <summary>Converts the given object to an <see cref="int" />.</summary>
-        /// <param name="obj">Object to convert.</param>
-        /// <returns>Int representation of the object.</returns>
-        public static int? ToNullableInt(this object obj)
-        {
-            return ConvertTo<int?>(obj);
-        }
-
+        
         /// <summary>Converts the given object to an <see cref="long" />.</summary>
         /// <param name="obj">Object to convert.</param>
         /// <returns>Long representation of the object.</returns>
@@ -324,15 +316,7 @@ namespace DataPowerTools.Extensions.Objects
         {
             return ConvertTo<long>(obj);
         }
-
-        /// <summary>Converts the given object to an <see cref="long" />.</summary>
-        /// <param name="obj">Object to convert.</param>
-        /// <returns>Long representation of the object.</returns>
-        public static long? ToNullableLong(this object obj)
-        {
-            return ConvertTo<long?>(obj);
-        }
-
+        
         /// <summary>Converts the given object to an <see cref="double" />.</summary>
         /// <param name="obj">Object to convert.</param>
         /// <returns>Double representation of the object.</returns>
@@ -340,15 +324,7 @@ namespace DataPowerTools.Extensions.Objects
         {
             return ConvertTo<double>(obj);
         }
-
-        /// <summary>Converts the given object to an <see cref="double" />.</summary>
-        /// <param name="obj">Object to convert.</param>
-        /// <returns>Double representation of the object.</returns>
-        public static double? ToNullableDouble(this object obj)
-        {
-            return ConvertTo<double?>(obj);
-        }
-
+        
         /// <summary>Converts the given object to an <see cref="decimal" />.</summary>
         /// <param name="obj">Object to convert.</param>
         /// <returns>Decimal representation of the object.</returns>
@@ -356,15 +332,7 @@ namespace DataPowerTools.Extensions.Objects
         {
             return ConvertTo<decimal>(obj);
         }
-
-        /// <summary>Converts the given object to an <see cref="decimal" />.</summary>
-        /// <param name="obj">Object to convert.</param>
-        /// <returns>Decimal representation of the object.</returns>
-        public static decimal? ToNullableDecimal(this object obj)
-        {
-            return ConvertTo<decimal?>(obj);
-        }
-
+        
         /// <summary>Converts the given object to an <see cref="DateTime" />.</summary>
         /// <param name="obj">Object to convert.</param>
         /// <returns>DateTime representation of the object.</returns>
