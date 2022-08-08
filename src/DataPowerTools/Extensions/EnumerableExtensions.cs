@@ -104,6 +104,9 @@ namespace DataPowerTools.Extensions
         {
             var rng = new Random();
 
+            if (n > arr.Length)
+                n = arr.Length;
+
             var sample = Enumerable
                 .Range(0, n)
                 .Select(x => rng.Next(0, 1 + arr.Length - n))
