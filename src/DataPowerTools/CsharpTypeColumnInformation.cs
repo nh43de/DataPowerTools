@@ -13,5 +13,7 @@ namespace DataPowerTools.Extensions
         public string DisplayName { get; set; }
 
         public bool IsNonStringReferenceType { get; set; }
+        
+        public override string ToString() => $"{Ordinal}. [{DisplayName}] ([{ColumnName}]) {FieldType}{(IsNonStringReferenceType ? " ref" : "")}";
     }
 }
