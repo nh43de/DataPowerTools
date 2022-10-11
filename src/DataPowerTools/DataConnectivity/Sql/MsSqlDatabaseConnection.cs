@@ -20,6 +20,13 @@ namespace DataPowerTools.DataConnectivity.Sql
             ConnectionString = connectionString;
         }
 
+        public MsSqlDatabaseConnection(SqlConnection connection)
+        {
+            Connection = connection;
+        }
+
+
+
         public SqlConnection Connection { get; set; }
 
         public string ConnectionString { get; }
@@ -107,6 +114,7 @@ namespace DataPowerTools.DataConnectivity.Sql
 
         public DataTable GetTableSchema(string tableName)
         {
+            //TODO: this is duplicated in MsSqlDatabaseConnection and PowerTools.database
             var noncomputedColumns = GetNonComputedColumns(tableName);
 
             var cols = "[" + string.Join("],[", noncomputedColumns) + "]";
