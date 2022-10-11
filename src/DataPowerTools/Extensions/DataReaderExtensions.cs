@@ -14,6 +14,7 @@ using DataPowerTools.Extensions.Objects;
 using DataPowerTools.FastMember;
 using DataPowerTools.PowerTools;
 using DataPowerTools.Strings;
+using System.Text;
 
 namespace DataPowerTools.Extensions
 {
@@ -700,6 +701,21 @@ namespace DataPowerTools.Extensions
             });
 
             return string.Join(", ", fields.Select(p => $"{{'{p.Nm}': '{p.Val}'}}"));
+        }
+
+        /// <summary>
+        /// Prints all data in a DataReader (does not rewind to the beginning).
+        /// </summary>
+        /// <param name="reader"></param>
+        /// <returns></returns>
+        public static string PrintData(this IDataReader reader)
+        {
+            var table = reader.ToDataTable();
+
+            var sb = new StringBuilder();
+            foreach (DataRow rowItem in table.Rows)
+                sb.AppendLine(rowItem.PrintRow());
+            return sb.ToString();
         }
 
         /// <summary>
