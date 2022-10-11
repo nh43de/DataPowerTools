@@ -2,7 +2,7 @@
 
 namespace DataPowerTools.Tests.Mssql
 {
-    [TestClass] //uncomment to enable
+    //[TestClass] //uncomment to enable
     public static class TestDb
     {
         /// <summary>
