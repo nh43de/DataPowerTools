@@ -87,6 +87,9 @@ namespace DataPowerTools.DataReaderExtensibility.TransformingReaders
             if (destinationType == typeof(int))
                 return DataTransforms.TransformInt;
 
+            if (destinationType == typeof(long))
+                return DataTransforms.TransformLong;
+
             if (destinationType == typeof(Guid))
                 return DataTransforms.TransformGuid;
 

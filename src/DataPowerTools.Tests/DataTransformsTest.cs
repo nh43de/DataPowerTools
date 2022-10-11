@@ -17,6 +17,12 @@ namespace DataPowerTools.Tests
         }
 
         [TestMethod]
+        public void TestTransformLong()
+        {
+            Assert.AreEqual(long.MaxValue, DataTransforms.TransformLong(long.MaxValue.ToString()));
+        }
+
+        [TestMethod]
         public void TestScientificDoubleToDecimal()
         {
             Assert.AreEqual(0.00123545m, DataTransforms.TransformDecimal("12.3545E-4"));

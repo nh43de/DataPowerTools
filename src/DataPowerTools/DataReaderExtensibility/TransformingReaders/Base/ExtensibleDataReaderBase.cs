@@ -1,5 +1,10 @@
+using Newtonsoft.Json.Linq;
 using System;
+using System.Collections.Generic;
 using System.Data;
+using System.Data.Common;
+using DataPowerTools.Extensions.DataConversionExtensions;
+using DataPowerTools.Extensions.Objects;
 
 namespace DataPowerTools.DataReaderExtensibility.TransformingReaders
 {
@@ -92,7 +97,33 @@ namespace DataPowerTools.DataReaderExtensibility.TransformingReaders
         //
         public virtual void Close() => DataReader.Close();
 
-        public virtual DataTable GetSchemaTable() => throw new NotImplementedException();
+        public virtual DataTable GetSchemaTable()
+        {
+            throw new NotImplementedException();
+            //var childSchemaTable = DataReader.GetSchemaTable();
+
+            //if (childSchemaTable == null)
+            //    return null;
+
+            //var newSchemaTable = childSchemaTable.Clone();
+
+            //newSchemaTable.Rows.Clear();
+
+            //var i = 0;
+            //for (; i < FieldCount; i++)
+            //{
+            //    foreach (DataRow stRow in childSchemaTable.Rows)
+            //    {
+            //        var ordinal = stRow[SchemaTableColumn.ColumnOrdinal].ToString().ToNullableInt();
+            //        var colName = stRow[SchemaTableColumn.ColumnName].ToString();
+
+            //        if (ordinal == i)
+            //            newSchemaTable.Rows.Add();
+            //    }
+            //}
+
+            //return newSchemaTable;
+        }
 
         public virtual bool NextResult() => DataReader.NextResult();
         public virtual bool Read() => DataReader.Read();

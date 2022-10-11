@@ -286,7 +286,7 @@ namespace DataPowerTools.Tests
 
             var rr = r["Col5"];
 
-            Assert.AreEqual(1, rr);
+            Assert.AreEqual(1L, rr);
         }
 
 

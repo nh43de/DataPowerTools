@@ -675,7 +675,9 @@ FROM    [#dropcode] AS [d];";
                     
                     //sa.FillSchema(dt, SchemaType.Source);
 
-                    return sc.ExecuteToDataTable(0);
+                    var r = sc.ExecuteToDataTable(0);
+                    
+                    return r;
                 }
             }
             catch (Exception ex)
