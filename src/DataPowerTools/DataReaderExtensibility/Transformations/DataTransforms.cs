@@ -202,6 +202,12 @@ namespace DataPowerTools.DataReaderExtensibility.TransformingReaders
         {
             var str = s?.ToString();
 
+            if (s is true)
+                return 1m;
+
+            if (s is false)
+                return 0m;
+
             if (string.IsNullOrWhiteSpace(str))
                 return null;
 
@@ -226,6 +232,15 @@ namespace DataPowerTools.DataReaderExtensibility.TransformingReaders
 
             return decimal.Parse(ss);
         };
+        
+
+        public static readonly DataTransform TransformLong = s =>
+        {
+            var d = TransformDecimal(s);
+
+            return Convert.ToInt64(d);
+        };
+
 
         public static readonly DataTransform TransformInt = s =>
         {
@@ -233,6 +248,7 @@ namespace DataPowerTools.DataReaderExtensibility.TransformingReaders
 
             return Convert.ToInt32(d);
         };
+        
         
         public static readonly DataTransform TransformStringIsNullOrWhiteSpace =
             s => string.IsNullOrWhiteSpace(s?.ToString()) ? null : s;
