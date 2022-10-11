@@ -659,7 +659,7 @@ FROM    [#dropcode] AS [d];";
         /// <returns></returns>
         public static DataTable GetDataSchema(string tableName, DbConnection connection)
         {
-            //TODO: this is duplicated in MsSqlDatabaseConnection and sqlocity.database
+            //TODO: this is duplicated in MsSqlDatabaseConnection and PowerTools.database
             var noncomputedColumns = (connection is SqlConnection)
                 ? GetNonComputedColumns(tableName, (SqlConnection) connection)
                 : GetTableColumns(tableName, connection);
@@ -766,13 +766,19 @@ FROM    [#dropcode] AS [d];";
         {
             try
             {
-                return connection.GetSchema("COLUMNS", new[] { null, tableName })
+                var s = connection.GetSchema("Tables", new[] { tableName });
+                
+                var r = s
                     .Rows.OfType<DataRow>().Select(row => row["COLUMN_NAME"].ToString()).ToArray();
+
+                return r;
             }
             catch (Exception e)
             {
                 //didn't work. that's fine
             }
+
+            //can also materialize schema by filling select top 0 to a datatable
 
             try
             {
