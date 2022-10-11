@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using System.Security.Principal;
 using DataPowerTools.DataReaderExtensibility.Columns;
 using DataPowerTools.Extensions;
 
@@ -9,10 +10,75 @@ namespace DataPowerTools.DataReaderExtensibility.TransformingReaders
 {
     /// <summary>
     ///     A smart data reader extends an IDataReader. It adapts reader output to source data, transforming it based on
-    ///     destination data type.
+    ///     destination data type. Available fields are ones present in the destination.
     /// </summary>
-    public class SmartDataReader<TDataReader> : ExtensibleDataReader<TDataReader>, IDiagnosticDataReader where TDataReader : IDataReader
+    public class SmartDataReader<TDataReader> : ExtensibleDataReaderBase<TDataReader>, IDiagnosticDataReader where TDataReader : IDataReader
     {
+        public override int FieldCount => ColumnMappingInfo.DestinationColumns.Length;
+
+        public override string GetName(int i)
+        {
+            var childOrdinal = GetChildOrdinal(i);
+
+            var name = DataReader.GetName(childOrdinal);
+
+            return name;
+        }
+
+        public override int GetOrdinal(string name)
+        {
+            var r = ColumnMappingInfo.DestinationColumns.FirstOrDefault(p => p.ColumnName == name)?.Ordinal;
+
+            if (r == null)
+                throw new Exception($"Column {name} not available");
+
+            return r.Value;
+        }
+
+        public override int GetChildOrdinal(int i)
+        {
+            var destOrdinal = ColumnMappingInfo.DestinationColumns[i].Ordinal;
+
+            var sourceOrdinal = ColumnMappingInfo.DestinationOrdinalToSourceOrdinal[destOrdinal];
+
+            if (sourceOrdinal == null)
+                throw new Exception($"Column {i} not available");
+
+            return sourceOrdinal.Value;
+        }
+
+        public object GetValue(string name)
+        {
+            if (_mappingInfoLazy.Value != null)
+            {
+                var transformOrdinal = ColumnMappingInfo.SourceColumnNameToDestinationOrdinal[name];
+
+                return transformOrdinal == null
+                    ? DataReader[name]
+                    : DataTransformsInDestinationOrder[transformOrdinal.Value](DataReader[name]);
+            }
+
+            return DataReader[name];
+        }
+
+        public override object GetValue(int i)
+        {
+            var childOrdinal = GetChildOrdinal(i);
+
+            var o = DataReader.GetValue(childOrdinal);
+
+            if (ColumnMappingInfo != null)
+            {
+                var transformIndex = ColumnMappingInfo.SourceOrdinalToDestinationOrdinal[childOrdinal];
+
+                return transformIndex == null
+                    ? o
+                    : DataTransformsInDestinationOrder[transformIndex.Value](o);
+            }
+
+            return o;
+        }
+
         /// <summary>
         ///     Value: ( Source ordinal ) -> ( TransformOrdinal )
         /// </summary>
@@ -42,48 +108,16 @@ namespace DataPowerTools.DataReaderExtensibility.TransformingReaders
 
         #region SmartTransform Functionality
 
-        public override object this[int i] => TransformObject(DataReader[i], i);
 
-        public override object this[string name] => TransformObject(DataReader[name], name);
+        public override object this[int i] => GetValue(i);
+
+        public override object this[string name] => GetValue(name);
         
         public string GetReaderDiagnosticInfo()
         {
             return this.PrintDiagnostics();
         }
-
-        public override object GetValue(int i)
-        {
-            return TransformObject(DataReader.GetValue(i), i);
-        }
-
-
-        private object TransformObject(object o, string name)
-        {
-            if (_mappingInfoLazy.Value != null)
-            {
-                var transformOrdinal = _mappingInfoLazy.Value.SourceColumnNameToDestinationOrdinal[name];
-                return transformOrdinal == null
-                    ? o
-                    : DataTransformsInDestinationOrder[transformOrdinal.Value](o);
-            }
-
-            return o;
-        }
-
-        private object TransformObject(object o, int sourceIndex)
-        {
-            if (_mappingInfoLazy.Value != null)
-            {
-                var transformIndex = _mappingInfoLazy.Value.SourceOrdinalToDestinationOrdinal[sourceIndex];
-
-                return transformIndex == null
-                    ? o
-                    : DataTransformsInDestinationOrder[transformIndex.Value](o);
-            }
-
-            return o;
-        }
-
+        
         public override int GetValues(object[] values)
         {
             var i = 0;
@@ -104,7 +138,7 @@ namespace DataPowerTools.DataReaderExtensibility.TransformingReaders
 
                 try
                 {
-                    srcValue = DataReader.GetValue(i).ToString();
+                    srcValue = GetValue(i).ToString();
                 }
                 catch (Exception e1)
                 {

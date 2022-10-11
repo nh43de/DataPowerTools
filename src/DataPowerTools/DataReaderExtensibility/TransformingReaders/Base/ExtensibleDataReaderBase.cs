@@ -91,7 +91,9 @@ namespace DataPowerTools.DataReaderExtensibility.TransformingReaders
         //
         //
         public virtual void Close() => DataReader.Close();
-        public virtual DataTable GetSchemaTable() => DataReader.GetSchemaTable();
+
+        public virtual DataTable GetSchemaTable() => throw new NotImplementedException();
+
         public virtual bool NextResult() => DataReader.NextResult();
         public virtual bool Read() => DataReader.Read();
         public virtual int Depth => DataReader.Depth;

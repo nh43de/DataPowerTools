@@ -54,7 +54,7 @@ namespace DataPowerTools.DataReaderExtensibility.TransformingReaders
         public virtual bool IsDBNull(int i) => DataReader.IsDBNull(i);
         public virtual int FieldCount => DataReader.FieldCount;
         public virtual void Close() => DataReader.Close();
-        public virtual DataTable GetSchemaTable() => DataReader.GetSchemaTable();
+        public virtual DataTable GetSchemaTable() => throw new NotImplementedException();
         public virtual bool NextResult() => DataReader.NextResult();
         public virtual bool Read() => DataReader.Read();
         public virtual int Depth => DataReader.Depth;

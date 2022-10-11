@@ -86,9 +86,9 @@ namespace DataPowerTools.Tests
 
             sr.Read();
 
-            Assert.AreEqual(sr[0], "abc");
-            Assert.AreEqual(sr[1], 20);
-            Assert.AreEqual(sr[2], 20);
+            Assert.AreEqual(sr["Col1"], 10);
+            Assert.AreEqual(sr["Col3"], "abc");
+            Assert.AreEqual(sr["Col2"], 20);
         }
 
         [TestMethod]

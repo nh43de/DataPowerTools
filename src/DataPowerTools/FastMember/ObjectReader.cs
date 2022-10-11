@@ -370,6 +370,7 @@ namespace DataPowerTools.FastMember
         }
 
 #if !COREFX
+        //also see SchemaTableHelpers.cs
         public override DataTable GetSchemaTable()
         {
             // these are the columns used by DataTable load

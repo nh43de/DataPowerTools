@@ -5,7 +5,9 @@ using System.Globalization;
 
 namespace DataPowerTools.DataReaderExtensibility
 {
-    public static class Helpers
+    //also see ObjectReader.cs
+
+    public static class SchemaTableHelpers
     {
         public static DataTable GetSchemaTable(string[] columnNames)
         {

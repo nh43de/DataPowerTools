@@ -16,7 +16,7 @@ namespace DataPowerTools.DataReaderExtensibility.Columns
             BasicDataColumnInfo[] sourceColumns)
         {
             SourceColumns = sourceColumns;
-            DestinationColumns = destinationColumns;
+            DestinationColumns = destinationColumns.OrderBy(p => p.Ordinal).ToArray();
 
             //check for uniqueness on both sides
             var destNames = destinationColumns.Select(dc => dc.ColumnName).ToHashSet();
@@ -50,6 +50,12 @@ namespace DataPowerTools.DataReaderExtensibility.Columns
                     .ToArray()
                 ;
 
+            DestinationOrdinalToSourceOrdinal = Mappings
+                    .Where(p => p.DestinationField != null && p.SourceField != null)
+                    .Select(mapping => mapping.SourceField?.Ordinal)
+                .ToArray()
+            ;
+
             // dictionary[srcName] = destOrdinal
             SourceColumnNameToDestinationOrdinal = Mappings.ToDictionary(
                 readerField => readerField.SourceField.ColumnName,
@@ -70,7 +76,7 @@ namespace DataPowerTools.DataReaderExtensibility.Columns
                     .ToArray();
             ;
         }
-
+        
         /// <summary>
         ///     Mappings
         ///     Returns [ Source: BasicDataColumnInfo, Destination: BasicDataColumnInfo ]
@@ -94,6 +100,12 @@ namespace DataPowerTools.DataReaderExtensibility.Columns
         /// </summary>
         public int?[] SourceOrdinalToDestinationOrdinal { get; private set; }
 
+        /// <summary>
+        ///     ( SourceOrdinal ) -> ( InfoOrdinal )
+        ///     int[]
+        ///     ie. v[srcOrd] = destOrd
+        /// </summary>
+        public int?[] DestinationOrdinalToSourceOrdinal { get; private set; }
 
         /// <summary>
         ///     Returns a list of source ordinals that have non-string destinations.

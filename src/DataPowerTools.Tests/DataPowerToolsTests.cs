@@ -2,8 +2,11 @@
 using System.Data;
 using System.Data.SQLite;
 using System.Linq;
+using System.Threading.Tasks;
+using DataPowerTools.DataConnectivity.Sql;
 using DataPowerTools.DataReaderExtensibility.TransformingReaders;
 using DataPowerTools.Extensions;
+using DataPowerTools.PowerTools;
 using DataPowerTools.Tests.Models;
 using Microsoft.VisualStudio.TestTools.UnitTesting; //TODO: uncomment these and test cases below to test excel functionality
 //using DataPowerTools.Connectivity;
@@ -180,6 +183,80 @@ namespace DataPowerTools.Tests
             Assert.AreEqual(tt, 1);
             Assert.AreEqual(tf, 2);
         }
+
+
+        
+        [TestMethod]
+        public async Task TestMapToSqlDestination1234()
+        {
+            var tt = Models.Test1234.GetTest1234s();
+            
+            var conn = new SQLiteConnection("Data Source=:memory:");
+            conn.Open();
+
+            conn.ExecuteSql("CREATE TABLE Test123 ( Col1 int, Col2 decimal(3,4), Col3 varchar(255) )");
+            conn.ExecuteSql("INSERT INTO Test123 VALUES ( 1, 2.344, 'this is a test')");
+
+            var r = tt.ToDataReader() //d.CreateSqlCommand("SELECT * FROM Test123").ExecuteReader()
+                .MapToSqlDestination("Test123", conn, DataTransformGroups.Default);
+
+            await r.BulkInsertUsingInsertStatements(
+                conn,
+                "Test123",
+                DatabaseEngine.Sqlite,
+                new GenericBulkCopyOptions
+                {
+                    BatchSize = 1
+                });
+
+            var dd = conn.ExecuteReader("SELECT * FROM Test123").PrintData();
+
+            var ss = @"'Col1': '1', 'Col2': '2.344', 'Col3': 'this is a test'
+'Col1': '1', 'Col2': '1.1', 'Col3': 'TestCol3'
+'Col1': '11', 'Col2': '11.1', 'Col3': '(null)'
+'Col1': '111', 'Col2': '111.1', 'Col3': '(null)'
+'Col1': '1111', 'Col2': '0', 'Col3': '(null)'
+";
+
+            Assert.AreEqual(ss, dd);
+        }
+
+
+        [TestMethod]
+        public async Task TestMapToSqlDestination4123()
+        {
+            var tt = Models.Test3214.GetTest3214s();
+
+            var conn = new SQLiteConnection("Data Source=:memory:");
+            conn.Open();
+
+            conn.ExecuteSql("CREATE TABLE Test123 ( Col1 int, Col2 decimal(3,4), Col3 varchar(255) )");
+            conn.ExecuteSql("INSERT INTO Test123 VALUES ( 1, 2.344, 'this is a test')");
+
+            var r = tt.ToDataReader() //d.CreateSqlCommand("SELECT * FROM Test123").ExecuteReader()
+                .MapToSqlDestination("Test123", conn, DataTransformGroups.Default);
+
+            await r.BulkInsertUsingInsertStatements(
+                conn,
+                "Test123",
+                DatabaseEngine.Sqlite,
+                new GenericBulkCopyOptions
+                {
+                    BatchSize = 1
+                });
+
+            var dd = conn.ExecuteReader("SELECT * FROM Test123").PrintData();
+
+            var ss = @"'Col1': '1', 'Col2': '2.344', 'Col3': 'this is a test'
+'Col1': '1', 'Col2': '1.1', 'Col3': 'TestCol3'
+'Col1': '11', 'Col2': '11.1', 'Col3': '(null)'
+'Col1': '111', 'Col2': '111.1', 'Col3': '(null)'
+'Col1': '1111', 'Col2': '0', 'Col3': '(null)'
+";
+
+            Assert.AreEqual(ss, dd);
+        }
+
 
 
         //[TestMethod]

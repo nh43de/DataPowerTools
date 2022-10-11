@@ -2,9 +2,6 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using DataPowerTools.Extensions;
 using DataPowerTools.Extensions.Objects;
 
@@ -183,7 +180,7 @@ namespace DataPowerTools.PowerTools
 
             for (var i = 0; i < dataRecord.FieldCount; i++)
             {
-                var columnName = dataRecord.GetName(i); //TODO: needs to support mapping columns
+                var columnName = dataRecord.GetName(i); //TODO: needs to support mapping columns //TODO: this is called with every insert command built - this should be cached
                 var columnValue = dataRecord[i];
                 
                 columns += linePrefix + preKeywordEscapeCharacter + columnName + postKeywordEscapeCharacter + ",";
@@ -197,13 +194,13 @@ namespace DataPowerTools.PowerTools
                 dbCommand.AddParameter(parameterName, columnValue);
             }
 
-            dbCommand.AppendCommandText(string.Format(sqlInsertStatementTemplate, tableName, columns.TrimEnd(','), values.TrimEnd(',')));
+            var ss = string.Format(sqlInsertStatementTemplate, tableName, columns.TrimEnd(','), values.TrimEnd(','));
+
+            dbCommand.AppendCommandText(ss);
 
             return dbCommand;
         }
-
-
-
+        
         private static void GetEscapeStrings(KeywordEscapeMethod keywordEscapeMethod, out string preKeywordEscapeCharacter, out string postKeywordEscapeCharacter)
         {
             switch (keywordEscapeMethod)
