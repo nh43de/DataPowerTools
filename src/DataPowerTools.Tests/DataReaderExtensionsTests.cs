@@ -69,8 +69,9 @@ namespace DataPowerTools.Tests
 
             var r = drp.ToDataTable();
 
-            Assert.AreEqual(r.PrintData(),
-                "'NewCol1': 'Test_New', 'NewCol2': '135'\r\n'NewCol1': 'Test1_New', 'NewCol2': '110'\r\n'NewCol1': 'Test2_New', 'NewCol2': '220'\r\n'NewCol1': 'Test3_New', 'NewCol2': '330'\r\n");
+            Assert.AreEqual(
+                "[{\"NewCol1\": \"Test_New\"}, {\"NewCol2\": \"135\"},\r\n{\"NewCol1\": \"Test1_New\"}, {\"NewCol2\": \"110\"},\r\n{\"NewCol1\": \"Test2_New\"}, {\"NewCol2\": \"220\"},\r\n{\"NewCol1\": \"Test3_New\"}, {\"NewCol2\": \"330\"}]",
+                r.PrintData());
         }
 
 

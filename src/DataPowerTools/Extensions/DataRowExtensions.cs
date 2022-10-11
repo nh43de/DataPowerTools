@@ -23,7 +23,7 @@ namespace DataPowerTools.Extensions
 
             var valToDisplay = new Func<string, string>(val => string.IsNullOrEmpty(val) ? "(null)" : val);
 
-            _rtn = string.Join(", ", colVals.Select(v => $"'{v.ColName}': '{valToDisplay(v.ColVal)}'"));
+            _rtn = string.Join(", ", colVals.Select(v => $"{{\"{v.ColName}\": \"{valToDisplay(v.ColVal)}\"}}"));
 
             return _rtn;
         }

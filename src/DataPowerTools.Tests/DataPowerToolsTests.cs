@@ -211,12 +211,11 @@ namespace DataPowerTools.Tests
 
             var dd = conn.ExecuteReader("SELECT * FROM Test123").PrintData();
 
-            var ss = @"'Col1': '1', 'Col2': '2.344', 'Col3': 'this is a test'
-'Col1': '1', 'Col2': '1.1', 'Col3': 'TestCol3'
-'Col1': '11', 'Col2': '11.1', 'Col3': '(null)'
-'Col1': '111', 'Col2': '111.1', 'Col3': '(null)'
-'Col1': '1111', 'Col2': '0', 'Col3': '(null)'
-";
+            var ss = @"[{""Col1"": ""1""}, {""Col2"": ""2.344""}, {""Col3"": ""this is a test""},
+{""Col1"": ""1""}, {""Col2"": ""1.1""}, {""Col3"": ""TestCol3""},
+{""Col1"": ""11""}, {""Col2"": ""11.1""}, {""Col3"": ""(null)""},
+{""Col1"": ""111""}, {""Col2"": ""111.1""}, {""Col3"": ""(null)""},
+{""Col1"": ""1111""}, {""Col2"": ""0""}, {""Col3"": ""(null)""}]";
 
             Assert.AreEqual(ss, dd);
         }
@@ -247,12 +246,11 @@ namespace DataPowerTools.Tests
 
             var dd = conn.ExecuteReader("SELECT * FROM Test123").PrintData();
 
-            var ss = @"'Col1': '1', 'Col2': '2.344', 'Col3': 'this is a test'
-'Col1': '1', 'Col2': '1.1', 'Col3': 'TestCol3'
-'Col1': '11', 'Col2': '11.1', 'Col3': '(null)'
-'Col1': '111', 'Col2': '111.1', 'Col3': '(null)'
-'Col1': '1111', 'Col2': '0', 'Col3': '(null)'
-";
+            var ss = @"[{""Col1"": ""1""}, {""Col2"": ""2.344""}, {""Col3"": ""this is a test""},
+{""Col1"": ""1""}, {""Col2"": ""1.1""}, {""Col3"": ""TestCol3""},
+{""Col1"": ""11""}, {""Col2"": ""11.1""}, {""Col3"": ""(null)""},
+{""Col1"": ""111""}, {""Col2"": ""111.1""}, {""Col3"": ""(null)""},
+{""Col1"": ""1111""}, {""Col2"": ""0""}, {""Col3"": ""(null)""}]";
 
             Assert.AreEqual(ss, dd);
         }

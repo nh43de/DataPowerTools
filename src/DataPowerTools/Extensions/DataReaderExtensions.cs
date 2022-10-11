@@ -700,11 +700,15 @@ namespace DataPowerTools.Extensions
                 Val = o1?.ToString()
             });
 
-            return string.Join(", ", fields.Select(p => $"{{'{p.Nm}': '{p.Val}'}}"));
+            var joinString = string.Join(", ", fields.Select(p => $"{{\"{p.Nm}\": \"{p.Val}\"}}"));
+
+            var r = $"[{joinString}]";
+
+            return r;
         }
 
         /// <summary>
-        /// Prints all data in a DataReader (does not rewind to the beginning).
+        /// Prints all data in a DataReader to a JSON string (does not rewind to the beginning).
         /// </summary>
         /// <param name="reader"></param>
         /// <returns></returns>
@@ -712,10 +716,9 @@ namespace DataPowerTools.Extensions
         {
             var table = reader.ToDataTable();
 
-            var sb = new StringBuilder();
-            foreach (DataRow rowItem in table.Rows)
-                sb.AppendLine(rowItem.PrintRow());
-            return sb.ToString();
+            var r = table.PrintData();
+
+            return r;
         }
 
         /// <summary>

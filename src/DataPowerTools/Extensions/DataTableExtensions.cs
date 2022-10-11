@@ -77,8 +77,18 @@ namespace DataPowerTools.Extensions
         public static string PrintData(this DataTable table)
         {
             var sb = new StringBuilder();
+
+            sb.Append("[");
+
             foreach (DataRow rowItem in table.Rows)
-                sb.AppendLine(rowItem.PrintRow());
+            {
+                sb.AppendLine(rowItem.PrintRow() + ",");
+            }
+
+            sb.Remove(sb.Length - 3, 3);
+
+            sb.Append("]");
+
             return sb.ToString();
         }
 
