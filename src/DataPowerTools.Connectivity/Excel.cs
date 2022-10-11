@@ -38,12 +38,20 @@ namespace DataPowerTools.Connectivity
         /// Gets a datareader from an excel file (can be xls or xlsx).
         /// </summary>
         /// <param name="filePath"></param>
+        /// <param name="headerConfig"></param>
         /// <returns></returns>
-        public static IDataReader GetDataReader(string filePath)
+        public static IDataReader GetDataReader(string filePath, HeaderReaderConfiguration headerConfig = null)
         {
             var fs = new FileStream(filePath, FileMode.Open);
 
-            return ExcelReaderFactory.CreateReader(fs);
+            var r = (IDataReader)ExcelReaderFactory.CreateReader(fs);
+
+            if (headerConfig != null)
+            {
+                r = r.ApplyHeaders(headerConfig);
+            }
+
+            return r;
         }
 
         /// <summary>
