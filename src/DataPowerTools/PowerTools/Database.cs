@@ -764,6 +764,30 @@ FROM    [#dropcode] AS [d];";
         /// <returns></returns>
         public static string[] GetTableColumns(string tableName, DbConnection connection)
         {
+            if (connection.GetType().Name.ToLower().Contains("sqlite")) //TODO: crude, but will need some significant changes to be better at handling different connection types
+            {
+                try
+                {
+                    using (var cmd = connection.CreateSqlCommand(@"select * from pragma_table_info(@table_name)"))
+                    {
+                        var p = cmd.CreateParameter();
+
+                        p.ParameterName = "@table_name";
+                        p.Value = tableName;
+
+                        cmd.Parameters.Add(p);
+                        
+                        var r = cmd.ExecuteReader().SelectRows(dr => dr["name"]?.ToString()).ToArray();
+                        
+                        return r;
+                    }
+                }
+                catch (Exception e)
+                {
+                    //didn't work. that's fine
+                }
+            }
+
             try
             {
                 var s = connection.GetSchema("Tables", new[] { tableName });
