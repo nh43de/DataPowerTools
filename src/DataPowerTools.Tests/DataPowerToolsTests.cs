@@ -111,7 +111,7 @@ namespace DataPowerTools.Tests
 
 
         //TODO: broken
-        //[TestMethod]
+        [TestMethod]
         public void TestDiagnostics()
         {
             var d = new SQLiteConnection("Data Source=:memory:");
@@ -134,7 +134,7 @@ namespace DataPowerTools.Tests
         }
 
         //TODO: broken
-        //[TestMethod]
+        [TestMethod]
         public void TestDiagnosticsWithError()
         {
             var d = new SQLiteConnection("Data Source=:memory:");
