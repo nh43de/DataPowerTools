@@ -26,6 +26,8 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Text;
+using DataPowerTools.Extensions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SimpleCSV;
 
@@ -34,6 +36,7 @@ namespace SimpleCSVTest
     [TestClass]
     public class CSVWriterTest
     {
+
         private string InvokeWriter(string[] fields)
         {
             var sw = new StringWriter();
@@ -49,6 +52,30 @@ namespace SimpleCSVTest
             cw.WriteNext(fields);
             return sw.ToString();
         }
+        
+        [TestMethod]
+        public void TestToCsvString()
+        {
+            var dd = new[]
+            {
+                new
+                {
+                    Description = "“"
+                }
+            };
+
+            var csv = dd.ToCsvString();
+
+            var stream = new MemoryStream();
+
+            using var writeFile = new StreamWriter(stream, leaveOpen: true, encoding: Encoding.Unicode);
+
+            writeFile.Write(csv);
+            writeFile.Flush();
+
+            stream.Position = 0;
+
+        }
 
         [TestMethod]
         public void CorrectlyParseNullString()
@@ -58,7 +85,7 @@ namespace SimpleCSVTest
             cw.WriteNext(null);
             Assert.AreEqual(0, sw.ToString().Length);
         }
-
+        
         [TestMethod]
         public void CorrectlyParseNullObject()
         {
