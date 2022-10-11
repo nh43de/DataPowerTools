@@ -5,6 +5,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
+using DataPowerTools.Attributes;
 using DataPowerTools.DataReaderExtensibility.Columns;
 using DataPowerTools.FastMember;
 using DataPowerTools.PowerTools;
@@ -50,8 +51,16 @@ namespace DataPowerTools.Extensions
         /// <returns></returns>
         public static CsharpTypeColumnInformation GetColumnFieldInfo(this PropertyInfo columnPropertyInfo)
         {
-            var colType = columnPropertyInfo.PropertyType;
-         
+            //allow column type attributes to override backing type
+            var columnTypeAttribute = columnPropertyInfo.CustomAttributes
+                .FirstOrDefault(x => x.AttributeType == typeof(ColumnTypeAttribute));
+
+            var colType = (columnTypeAttribute?.ConstructorArguments?.Any() ?? false)
+                ? columnTypeAttribute.ConstructorArguments[0].Value as Type
+                : null;
+
+            colType ??= columnPropertyInfo.PropertyType;
+
             ////if enum get root type
             //if (colType.IsEnum)
             //    colType = colType.GetEnumUnderlyingType();
@@ -65,7 +74,7 @@ namespace DataPowerTools.Extensions
                 : null;
 
             var isNonStringReferenceType = !(!colType.IsClass && !colType.IsInterface || colType == typeof(string));
-
+            
             return new CsharpTypeColumnInformation
             {
                 FieldType = colType,
