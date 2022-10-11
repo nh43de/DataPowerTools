@@ -4,6 +4,7 @@ using DataPowerTools.Extensions.Objects;
 
 namespace DataPowerTools.DataReaderExtensibility.TransformingReaders
 {
+    //TODO: default transform group will transform a null to a 0 if destination is int, even if nullable
     public static class DataTransformGroups
     {
         /// <summary>
