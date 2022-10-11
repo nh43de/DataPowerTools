@@ -55,7 +55,7 @@ namespace DataPowerTools.DataReaderExtensibility.TransformingReaders
 
                 return transformOrdinal == null
                     ? DataReader[name]
-                    : DataTransformsInDestinationOrder[transformOrdinal.Value](DataReader[name]);
+                    : DataTransformsInDestinationOrder[transformOrdinal.Value].Transform(DataReader[name]);
             }
 
             return DataReader[name];
@@ -73,7 +73,7 @@ namespace DataPowerTools.DataReaderExtensibility.TransformingReaders
 
                 return transformIndex == null
                     ? o
-                    : DataTransformsInDestinationOrder[transformIndex.Value](o);
+                    : DataTransformsInDestinationOrder[transformIndex.Value].Transform(o);
             }
 
             return o;
@@ -84,8 +84,16 @@ namespace DataPowerTools.DataReaderExtensibility.TransformingReaders
         /// </summary>
         private readonly Lazy<ColumnMappingInfo> _mappingInfoLazy;
 
-        public readonly DataTransform[] DataTransformsInDestinationOrder;
 
+
+
+        public class ColumnTransform
+        {
+            public TypedDataColumnInfo DestinationColumn { get; set; }
+            public DataTransform Transform { get; set; }
+        }
+
+        public readonly ColumnTransform[] DataTransformsInDestinationOrder;
 
         public SmartDataReader(TDataReader dataReader, TypedDataColumnInfo[] destinationColumns,
             DataTransformGroup dataTransformGroup = null) : base(dataReader)
@@ -95,7 +103,16 @@ namespace DataPowerTools.DataReaderExtensibility.TransformingReaders
             DataTransformsInDestinationOrder =
                 destinationColumns
                     .StuffToArray(p => p.Ordinal)
-                    .Select(destCol => destCol == null ? null : dataTransformGroup(destCol.DataType))
+                    .Select(destCol =>
+                    {
+                        var ii = destCol == null ? null : dataTransformGroup(destCol.DataType);
+
+                        return new ColumnTransform
+                        {
+                            DestinationColumn = destCol,
+                            Transform = ii
+                        };
+                    })
                     .ToArray();
 
             _mappingInfoLazy = new Lazy<ColumnMappingInfo>(() => dataReader.GetColumnMappings(destinationColumns));

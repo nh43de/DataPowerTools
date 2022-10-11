@@ -255,6 +255,39 @@ namespace DataPowerTools.Tests
             Assert.AreEqual(ss, dd);
         }
 
+        [TestMethod]
+        public async Task TestMapToSqlDestination4123B()
+        {
+            var tt = Models.Test3214B.GetTest3214Bs();
+
+            var conn = new SQLiteConnection("Data Source=:memory:");
+            conn.Open();
+
+            conn.ExecuteSql("CREATE TABLE Test123 (Col1 int, Col2 decimal(3,4), Col3 varchar(255), Col5 integer not null)");
+            //conn.ExecuteSql("INSERT INTO Test123 VALUES ( 1, 2.344, 'this is a test', 0)");
+
+            var r = tt.ToDataReader() //d.CreateSqlCommand("SELECT * FROM Test123").ExecuteReader()
+                .MapToSqlDestination("Test123", conn, DataTransformGroups.Default);
+
+            //await r.BulkInsertUsingInsertStatements(
+                //conn,
+                //"Test123",
+                //DatabaseEngine.Sqlite,
+                //new GenericBulkCopyOptions
+                //{
+                //    BatchSize = 1
+                //});
+
+            //var dd = conn.ExecuteReader("SELECT * FROM Test123");
+
+            //dd.Read();
+
+            r.Read();
+
+            var rr = r["Col5"];
+
+            Assert.AreEqual(1, rr);
+        }
 
 
         //[TestMethod]

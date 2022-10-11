@@ -136,17 +136,13 @@ namespace DataPowerTools.Extensions
             return d;
         }
 
-
-
         public static string PrintColumnMappings<TDataReader>(this SmartDataReader<TDataReader> reader) where TDataReader : IDataReader
             => reader.ColumnMappingInfo.PrintMappings();
-
-
+        
         public static string[] PrintTransformGroups<TDataReader>(this SmartDataReader<TDataReader> reader) where TDataReader : IDataReader
             => reader.DataTransformsInDestinationOrder.Select((t, i) =>
-                        $"{i}. {t.Method.Name}"
+                        $"{i}. {t.Transform.Method.Name}"
             ).ToArray();
-
 
         public static FieldValueInfo[] GetNonStringDestinationFieldValues<TDataReader>(this SmartDataReader<TDataReader> reader) where TDataReader : IDataReader
         {
