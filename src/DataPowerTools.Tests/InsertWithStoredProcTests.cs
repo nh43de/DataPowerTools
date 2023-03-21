@@ -5,8 +5,8 @@ using System.Data;
 using System.IO;
 using Microsoft.Data.SqlClient.Server;
 
-namespace DataPowerTools.Tests
-{
+namespace DataPowerTools.Tests;
+
     //this is a test of using TVPs for maximum upload performance on bulk insert
 
     //https://stackoverflow.com/questions/25770180/how-can-i-insert-10-million-records-in-the-shortest-time-possible
@@ -109,5 +109,3 @@ GO
          */
 
 
-    }
-}
