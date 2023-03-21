@@ -52,7 +52,7 @@ namespace Sqlite.Extensions
             if (reader == null)
                 throw new ArgumentNullException(nameof(reader));
 
-            if (reader == null)
+            if (destinationTableName == null)
                 throw new ArgumentNullException(nameof(destinationTableName));
 
             if (Connection.State == ConnectionState.Closed)
