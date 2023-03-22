@@ -2,54 +2,39 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
+using System.Text;
 using DataPowerTools.Extensions;
 using DataPowerTools.Extensions.Objects;
 
 namespace DataPowerTools.PowerTools
 {
-
-    /// <summary>
-    /// The method used for escaping keywords.
-    /// </summary>
-    public enum KeywordEscapeMethod
+    public class InsertSqlBuilder
     {
-        /// <summary>No escape method is used.</summary>
-        None = 0,
-        /// <summary>Keywords are enclosed in square brackets. Used by SQL Server, SQLite.</summary>
-        SquareBracket = 1,
-        /// <summary>Keywords are enclosed in double quotes. Used by PostgreSQL, SQLite.</summary>
-        DoubleQuote = 2,
-        /// <summary>Keywords are enclosed in backticks aka grave accents (ASCII code 96). Used by MySQL, SQLite.</summary>
-        Backtick = 3
-    }
-    public struct SqlInsertInfo
-    {
-        public string InsertTemplate { get; set; }
-        public KeywordEscapeMethod KeywordEscapeMethod { get; set; }
-    }
+        private readonly bool _insertNewLines;
 
-
-    public class InsertCommandSqlBuilder
-    {
+        private readonly bool _appendInsertedCols;
         //TODO: needs to support mapping columns
 
         public DatabaseEngine DatabaseEngine { get; }
         public TypeAccessorCache TypeAccessorCache { get; } = new TypeAccessorCache();
 
 
-        public InsertCommandSqlBuilder(DatabaseEngine databaseEngine)
+        public InsertSqlBuilder(DatabaseEngine databaseEngine, bool insertNewLines = false, bool appendInsertedCols = false)
         {
+            _insertNewLines = insertNewLines;
+            _appendInsertedCols = appendInsertedCols;
             DatabaseEngine = databaseEngine;
         }
+        
         /// <summary>
         /// Generates a parameterized MySQL INSERT statement from the given object and adds it to the <see cref="DbCommand" />
         /// </summary>
         /// <param name="dbCommand"><see cref="DbCommand" /> instance to append inserts to.</param>
         /// <param name="obj">Object to generate the SQL INSERT statement from.</param>
         /// <param name="destinationTableName"></param>
-        public DbCommand AppendInsert(DbCommand dbCommand, object obj, string destinationTableName)
+        public StringBuilder AppendInsert(StringBuilder dbCommand, object obj, string destinationTableName)
         {
-            var i = GetInsertTemplate(DatabaseEngine);
+            var i = GetInsertTemplate(DatabaseEngine, _appendInsertedCols);
 
             return AppendInsertCommand(dbCommand, obj, i.InsertTemplate, destinationTableName, i.KeywordEscapeMethod);
         }
@@ -60,9 +45,9 @@ namespace DataPowerTools.PowerTools
         /// <param name="dbCommand"><see cref="DbCommand" /> instance to append inserts to.</param>
         /// <param name="dataRecord">Record to generate the SQL INSERT statement from.</param>
         /// <param name="destinationTableName"></param>
-        public DbCommand AppendInsert(DbCommand dbCommand, IDataRecord dataRecord, string destinationTableName)
+        public StringBuilder AppendInsert(StringBuilder dbCommand, IDataRecord dataRecord, string destinationTableName)
         {
-            var i = GetInsertTemplate(DatabaseEngine);
+            var i = GetInsertTemplate(DatabaseEngine, _appendInsertedCols);
 
             return AppendInsertCommand(dbCommand, dataRecord, i.InsertTemplate, destinationTableName, i.KeywordEscapeMethod);
         }
@@ -71,7 +56,7 @@ namespace DataPowerTools.PowerTools
         /// Generates a parameterized SQL INSERT statement from the given object and adds it to the
         /// <see cref="DbCommand" />.
         /// </summary>
-        public DbCommand AppendInsertCommand(DbCommand dbCommand, object obj, string sqlInsertStatementTemplate, string tableName, KeywordEscapeMethod keywordEscapeMethod = KeywordEscapeMethod.None)
+        private StringBuilder AppendInsertCommand(StringBuilder dbCommand, object obj, string sqlInsertStatementTemplate, string tableName, KeywordEscapeMethod keywordEscapeMethod = KeywordEscapeMethod.None)
         {
             if (obj == null)
             {
@@ -86,12 +71,16 @@ namespace DataPowerTools.PowerTools
                 keywordEscapeMethod);
         }
 
-        
+        private string EscapeValueString(string valueString)
+        {
+            return valueString.Replace("'", "''");
+        }
+
         /// <summary>
         /// Generates a parameterized SQL INSERT statement from the given object and adds it to the
         /// <see cref="DbCommand" />.
         /// </summary>
-        public DbCommand AppendInsertCommand(DbCommand dbCommand, IDictionary<string, object> columnNamesAndValues, string sqlInsertStatementTemplate, string tableName, KeywordEscapeMethod keywordEscapeMethod = KeywordEscapeMethod.None)
+        private StringBuilder AppendInsertCommand(StringBuilder dbCommand, IDictionary<string, object> columnNamesAndValues, string sqlInsertStatementTemplate, string tableName, KeywordEscapeMethod keywordEscapeMethod = KeywordEscapeMethod.None)
         {
             //TODO: performance optimization: would have better performance if parameter values were changed instead of rebuilding the command every time (https://docs.microsoft.com/en-us/dotnet/standard/data/sqlite/bulk-insert)
             //TODO: do we really want this a dictionary?? seems like a waste to do all that hashing when building it
@@ -116,9 +105,9 @@ namespace DataPowerTools.PowerTools
                 throw new Exception("The 'sqlInsertStatementTemplate' parameter does not conform to the template requirements of containing three string.Format arguments. A valid example is: INSERT INTO {0} ({1}) VALUES({2});");
             }
 
-            GetEscapeStrings(keywordEscapeMethod, out var preKeywordEscapeCharacter, out var postKeywordEscapeCharacter);
+            InsertCommandSqlBuilder.GetEscapeStrings(keywordEscapeMethod, out var preKeywordEscapeCharacter, out var postKeywordEscapeCharacter);
             
-            var linePrefix = Environment.NewLine + "\t";
+            var linePrefix = _insertNewLines ? Environment.NewLine + "\t" : string.Empty;
 
             var columns = string.Empty;
             var values = string.Empty;
@@ -128,18 +117,16 @@ namespace DataPowerTools.PowerTools
                 if (nameAndValue.Value == null)
                     continue;
 
-                columns += linePrefix + preKeywordEscapeCharacter + nameAndValue.Key + postKeywordEscapeCharacter + ",";
+                var colName = preKeywordEscapeCharacter + nameAndValue.Key + postKeywordEscapeCharacter;
 
-                // Note that we are appending the ordinal parameter position as a suffix to the parameter name in order to create
-                // some uniqueness for each parameter name so that this method can be called repeatedly as well as to aid in debugging.
-                var parameterName = "@" + nameAndValue.Key + "_p" + dbCommand.Parameters.Count;
+                columns += linePrefix + colName + ",";
 
-                values += linePrefix + parameterName + ",";
+                var escapedValue = EscapeValueString(nameAndValue.Value.ToString());
 
-                dbCommand.AddParameter(parameterName, nameAndValue.Value);
+                values += $"'{escapedValue}' as {colName},";
             }
 
-            dbCommand.AppendCommandText(string.Format(sqlInsertStatementTemplate, tableName, columns.TrimEnd(','), values.TrimEnd(',')));
+            dbCommand.Append(string.Format(sqlInsertStatementTemplate, tableName, columns.TrimEnd(','), values.TrimEnd(',')));
 
             return dbCommand;
         }
@@ -149,7 +136,7 @@ namespace DataPowerTools.PowerTools
         /// Generates a parameterized SQL INSERT statement from the given object and adds it to the
         /// <see cref="DbCommand" />.
         /// </summary>
-        public DbCommand AppendInsertCommand(DbCommand dbCommand, IDataRecord dataRecord, string sqlInsertStatementTemplate, string tableName, KeywordEscapeMethod keywordEscapeMethod = KeywordEscapeMethod.None)
+        private StringBuilder AppendInsertCommand(StringBuilder dbCommand, IDataRecord dataRecord, string sqlInsertStatementTemplate, string tableName, KeywordEscapeMethod keywordEscapeMethod = KeywordEscapeMethod.None)
         {
             if (dataRecord == null)
             {
@@ -171,9 +158,9 @@ namespace DataPowerTools.PowerTools
                 throw new Exception("The 'sqlInsertStatementTemplate' parameter does not conform to the template requirements of containing three string.Format arguments. A valid example is: INSERT INTO {0} ({1}) VALUES({2});");
             }
 
-            GetEscapeStrings(keywordEscapeMethod, out var preKeywordEscapeCharacter, out var postKeywordEscapeCharacter);
+            InsertCommandSqlBuilder.GetEscapeStrings(keywordEscapeMethod, out var preKeywordEscapeCharacter, out var postKeywordEscapeCharacter);
 
-            var linePrefix = Environment.NewLine + "\t";
+            var linePrefix = _insertNewLines ? Environment.NewLine + "\t" : string.Empty;
 
             var columns = string.Empty;
             var values = string.Empty;
@@ -182,110 +169,50 @@ namespace DataPowerTools.PowerTools
             {
                 var columnName = dataRecord.GetName(i); //TODO: needs to support mapping columns //TODO: this is called with every insert command built - this should be cached
                 var columnValue = dataRecord[i];
-                
-                columns += linePrefix + preKeywordEscapeCharacter + columnName + postKeywordEscapeCharacter + ",";
 
-                // Note that we are appending the ordinal parameter position as a suffix to the parameter name in order to create
-                // some uniqueness for each parameter name so that this method can be called repeatedly as well as to aid in debugging.
-                var parameterName = "@" + columnName + "_p" + dbCommand.Parameters.Count;
+                var colName = preKeywordEscapeCharacter + columnName + postKeywordEscapeCharacter;
 
-                values += linePrefix + parameterName + ",";
+                columns += linePrefix + colName + ",";
 
-                dbCommand.AddParameter(parameterName, columnValue);
+                var escapedValue = EscapeValueString(columnValue.ToString());
+
+                values += $"'{escapedValue}' as {colName},";
             }
 
             var ss = string.Format(sqlInsertStatementTemplate, tableName, columns.TrimEnd(','), values.TrimEnd(','));
 
-            dbCommand.AppendCommandText(ss);
+            dbCommand.Append(ss);
 
             return dbCommand;
         }
         
-        public static void GetEscapeStrings(KeywordEscapeMethod keywordEscapeMethod, out string preKeywordEscapeCharacter, out string postKeywordEscapeCharacter)
-        {
-            switch (keywordEscapeMethod)
-            {
-                case KeywordEscapeMethod.SquareBracket:
-                    preKeywordEscapeCharacter = "[";
-                    postKeywordEscapeCharacter = "]";
-                    break;
-                case KeywordEscapeMethod.DoubleQuote:
-                    preKeywordEscapeCharacter = "\"";
-                    postKeywordEscapeCharacter = "\"";
-                    break;
-                case KeywordEscapeMethod.Backtick:
-                    preKeywordEscapeCharacter = "`";
-                    postKeywordEscapeCharacter = "`";
-                    break;
-                case KeywordEscapeMethod.None:
-                    preKeywordEscapeCharacter = "";
-                    postKeywordEscapeCharacter = "";
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(keywordEscapeMethod), keywordEscapeMethod, null);
-            }
-        }
-
-
-        private static SqlInsertInfo GetInsertTemplate(DatabaseEngine databaseEngine)
+        private static SqlInsertInfo GetInsertTemplate(DatabaseEngine databaseEngine, bool appendLastInserted)
         {
             switch (databaseEngine)
             {
                 case DatabaseEngine.MySql:
                     return new SqlInsertInfo
                         {
-                            InsertTemplate = @"
-INSERT INTO {0}
-({1}
-)
-VALUES
-({2}
-);
-SELECT LAST_INSERT_ID() AS LastInsertedId;
-",
+                            InsertTemplate = @"INSERT INTO {0} ({1}) SELECT {2};" + (appendLastInserted ? " SELECT LAST_INSERT_ID() AS LastInsertedId;" : "") + "\r\n",
                             KeywordEscapeMethod = KeywordEscapeMethod.Backtick
                         }
                         ;
                 case DatabaseEngine.Postgre:
                     return new SqlInsertInfo
                     {
-                        InsertTemplate = @"
-INSERT INTO {0}
-({1}
-)
-VALUES
-({2}
-);
-select LastVal();
-",
+                        InsertTemplate = @"INSERT INTO {0} ({1}) SELECT {2};"+ (appendLastInserted ? " select LastVal();" : "") + "\r\n",
                         KeywordEscapeMethod = KeywordEscapeMethod.None
                     };
                 case DatabaseEngine.Sqlite:
                     return new SqlInsertInfo
                     {
-                        InsertTemplate = @"
-INSERT INTO {0}
-({1}
-)
-VALUES
-({2}
-);
-SELECT last_insert_rowid() AS [LastInsertedId];
-",
+                        InsertTemplate = @"INSERT INTO {0} ({1}) SELECT {2};" + (appendLastInserted ? " SELECT last_insert_rowid() AS [LastInsertedId];" : "") + "\r\n",
                         KeywordEscapeMethod = KeywordEscapeMethod.SquareBracket
                     };
                 case DatabaseEngine.SqlServer:
                     return new SqlInsertInfo
                     {
-                        InsertTemplate = @"
-INSERT INTO {0}
-({1}
-)
-VALUES
-({2}
-);
-SELECT SCOPE_IDENTITY() AS [LastInsertedId];
-",
+                        InsertTemplate = @"INSERT INTO {0} ({1}) SELECT {2};" + (appendLastInserted ? " SELECT SCOPE_IDENTITY() AS [LastInsertedId];" : "") + "\r\n",
                         KeywordEscapeMethod = KeywordEscapeMethod.SquareBracket
                     };
                 default:
@@ -293,8 +220,5 @@ SELECT SCOPE_IDENTITY() AS [LastInsertedId];
             }
         }
 
-
     }
-
-
 }
