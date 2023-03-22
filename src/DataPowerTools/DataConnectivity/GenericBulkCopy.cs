@@ -40,7 +40,7 @@ namespace Sqlite.Extensions
         
         /// <summary>
         /// Copies all rows in the supplied IDataReader to a destination table specified
-        /// by the destinationTableName.
+        /// by the destinationTableName using insert statements.
         /// </summary>
         /// <param name="reader"></param>
         /// <param name="destinationTableName"> Name of the destination table in the database.</param>
@@ -52,7 +52,7 @@ namespace Sqlite.Extensions
             if (reader == null)
                 throw new ArgumentNullException(nameof(reader));
 
-            if (reader == null)
+            if (destinationTableName == null)
                 throw new ArgumentNullException(nameof(destinationTableName));
 
             if (Connection.State == ConnectionState.Closed)

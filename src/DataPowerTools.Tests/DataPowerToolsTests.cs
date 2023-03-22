@@ -115,6 +115,69 @@ namespace DataPowerTools.Tests
 
         //TODO: broken
         [TestMethod]
+        public void TestSelectNonStrictMapToLargerSetShouldWork()
+        {
+            var d = new SQLiteConnection("Data Source=:memory:");
+            d.Open();
+
+            d.ExecuteSql("CREATE TABLE Test123 ( Col1 int, Col2 decimal(3,4), Col3 varchar(255) )");
+            d.ExecuteSql("INSERT INTO Test123 VALUES ( 1, 2.344, 'this is a test')");
+
+            var sr = d.CreateSqlCommand("SELECT * FROM Test123")
+                .ExecuteReader()
+                .SelectNonStrict<Test1234>()
+                .ToArray();
+            
+            //var sr2 = d.CreateSqlCommand("SELECT * FROM Test1234")
+            //    .ExecuteReader()
+            //    .ToArray<Test123>();
+
+            //var sr3 = d.CreateSqlCommand("SELECT * FROM Test1234")
+            //    .ExecuteReader()
+            //    .MapToType(typeof(Test123))
+            //    .ToArray<Test123>();
+
+            d.Close();
+            d.Dispose();
+        }
+
+
+
+
+        //TODO: broken
+        [TestMethod]
+        public void TestSqliteNullableColumns()
+        {
+            var d = new SQLiteConnection("Data Source=:memory:");
+            d.Open();
+
+            d.ExecuteSql("CREATE TABLE Company ( Id int, Nd decimal(3,4) null, Nnd decimal(3,4) not null)");
+            d.ExecuteSql("INSERT INTO Company VALUES ( 1, null, 1.1 )");
+
+            var sr = d.CreateSqlCommand("SELECT * FROM Company")
+                .ExecuteReader()
+                //.MapToSqlDestination("Company", d, DataTransformGroups.Default);
+                .GetFieldInfo();
+
+
+
+            //sr.Read();
+
+            //var rr = sr.PrintDiagnostics();
+
+
+            Assert.AreEqual(sr.First(p => p.ColumnName == "Nd").FieldType, typeof(decimal?));
+
+
+            //Assert.AreEqual("0. [Id] (Int32) '1' -> 0. [Id] (Int32) '1'\r\n1. [Nd] (Decimal?) null -> 1. [Nnd] (Decimal) '1.1'", rr);
+
+            d.Close();
+            d.Dispose();
+        }
+
+
+        //TODO: broken
+        [TestMethod]
         public void TestDiagnostics()
         {
             var d = new SQLiteConnection("Data Source=:memory:");

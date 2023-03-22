@@ -617,6 +617,24 @@ namespace DataPowerTools.Extensions
         }
 
         /// <summary>
+        /// Applies a mapping and transformation based on a SQL destination. DataTransformationGroups determine how
+        /// transformations are mapped to destination types.
+        /// Column renaming/reordering/aliasing is also setup automatically.
+        /// </summary>
+        /// <param name="dataReader"></param>
+        /// <param name="destinationTable"></param>
+        /// <param name="destinationConnection"></param>
+        /// <param name="transformGroup"></param>
+        /// <returns></returns>
+        public static SmartDataReader<TDataReader> MapToSqlDestination<TDataReader>(this TDataReader dataReader, string destinationTable,
+            DbConnection destinationConnection, DataTransformGroup transformGroup = null) where TDataReader : IDataReader
+        {
+            var destinationColumns = Database.GetDataSchemaTypedColumnInfo(destinationTable, destinationConnection).ToArray();
+
+            return new SmartDataReader<TDataReader>(dataReader, destinationColumns, transformGroup ?? DataTransformGroups.None);
+        }
+
+        /// <summary>
         /// Gets a Smart data reader based on a destination type and applies transformation group.
         /// </summary>
         /// <typeparam name="TDataReader"></typeparam>
@@ -640,31 +658,6 @@ namespace DataPowerTools.Extensions
 
             return new SmartDataReader<IDataReader>(dr, destinationColumns, transformGroup ?? DataTransformGroups.None);
         }
-        
-        /// <summary>
-        /// Applies a mapping and transformation based on a SQL destination. DataTransformationGroups determine how
-        /// transformations are mapped to destination types.
-        /// Column renaming/reordering/aliasing is also setup automatically.
-        /// </summary>
-        /// <param name="dataReader"></param>
-        /// <param name="destinationTable"></param>
-        /// <param name="destinationConnection"></param>
-        /// <param name="transformGroup"></param>
-        /// <returns></returns>
-        public static SmartDataReader<TDataReader> MapToSqlDestination<TDataReader>(this TDataReader dataReader, string destinationTable,
-            DbConnection destinationConnection, DataTransformGroup transformGroup = null) where TDataReader : IDataReader
-        {
-            var destinationColumns = Database.GetDataSchemaColumns(destinationTable, destinationConnection)
-                    .Select(c => new TypedDataColumnInfo
-                    {
-                        ColumnName = c.ColumnName,
-                        DataType = c.DataType,
-                        Ordinal = c.Ordinal
-                    }).ToArray();
-
-            return new SmartDataReader<TDataReader>(dataReader, destinationColumns, transformGroup ?? DataTransformGroups.None);
-        }
-
         /// <summary>
         /// Map and transform by specifying destination column metadata manually.
         /// </summary>

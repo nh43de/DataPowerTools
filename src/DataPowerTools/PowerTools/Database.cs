@@ -6,6 +6,7 @@ using Microsoft.Data.SqlClient;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using DataPowerTools.DataReaderExtensibility.Columns;
 using DataPowerTools.Extensions;
 
 namespace DataPowerTools.PowerTools
@@ -24,7 +25,7 @@ namespace DataPowerTools.PowerTools
         /// <param name="password"></param>
         /// <param name="integratedSecuity"></param>
         /// <returns></returns>
-        public static string GetConnectionString(
+        public static string GetConnectionString( //mssql
             string initialCatalog = "",
             string dataSource = "",
             string userId = "",
@@ -161,6 +162,7 @@ WHERE [t].[object_id] = OBJECT_ID(@table_name);", connection))
                 return (string)cmd.ExecuteScalar();
             }
         }
+
         /// <summary>
         /// Gets a list of all tables and their FK-tier heirarchy.
         /// This is for making deletion and insertion tasks easier when dealing with FK graphs.
@@ -186,7 +188,7 @@ WHERE [t].[object_id] = OBJECT_ID(@table_name);", connection))
         /// </summary>
         /// <param name="sqlc"></param>
         /// <returns></returns>
-        public static List<TableHierarchy> GetTableHierarchy(SqlConnection sqlc)
+        public static List<TableHierarchy> GetTableHierarchy(SqlConnection sqlc) //mssql
         {
             //TODO: modify so that it shows which tables are truncate-able (no FK references whatsoever)
             const string sql = @"DECLARE @RITable TABLE
@@ -386,7 +388,7 @@ FROM    [sys].[foreign_keys] [foreign_keys01]
         /// </summary>
         /// <param name="connection"></param>
         /// <returns></returns>
-        public static List<string> GetTableList(SqlConnection connection)
+        public static List<string> GetTableList(SqlConnection connection) //mssql
         {
             var tables = new List<string>();
 
@@ -831,13 +833,35 @@ FROM    [#dropcode] AS [d];";
             }
         }
 
+
         /// <summary>
         /// Gets the data schema columns of the specified database table.
         /// </summary>
         /// <param name="destinationTableName"></param>
         /// <param name="connection"></param>
         /// <returns></returns>
-        public static IEnumerable<DataColumn> GetDataSchemaColumns(string destinationTableName, DbConnection connection)
+        public static IEnumerable<TypedDataColumnInfo> GetDataSchemaTypedColumnInfo(string destinationTableName, DbConnection connection)
+        {
+            var destinationColumnsQ = GetDataSchemaColumns(destinationTableName, connection).ToArray();
+            
+            var destinationColumns = destinationColumnsQ
+                .Select(c => new TypedDataColumnInfo
+                {
+                    ColumnName = c.ColumnName,
+                    DataType = c.DataType,
+                    Ordinal = c.Ordinal
+                }).ToArray();
+
+            return destinationColumns;
+        }
+        
+        /// <summary>
+        /// Gets the data schema columns of the specified database table.
+        /// </summary>
+        /// <param name="destinationTableName"></param>
+        /// <param name="connection"></param>
+        /// <returns></returns>
+        private static IEnumerable<DataColumn> GetDataSchemaColumns(string destinationTableName, DbConnection connection)
         {
             return GetDataSchema(destinationTableName, connection).GetDataColumns();
         }
@@ -848,7 +872,7 @@ FROM    [#dropcode] AS [d];";
         /// <param name="destinationTableName"></param>
         /// <param name="connString"></param>
         /// <returns></returns>
-        public static IEnumerable<DataColumn> GetDataSchemaColumns(string destinationTableName, string connString)
+        private static IEnumerable<DataColumn> GetDataSchemaColumns(string destinationTableName, string connString)
         {
             return GetDataSchema(destinationTableName, connString).GetDataColumns();
         }
