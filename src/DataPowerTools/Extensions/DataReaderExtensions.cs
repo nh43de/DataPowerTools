@@ -37,6 +37,45 @@ namespace DataPowerTools.Extensions
         }
 
         /// <summary>
+        /// UnPivots an IDataReader. Result column names are "DimensionA", "DimensionB", and "Value"
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="reader"></param>
+        /// <returns></returns>
+        public static UnPivotingDataReader<T> UnPivot<T>(this T reader) where T : IDataReader
+        {
+            var rr = new UnPivotingDataReader<T>(reader);
+
+            return rr;
+        }
+
+        /// <summary>
+        /// Selects an IDataReader into a new one using the specified column mappings, by column ordinal.
+        /// </summary>
+        /// <param name="reader"></param>
+        /// <param name="columnActionsByOrdinal"></param>
+        /// <returns></returns>
+        public static IDataReader Select(this IDataReader reader, Dictionary<int, RowProjection<object>> columnActionsByOrdinal)
+        {
+            var rr = new ColumnTransformingDataReader<object, IDataReader>(reader, columnActionsByOrdinal);
+
+            return rr;
+        }
+
+        /// <summary>
+        /// Selects an IDataReader into a new one using the specified column mappings, by column name.
+        /// </summary>
+        /// <param name="reader"></param>
+        /// <param name="columnActionsByName"></param>
+        /// <returns></returns>
+        public static IDataReader Select(this IDataReader reader, Dictionary<string, RowProjection<object>> columnActionsByName)
+        {
+            var rr = new ColumnTransformingDataReader<object, IDataReader>(reader, columnActionsByName);
+
+            return rr;
+        }
+
+        /// <summary>
         /// returns a datareader that will read the object as a single row.
         /// </summary>
         /// <typeparam name="T"></typeparam>
@@ -289,8 +328,6 @@ namespace DataPowerTools.Extensions
             logEvents = l.LogEvents;
 
             return l;
-
-
         }
 
         /// <summary>
