@@ -124,7 +124,9 @@ namespace DataPowerTools
         {
             using var ts = File.Open(outputFile, FileMode.Create);
             using var sw = new StreamWriter(ts);
-            Write(reader, sw, writeHeaders);
+            using var csvWriter = new CSVWriter(sw);
+            
+            Write(reader, sw, csvWriter, writeHeaders);
         }
 
         /// <summary>
@@ -132,13 +134,12 @@ namespace DataPowerTools
         /// </summary>
         /// <param name="reader"></param>
         /// <param name="sw"></param>
+        /// <param name="csvWriter"></param>
         /// <param name="writeHeaders"></param>
-        public static void Write(IDataReader reader, TextWriter sw, bool writeHeaders = true)
+        public static void Write(IDataReader reader, TextWriter sw, CSVWriter csvWriter, bool writeHeaders = true)
         {
             var isInitialized = false;
             var fieldCount = 0;
-
-            using var csvWriter = new CSVWriter(sw);
             
             void Initialize()
             {
@@ -186,9 +187,10 @@ namespace DataPowerTools
         public static string WriteString(IDataReader reader, bool writeHeaders = true, bool useTabFormat = false)
         {
             using var sw = new StringWriter();
+
             using var csvWriter = useTabFormat ? new CSVWriter(sw, '\t', CSVWriter.NoQuoteCharacter) : new CSVWriter(sw);
 
-            Write(reader, sw, writeHeaders);
+            Write(reader, sw, csvWriter, writeHeaders);
 
             return sw.ToString();
         }
