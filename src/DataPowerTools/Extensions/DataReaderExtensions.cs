@@ -31,9 +31,9 @@ namespace DataPowerTools.Extensions
         /// <summary>
         /// Writes datareader to CSV.
         /// </summary>
-        public static string AsCsv(this IDataReader reader, bool writeHeaders = true)
+        public static string AsCsv(this IDataReader reader, bool writeHeaders = true, bool useTabFormat = false)
         {
-            return Csv.WriteString(reader);
+            return Csv.WriteString(reader, writeHeaders, useTabFormat);
         }
 
         /// <summary>

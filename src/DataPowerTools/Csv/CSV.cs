@@ -175,17 +175,18 @@ namespace DataPowerTools
                 }
             }
         }
-        
+
         /// <summary>
         /// Writes an IDataReader to a CSV string.
         /// </summary>
         /// <param name="reader"></param>
         /// <param name="writeHeaders"></param>
+        /// <param name="useTabFormat">Outputs CSV in tab format</param>
         /// <returns></returns>
-        public static string WriteString(IDataReader reader, bool writeHeaders = true)
+        public static string WriteString(IDataReader reader, bool writeHeaders = true, bool useTabFormat = false)
         {
             using var sw = new StringWriter();
-            using var csvWriter = new CSVWriter(sw);
+            using var csvWriter = useTabFormat ? new CSVWriter(sw, '\t', CSVWriter.NoQuoteCharacter) : new CSVWriter(sw);
 
             Write(reader, sw, writeHeaders);
 
