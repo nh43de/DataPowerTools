@@ -76,6 +76,24 @@ namespace DataPowerTools.Extensions
         }
 
         /// <summary>
+        /// Creates insert statements from an IDataReader.
+        /// </summary>
+        /// <param name="reader"></param>
+        /// <param name="tableName"></param>
+        /// <param name="engine"></param>
+        /// <returns></returns>
+        public static string AsInsertStatements(this IDataReader reader, string tableName, DatabaseEngine engine = DatabaseEngine.SqlServer)
+        {
+            var sb = new StringBuilder();
+
+            var isb = new InsertSqlBuilder(engine);
+
+            reader.Each(p => isb.AppendInsert(sb, p, tableName));
+
+            return sb.ToString();
+        }
+
+        /// <summary>
         /// returns a datareader that will read the object as a single row.
         /// </summary>
         /// <typeparam name="T"></typeparam>
