@@ -5,6 +5,11 @@ using System.Linq;
 
 namespace DataPowerTools.DataReaderExtensibility.TransformingReaders
 {
+    /// <summary>
+    /// Data reader that will add columns to an existing data reader.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <typeparam name="TDataReader"></typeparam>
     public class AddColumnsDataReader<T, TDataReader> : ExtensibleDataReaderExplicit<TDataReader> where TDataReader : IDataReader
     {
         private readonly Lazy<Dictionary<string, int>> _addColumnIndexByName;
