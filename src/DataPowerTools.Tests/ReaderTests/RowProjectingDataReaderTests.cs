@@ -36,6 +36,7 @@ public class RowProjectingDataReaderTests
         Assert.AreEqual(expected, rr);
     }
 
+    //TODO: broken, need to be able to create data reader since CSV reader automatically addresses duplicate columns and anonymous types don't support them either (only have this issue with SQL server data readers e.g. when a query has duplicated column names).
 //    [TestMethod]
 //    public void TestRemoveDuplicates()
 //    {
