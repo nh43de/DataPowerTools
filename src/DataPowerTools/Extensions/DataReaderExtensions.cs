@@ -858,6 +858,7 @@ namespace DataPowerTools.Extensions
         /// <param name="dr"></param>
         /// <param name="propNames">Prop names to only include.</param>
         /// <returns></returns>
+        [Obsolete("This overload will be renamed, use SelectRows instead")]
         public static IEnumerable<T> SelectNonStrict<T>(this IDataReader dr, string[] propNames)
         {
             return dr.SelectNonStrict(typeof(T), () => Activator.CreateInstance<T>(), propNames).OfType<T>();
@@ -871,6 +872,7 @@ namespace DataPowerTools.Extensions
         /// <param name="dr"></param>
         /// <param name="ignoreNonStringReferenceTypes"></param>
         /// <returns></returns>
+        [Obsolete("This overload will be renamed, use SelectRows instead")]
         public static IEnumerable<T> SelectNonStrict<T>(this IDataReader dr, bool ignoreNonStringReferenceTypes = true)
         {
             return dr.SelectNonStrict(typeof(T), ignoreNonStringReferenceTypes).OfType<T>();
@@ -884,6 +886,7 @@ namespace DataPowerTools.Extensions
         /// <param name="type"></param>
         /// <param name="ignoreNonStringReferenceTypes"></param>
         /// <returns></returns>
+        [Obsolete("This overload will be renamed, use SelectRows instead")]
         public static IEnumerable SelectNonStrict(this IDataReader dr, Type type, bool ignoreNonStringReferenceTypes = true)
         {
             var props = type.GetColumnMemberNames(ignoreNonStringReferenceTypes);
@@ -899,6 +902,7 @@ namespace DataPowerTools.Extensions
         /// <param name="type"></param>
         /// <param name="propNames">Prop names to only include.</param>
         /// <returns></returns>
+        [Obsolete("This overload will be renamed, use SelectRows instead")]
         public static IEnumerable SelectNonStrict(this IDataReader dr, Type type, string[] propNames)
         {
             return SelectNonStrict(dr, type, () => Activator.CreateInstance(type), propNames);
@@ -914,13 +918,14 @@ namespace DataPowerTools.Extensions
         /// <param name="newObjectFactory"></param>
         /// <param name="ignoreNonStringReferenceTypes"></param>
         /// <returns></returns>
+        [Obsolete("This overload will be renamed, use SelectRows instead")]
         public static IEnumerable SelectNonStrict(this IDataReader dr, Type type, Func<object> newObjectFactory, bool ignoreNonStringReferenceTypes = true)
         {
             var props = type.GetColumnMemberNames(ignoreNonStringReferenceTypes);
 
             return SelectNonStrict(dr, type, newObjectFactory, props);
         }
-        
+
         /// <summary>
         /// Yields an IDataReader as an enumerable. Property names must match column names exactly. 
         /// This is slower than using FastMember but implicit casts are made, and you can specify a type factory.
@@ -930,6 +935,7 @@ namespace DataPowerTools.Extensions
         /// <param name="typeFactory">How to make an object of the specified type.</param>
         /// <param name="propNames">Prop names to only include.</param>
         /// <returns></returns>
+        [Obsolete("This overload will be renamed, use SelectRows instead")]
         public static IEnumerable SelectNonStrict(this IDataReader dr, Type type, Func<object> typeFactory, string[] propNames)
         {
             var props = type.GetColumnInfo(propNames);
