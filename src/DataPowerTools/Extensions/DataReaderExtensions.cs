@@ -983,16 +983,24 @@ namespace DataPowerTools.Extensions
         }
 
         /// <summary>
-        /// Removes duplicate column names. Which column ends up being used is indeterminate.
+        /// Removes duplicate column names. Which column ends up being used is determined by the underlying IDataReader.
         /// </summary>
         /// <typeparam name="TDataReader"></typeparam>
         /// <param name="dataReader"></param>
         /// <returns></returns>
         public static IDataReader RemoveDuplicateColumnNames<TDataReader>(this TDataReader dataReader) where TDataReader : IDataReader
         {
-            var allCols = dataReader.GetFieldNames().Distinct();
+            //get all distinct names
+            var names = dataReader
+                .GetFieldNames()
+                .Distinct()
+                .ToDictionary(name => name,
+                    name => new RowProjection<object>(_ => _[name]));
+            
+            //if done this way then risk failing when a BiDirectionalMap to source is required e.g. when applying aliases.
+            //var allCols = dataReader.GetFieldNames().Distinct();
 
-            return new ProjectingDataReader<TDataReader>(dataReader, allCols);
+            return new ProjectingDataReader<TDataReader>(dataReader, names);
         }
         
         /// <summary>
