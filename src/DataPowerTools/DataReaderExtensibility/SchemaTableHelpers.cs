@@ -9,6 +9,11 @@ namespace DataPowerTools.DataReaderExtensibility
 
     public static class SchemaTableHelpers
     {
+        /// <summary>
+        /// Gets schema table for basic data reader.
+        /// </summary>
+        /// <param name="columnNames"></param>
+        /// <returns></returns>
         public static DataTable GetSchemaTable(string[] columnNames)
         {
             var schema = new DataTable("SchemaTable")
@@ -81,4 +86,32 @@ namespace DataPowerTools.DataReaderExtensibility
             return schema;
         }
     }
+
+    /*
+        schema.Columns.Add(SchemaTableColumn.AllowDBNull, typeof(bool)).ReadOnly = true;
+        schema.Columns.Add(SchemaTableColumn.BaseColumnName, typeof(string)).ReadOnly = true;
+        schema.Columns.Add(SchemaTableColumn.BaseSchemaName, typeof(string)).ReadOnly = true;
+        schema.Columns.Add(SchemaTableColumn.BaseTableName, typeof(string)).ReadOnly = true;
+        schema.Columns.Add(SchemaTableColumn.ColumnName, typeof(string)).ReadOnly = true;
+        schema.Columns.Add(SchemaTableColumn.ColumnOrdinal, typeof(int)).ReadOnly = true;
+        schema.Columns.Add(SchemaTableColumn.ColumnSize, typeof(int)).ReadOnly = true;
+        schema.Columns.Add(SchemaTableColumn.DataType, typeof(object)).ReadOnly = true;
+        schema.Columns.Add(SchemaTableColumn.IsAliased, typeof(bool)).ReadOnly = true;
+        schema.Columns.Add(SchemaTableColumn.IsExpression, typeof(bool)).ReadOnly = true;
+        schema.Columns.Add(SchemaTableColumn.IsKey, typeof(bool)).ReadOnly = true;
+        schema.Columns.Add(SchemaTableColumn.IsLong, typeof(bool)).ReadOnly = true;
+        schema.Columns.Add(SchemaTableColumn.IsUnique, typeof(bool)).ReadOnly = true;
+        schema.Columns.Add(SchemaTableColumn.NumericPrecision, typeof(short)).ReadOnly = true;
+        schema.Columns.Add(SchemaTableColumn.NumericScale, typeof(short)).ReadOnly = true;
+        schema.Columns.Add(SchemaTableColumn.ProviderType, typeof(int)).ReadOnly = true;
+
+
+
+        schema.Columns.Add(SchemaTableOptionalColumn.BaseCatalogName, typeof(string)).ReadOnly = true;
+        schema.Columns.Add(SchemaTableOptionalColumn.BaseServerName, typeof(string)).ReadOnly = true;
+        schema.Columns.Add(SchemaTableOptionalColumn.IsAutoIncrement, typeof(bool)).ReadOnly = true;
+        schema.Columns.Add(SchemaTableOptionalColumn.IsHidden, typeof(bool)).ReadOnly = true;
+        schema.Columns.Add(SchemaTableOptionalColumn.IsReadOnly, typeof(bool)).ReadOnly = true;
+        schema.Columns.Add(SchemaTableOptionalColumn.IsRowVersion, typeof(bool)).ReadOnly = true;
+    */
 }

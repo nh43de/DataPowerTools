@@ -384,13 +384,13 @@ namespace DataPowerTools.Extensions
         //    return new AliasingDataReader(dataReader, sourceToAliasMapping);
         //}
 
-
         /// <summary>
         /// Projects all reader columns into a new set of columns.
         /// </summary>
         /// <param name="dataReader"></param>
         /// <param name="projectedColumns"></param>
         /// <returns></returns>
+        [Obsolete("This overload will be renamed to SelectRows")]
         public static IDataReader ApplyProjection<TDataReader>(this TDataReader dataReader,
             params RowProjection<object>[] projectedColumns) where TDataReader : IDataReader
         {
@@ -403,6 +403,7 @@ namespace DataPowerTools.Extensions
         /// <param name="dataReader"></param>
         /// <param name="projectedColumns"></param>
         /// <returns></returns>
+        [Obsolete("This overload will be renamed to SelectRows")]
         public static IDataReader ApplyProjection<TDataReader>(this TDataReader dataReader,
             Dictionary<string, RowProjection<object>> projectedColumns) where TDataReader: IDataReader
         {
@@ -603,34 +604,6 @@ namespace DataPowerTools.Extensions
             return fields.ToArray();
         }
 
-
-        /*
-         	schema.Columns.Add(SchemaTableColumn.AllowDBNull, typeof(bool)).ReadOnly = true;
-			schema.Columns.Add(SchemaTableColumn.BaseColumnName, typeof(string)).ReadOnly = true;
-			schema.Columns.Add(SchemaTableColumn.BaseSchemaName, typeof(string)).ReadOnly = true;
-			schema.Columns.Add(SchemaTableColumn.BaseTableName, typeof(string)).ReadOnly = true;
-			schema.Columns.Add(SchemaTableColumn.ColumnName, typeof(string)).ReadOnly = true;
-			schema.Columns.Add(SchemaTableColumn.ColumnOrdinal, typeof(int)).ReadOnly = true;
-			schema.Columns.Add(SchemaTableColumn.ColumnSize, typeof(int)).ReadOnly = true;
-			schema.Columns.Add(SchemaTableColumn.DataType, typeof(object)).ReadOnly = true;
-			schema.Columns.Add(SchemaTableColumn.IsAliased, typeof(bool)).ReadOnly = true;
-			schema.Columns.Add(SchemaTableColumn.IsExpression, typeof(bool)).ReadOnly = true;
-			schema.Columns.Add(SchemaTableColumn.IsKey, typeof(bool)).ReadOnly = true;
-			schema.Columns.Add(SchemaTableColumn.IsLong, typeof(bool)).ReadOnly = true;
-			schema.Columns.Add(SchemaTableColumn.IsUnique, typeof(bool)).ReadOnly = true;
-			schema.Columns.Add(SchemaTableColumn.NumericPrecision, typeof(short)).ReadOnly = true;
-			schema.Columns.Add(SchemaTableColumn.NumericScale, typeof(short)).ReadOnly = true;
-			schema.Columns.Add(SchemaTableColumn.ProviderType, typeof(int)).ReadOnly = true;
-
-
-
-			schema.Columns.Add(SchemaTableOptionalColumn.BaseCatalogName, typeof(string)).ReadOnly = true;
-			schema.Columns.Add(SchemaTableOptionalColumn.BaseServerName, typeof(string)).ReadOnly = true;
-			schema.Columns.Add(SchemaTableOptionalColumn.IsAutoIncrement, typeof(bool)).ReadOnly = true;
-			schema.Columns.Add(SchemaTableOptionalColumn.IsHidden, typeof(bool)).ReadOnly = true;
-			schema.Columns.Add(SchemaTableOptionalColumn.IsReadOnly, typeof(bool)).ReadOnly = true;
-			schema.Columns.Add(SchemaTableOptionalColumn.IsRowVersion, typeof(bool)).ReadOnly = true;
-        */
 
         /// <summary>
         /// Applies a mapping and tranformation based on a SQL destination. DataTranformationGroups determine how
@@ -1008,7 +981,32 @@ namespace DataPowerTools.Extensions
             while (reader.Read())
                 yield return projection(reader);
         }
+
+        /// <summary>
+        /// Removes duplicate column names. Which column ends up being used is indeterminate.
+        /// </summary>
+        /// <typeparam name="TDataReader"></typeparam>
+        /// <param name="dataReader"></param>
+        /// <returns></returns>
+        public static IDataReader RemoveDuplicateColumnNames<TDataReader>(this TDataReader dataReader) where TDataReader : IDataReader
+        {
+            var allCols = dataReader.GetFieldNames().Distinct();
+
+            return new ProjectingDataReader<TDataReader>(dataReader, allCols);
+        }
         
+        /// <summary>
+        /// Selects the specified rows of the data reader into a new IDataReader.
+        /// </summary>
+        /// <typeparam name="TDataReader"></typeparam>
+        /// <param name="dataReader"></param>
+        /// <param name="columnsToSelect"></param>
+        /// <returns></returns>
+        public static IDataReader SelectRows<TDataReader>(this TDataReader dataReader, string[] columnsToSelect) where TDataReader : IDataReader
+        {
+            return new ProjectingDataReader<TDataReader>(dataReader, columnsToSelect);
+        }
+
         /// <summary>
         /// Select function for data readers. Will apply default convert operations to fit it to a type. Formerly .Select()
         /// </summary>

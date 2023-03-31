@@ -7,6 +7,10 @@ using DataPowerTools.Extensions;
 
 namespace DataPowerTools.DataReaderExtensibility.TransformingReaders
 {
+    /// <summary>
+    /// This overwrites all columns into a projected sequence. This is basically a .Select or .SelectRows
+    /// </summary>
+    /// <typeparam name="TDataReader"></typeparam>
     public class ProjectingDataReader<TDataReader> : ExtensibleDataReaderExplicit<TDataReader> where TDataReader : IDataReader
     {
         private readonly Dictionary<string, RowProjection<object>> _columnsByName;
@@ -15,6 +19,18 @@ namespace DataPowerTools.DataReaderExtensibility.TransformingReaders
 
 
         private readonly int _fieldCount;
+
+        /// <summary>
+        /// Creates a data reader that reads from the underlying stream and returns only the columns specified.
+        /// </summary>
+        /// <param name="reader"></param>
+        /// <param name="selectColumns">The columns to select.</param>
+        public ProjectingDataReader(TDataReader reader, IEnumerable<string> selectColumns)
+            : this(reader, selectColumns
+                .ToDictionary(name => name, name => new RowProjection<object>(row => row[name])))
+        {
+
+        }
 
         /// <summary>
         /// Creates a data reader that reads from the underlying stream and returns only the columns specified in the transform.
