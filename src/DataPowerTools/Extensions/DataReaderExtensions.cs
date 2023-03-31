@@ -122,7 +122,7 @@ namespace DataPowerTools.Extensions
         /// <param name="outputTableName"></param>
         /// <param name="numberOfRowsToExamine"></param>
         /// <returns></returns>
-        public static string FitToCreateTableSql(this IDataReader reader, string outputTableName, int? numberOfRowsToExamine)
+        public static string FitToCreateTableSql(this IDataReader reader, string outputTableName, int? numberOfRowsToExamine = null)
         {
             return CreateTableSql.FromDataReader_Smart(outputTableName, reader, numberOfRowsToExamine);
         }
