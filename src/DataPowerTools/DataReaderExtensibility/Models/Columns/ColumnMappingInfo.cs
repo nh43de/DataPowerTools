@@ -32,8 +32,8 @@ namespace DataPowerTools.DataReaderExtensibility.Columns
             // (Source) BasicDataColumnInfo -> (Destination) BasicDataColumnInfo
             Mappings = sourceColumns.GroupJoin( //join source columns to destination column information
                         destinationColumns,
-                        sourceField => sourceField.ColumnName,
-                        destinationField => destinationField.ColumnName,
+                        sourceField => sourceField.ColumnName.ToLower(),
+                        destinationField => destinationField.ColumnName.ToLower(),
                         (sourceField, groupDestinationFields) => new BasicColumnMapping
                         {
                             SourceField = sourceField,

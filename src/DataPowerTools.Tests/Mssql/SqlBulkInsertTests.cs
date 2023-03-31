@@ -27,7 +27,9 @@ namespace DataPowerTools.Tests.Mssql
                 return r;
             }
         }
-        
+
+        //TODO: broken: inserting an empty string into a decimal column
+        //TODO: broken: case sensitivity (e.g. when data source is Myprice, and dest is MyPrice) note that some database 
         //[TestMethod]
         public async Task Upload()
         {
