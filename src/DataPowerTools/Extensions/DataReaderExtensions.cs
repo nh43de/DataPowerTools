@@ -392,7 +392,7 @@ namespace DataPowerTools.Extensions
         /// <returns></returns>
         [Obsolete("This overload will be renamed to SelectRows")]
         public static IDataReader ApplyProjection<TDataReader>(this TDataReader dataReader,
-            params RowProjection<object>[] projectedColumns) where TDataReader : IDataReader
+            RowProjection<object>[] projectedColumns) where TDataReader : IDataReader
         {
             return new ProjectingDataReader<TDataReader>(dataReader, projectedColumns);
         }
