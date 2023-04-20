@@ -14,7 +14,6 @@ namespace DataPowerTools.DataReaderExtensibility.TransformingReaders
         public UnionDataReader(TDataReader dataReaderFirst, TDataReader dataReaderSecond) : base(dataReaderFirst)
         {
             _dataReaderSecond = dataReaderSecond;
-
         }
 
         public override bool Read()

@@ -31,9 +31,48 @@ namespace DataPowerTools.Extensions
         /// <summary>
         /// Writes datareader to CSV.
         /// </summary>
-        public static string AsCsv(this IDataReader reader, bool writeHeaders = true)
+        public static string AsCsv(this IDataReader reader, bool writeHeaders = true, bool useTabFormat = false)
         {
-            return Csv.WriteString(reader);
+            return Csv.WriteString(reader, writeHeaders, useTabFormat);
+        }
+
+        /// <summary>
+        /// UnPivots an IDataReader. Result column names are "DimensionA", "DimensionB", and "Value"
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="reader"></param>
+        /// <returns></returns>
+        public static UnPivotingDataReader<T> UnPivot<T>(this T reader) where T : IDataReader
+        {
+            var rr = new UnPivotingDataReader<T>(reader);
+
+            return rr;
+        }
+
+        /// <summary>
+        /// Selects an IDataReader into a new one using the specified column mappings, by column ordinal.
+        /// </summary>
+        /// <param name="reader"></param>
+        /// <param name="columnActionsByOrdinal"></param>
+        /// <returns></returns>
+        public static IDataReader Select(this IDataReader reader, Dictionary<int, RowProjection<object>> columnActionsByOrdinal)
+        {
+            var rr = new ColumnTransformingDataReader<object, IDataReader>(reader, columnActionsByOrdinal);
+
+            return rr;
+        }
+
+        /// <summary>
+        /// Selects an IDataReader into a new one using the specified column mappings, by column name.
+        /// </summary>
+        /// <param name="reader"></param>
+        /// <param name="columnActionsByName"></param>
+        /// <returns></returns>
+        public static IDataReader Select(this IDataReader reader, Dictionary<string, RowProjection<object>> columnActionsByName)
+        {
+            var rr = new ColumnTransformingDataReader<object, IDataReader>(reader, columnActionsByName);
+
+            return rr;
         }
 
         /// <summary>
@@ -83,7 +122,7 @@ namespace DataPowerTools.Extensions
         /// <param name="outputTableName"></param>
         /// <param name="numberOfRowsToExamine"></param>
         /// <returns></returns>
-        public static string FitToCreateTableSql(this IDataReader reader, string outputTableName, int? numberOfRowsToExamine)
+        public static string FitToCreateTableSql(this IDataReader reader, string outputTableName, int? numberOfRowsToExamine = null)
         {
             return CreateTableSql.FromDataReader_Smart(outputTableName, reader, numberOfRowsToExamine);
         }
@@ -307,8 +346,6 @@ namespace DataPowerTools.Extensions
             logEvents = l.LogEvents;
 
             return l;
-
-
         }
 
         /// <summary>
@@ -347,15 +384,15 @@ namespace DataPowerTools.Extensions
         //    return new AliasingDataReader(dataReader, sourceToAliasMapping);
         //}
 
-
         /// <summary>
         /// Projects all reader columns into a new set of columns.
         /// </summary>
         /// <param name="dataReader"></param>
         /// <param name="projectedColumns"></param>
         /// <returns></returns>
+        [Obsolete("This overload will be renamed to SelectRows")]
         public static IDataReader ApplyProjection<TDataReader>(this TDataReader dataReader,
-            params RowProjection<object>[] projectedColumns) where TDataReader : IDataReader
+            RowProjection<object>[] projectedColumns) where TDataReader : IDataReader
         {
             return new ProjectingDataReader<TDataReader>(dataReader, projectedColumns);
         }
@@ -366,6 +403,7 @@ namespace DataPowerTools.Extensions
         /// <param name="dataReader"></param>
         /// <param name="projectedColumns"></param>
         /// <returns></returns>
+        [Obsolete("This overload will be renamed to SelectRows")]
         public static IDataReader ApplyProjection<TDataReader>(this TDataReader dataReader,
             Dictionary<string, RowProjection<object>> projectedColumns) where TDataReader: IDataReader
         {
@@ -566,34 +604,6 @@ namespace DataPowerTools.Extensions
             return fields.ToArray();
         }
 
-
-        /*
-         	schema.Columns.Add(SchemaTableColumn.AllowDBNull, typeof(bool)).ReadOnly = true;
-			schema.Columns.Add(SchemaTableColumn.BaseColumnName, typeof(string)).ReadOnly = true;
-			schema.Columns.Add(SchemaTableColumn.BaseSchemaName, typeof(string)).ReadOnly = true;
-			schema.Columns.Add(SchemaTableColumn.BaseTableName, typeof(string)).ReadOnly = true;
-			schema.Columns.Add(SchemaTableColumn.ColumnName, typeof(string)).ReadOnly = true;
-			schema.Columns.Add(SchemaTableColumn.ColumnOrdinal, typeof(int)).ReadOnly = true;
-			schema.Columns.Add(SchemaTableColumn.ColumnSize, typeof(int)).ReadOnly = true;
-			schema.Columns.Add(SchemaTableColumn.DataType, typeof(object)).ReadOnly = true;
-			schema.Columns.Add(SchemaTableColumn.IsAliased, typeof(bool)).ReadOnly = true;
-			schema.Columns.Add(SchemaTableColumn.IsExpression, typeof(bool)).ReadOnly = true;
-			schema.Columns.Add(SchemaTableColumn.IsKey, typeof(bool)).ReadOnly = true;
-			schema.Columns.Add(SchemaTableColumn.IsLong, typeof(bool)).ReadOnly = true;
-			schema.Columns.Add(SchemaTableColumn.IsUnique, typeof(bool)).ReadOnly = true;
-			schema.Columns.Add(SchemaTableColumn.NumericPrecision, typeof(short)).ReadOnly = true;
-			schema.Columns.Add(SchemaTableColumn.NumericScale, typeof(short)).ReadOnly = true;
-			schema.Columns.Add(SchemaTableColumn.ProviderType, typeof(int)).ReadOnly = true;
-
-
-
-			schema.Columns.Add(SchemaTableOptionalColumn.BaseCatalogName, typeof(string)).ReadOnly = true;
-			schema.Columns.Add(SchemaTableOptionalColumn.BaseServerName, typeof(string)).ReadOnly = true;
-			schema.Columns.Add(SchemaTableOptionalColumn.IsAutoIncrement, typeof(bool)).ReadOnly = true;
-			schema.Columns.Add(SchemaTableOptionalColumn.IsHidden, typeof(bool)).ReadOnly = true;
-			schema.Columns.Add(SchemaTableOptionalColumn.IsReadOnly, typeof(bool)).ReadOnly = true;
-			schema.Columns.Add(SchemaTableOptionalColumn.IsRowVersion, typeof(bool)).ReadOnly = true;
-        */
 
         /// <summary>
         /// Applies a mapping and tranformation based on a SQL destination. DataTranformationGroups determine how
@@ -809,6 +819,7 @@ namespace DataPowerTools.Extensions
         /// <param name="dr"></param>
         /// <param name="propNames">Prop names to only include.</param>
         /// <returns></returns>
+        [Obsolete("This overload will be renamed, use SelectRows instead")]
         public static IEnumerable<T> SelectNonStrict<T>(this IDataReader dr, string[] propNames)
         {
             return dr.SelectNonStrict(typeof(T), () => Activator.CreateInstance<T>(), propNames).OfType<T>();
@@ -822,6 +833,7 @@ namespace DataPowerTools.Extensions
         /// <param name="dr"></param>
         /// <param name="ignoreNonStringReferenceTypes"></param>
         /// <returns></returns>
+        [Obsolete("This overload will be renamed, use SelectRows instead")]
         public static IEnumerable<T> SelectNonStrict<T>(this IDataReader dr, bool ignoreNonStringReferenceTypes = true)
         {
             return dr.SelectNonStrict(typeof(T), ignoreNonStringReferenceTypes).OfType<T>();
@@ -835,6 +847,7 @@ namespace DataPowerTools.Extensions
         /// <param name="type"></param>
         /// <param name="ignoreNonStringReferenceTypes"></param>
         /// <returns></returns>
+        [Obsolete("This overload will be renamed, use SelectRows instead")]
         public static IEnumerable SelectNonStrict(this IDataReader dr, Type type, bool ignoreNonStringReferenceTypes = true)
         {
             var props = type.GetColumnMemberNames(ignoreNonStringReferenceTypes);
@@ -850,6 +863,7 @@ namespace DataPowerTools.Extensions
         /// <param name="type"></param>
         /// <param name="propNames">Prop names to only include.</param>
         /// <returns></returns>
+        [Obsolete("This overload will be renamed, use SelectRows instead")]
         public static IEnumerable SelectNonStrict(this IDataReader dr, Type type, string[] propNames)
         {
             return SelectNonStrict(dr, type, () => Activator.CreateInstance(type), propNames);
@@ -865,13 +879,14 @@ namespace DataPowerTools.Extensions
         /// <param name="newObjectFactory"></param>
         /// <param name="ignoreNonStringReferenceTypes"></param>
         /// <returns></returns>
+        [Obsolete("This overload will be renamed, use SelectRows instead")]
         public static IEnumerable SelectNonStrict(this IDataReader dr, Type type, Func<object> newObjectFactory, bool ignoreNonStringReferenceTypes = true)
         {
             var props = type.GetColumnMemberNames(ignoreNonStringReferenceTypes);
 
             return SelectNonStrict(dr, type, newObjectFactory, props);
         }
-        
+
         /// <summary>
         /// Yields an IDataReader as an enumerable. Property names must match column names exactly. 
         /// This is slower than using FastMember but implicit casts are made, and you can specify a type factory.
@@ -881,6 +896,7 @@ namespace DataPowerTools.Extensions
         /// <param name="typeFactory">How to make an object of the specified type.</param>
         /// <param name="propNames">Prop names to only include.</param>
         /// <returns></returns>
+        [Obsolete("This overload will be renamed, use SelectRows instead")]
         public static IEnumerable SelectNonStrict(this IDataReader dr, Type type, Func<object> typeFactory, string[] propNames)
         {
             var props = type.GetColumnInfo(propNames);
@@ -953,7 +969,40 @@ namespace DataPowerTools.Extensions
             while (reader.Read())
                 yield return projection(reader);
         }
+
+        /// <summary>
+        /// Removes duplicate column names. Which column ends up being used is determined by the underlying IDataReader.
+        /// </summary>
+        /// <typeparam name="TDataReader"></typeparam>
+        /// <param name="dataReader"></param>
+        /// <returns></returns>
+        public static IDataReader RemoveDuplicateColumnNames<TDataReader>(this TDataReader dataReader) where TDataReader : IDataReader
+        {
+            //get all distinct names
+            var names = dataReader
+                .GetFieldNames()
+                .Distinct()
+                .ToDictionary(name => name,
+                    name => new RowProjection<object>(_ => _[name]));
+            
+            //if done this way then risk failing when a BiDirectionalMap to source is required e.g. when applying aliases.
+            //var allCols = dataReader.GetFieldNames().Distinct();
+
+            return new ProjectingDataReader<TDataReader>(dataReader, names);
+        }
         
+        /// <summary>
+        /// Selects the specified rows of the data reader into a new IDataReader.
+        /// </summary>
+        /// <typeparam name="TDataReader"></typeparam>
+        /// <param name="dataReader"></param>
+        /// <param name="columnsToSelect"></param>
+        /// <returns></returns>
+        public static IDataReader SelectRows<TDataReader>(this TDataReader dataReader, string[] columnsToSelect) where TDataReader : IDataReader
+        {
+            return new ProjectingDataReader<TDataReader>(dataReader, columnsToSelect);
+        }
+
         /// <summary>
         /// Select function for data readers. Will apply default convert operations to fit it to a type. Formerly .Select()
         /// </summary>

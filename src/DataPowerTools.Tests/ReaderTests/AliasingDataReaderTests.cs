@@ -111,7 +111,38 @@ namespace DataPowerTools.Tests
         }
 
 
+        private static string Data = @"ItemId	Investor%	ClientId%	Investor
+1	A	123	G
+2	B	321	F
+3	C	147	Z
+4	D	158	D";
 
+
+        [TestMethod]
+        public void TestSelectRows()
+        {
+            var dr = Data
+                .ReadCsvString('\t', true);
+
+            var aliases = dr
+                .GetFieldNames()
+                .ToDictionary(name => name, name => name.Replace("%", "Pct"));
+
+            dr = dr.ApplyColumnsAliases(aliases);
+
+            var rr = dr.AsCsv();
+
+            //var fq = dr.FitToCreateTableSql("MyTable", null);
+
+            var expected = @"""ItemId"",""InvestorPct"",""ClientIdPct"",""Investor""
+""1"",""A"",""123"",""G""
+""2"",""B"",""321"",""F""
+""3"",""C"",""147"",""Z""
+""4"",""D"",""158"",""D""
+";
+
+            Assert.AreEqual(expected, rr);
+        }
 
     }
 }

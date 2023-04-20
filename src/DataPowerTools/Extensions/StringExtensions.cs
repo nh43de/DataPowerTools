@@ -1,10 +1,7 @@
-﻿using System;
-using System.Data;
-using System.Security;
-using System.Text;
+﻿using System.Data;
 using System.Text.RegularExpressions;
 using DataPowerTools.Strings;
-using Newtonsoft.Json.Linq;
+
 
 namespace DataPowerTools.Extensions
 {
@@ -69,17 +66,17 @@ namespace DataPowerTools.Extensions
             return IndentRegex.Replace(str, indentionStr);
         }
 
-        public static bool IsValidJson(this string obj)
-        {
-            try
-            {
-                JObject.Parse(obj);
-                return true;
-            }
-            catch (Exception)
-            {
-                return false;
-            }
-        }
+        //public static bool IsValidJson(this string obj)
+        //{
+        //    try
+        //    {
+        //        JObject.Parse(obj);
+        //        return true;
+        //    }
+        //    catch (Exception)
+        //    {
+        //        return false;
+        //    }
+        //}
     }
 }

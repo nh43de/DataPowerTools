@@ -26,7 +26,6 @@ https://github.com/codenesium/DataConversionExtensions/blob/master/License.txt
  *
  */
 using System;
-using Newtonsoft.Json.Linq;
 
 namespace DataPowerTools.Extensions.DataConversionExtensions
 {

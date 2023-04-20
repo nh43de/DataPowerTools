@@ -303,6 +303,7 @@ namespace DataPowerTools.Extensions
         /// <returns></returns>
         public static IDisposableEnumerable<T> ExecuteToEnumerable<T>(this DbCommand command, int? maxRows = null) where T: class
         {
+            //broken
             //TODO: need to dispose the enumerable structure and underlying reader when finished reading, otherwise will end up with multiple open result sets after reader finished reading
 
             IDataReader r = command.ExecuteReader();
@@ -314,7 +315,7 @@ namespace DataPowerTools.Extensions
 
             return new DataReaderEnumerable<T>(r, false);
         }
-
+        
         /// <summary>
         /// 
         /// </summary>
