@@ -19,7 +19,7 @@ AAC	AB	3
 
         var dd = csv.ReadCsvString('\t', true);
 
-        var r = dd.ToJson(true);
+        var r = dd.ReadToJson(true);
 
         Assert.AreEqual(@"[
   {

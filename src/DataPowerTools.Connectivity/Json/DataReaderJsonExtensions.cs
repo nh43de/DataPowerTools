@@ -12,7 +12,7 @@ namespace DataPowerTools.Connectivity.Json
 {
     public static class DataReaderJsonExtensions
     {
-        public static string ToJson(this IDataReader reader, bool indent = false)
+        public static string ReadToJson(this IDataReader reader, bool indent = false)
         {
             var props = reader.GetFieldNames();
 
