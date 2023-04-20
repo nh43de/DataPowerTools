@@ -37,7 +37,7 @@ namespace DataPowerTools.Connectivity.Json
         /// <summary>
         /// Creates insert statements from an array of json objects.
         /// </summary>
-        public static string FromJsonToCsv(this string jsonString, char delimiter = ',', bool writeHeaders = true)
+        public static string FromJsonToCsv(this string jsonString, bool writeHeaders = true, char delimiter = ',')
         {
             var sb = new StringBuilder();
             
