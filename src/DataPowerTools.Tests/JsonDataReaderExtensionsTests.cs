@@ -1,25 +1,28 @@
-﻿using DataPowerTools.Extensions;
+﻿using DataPowerTools.Connectivity.Json;
+using DataPowerTools.Extensions;
 using DataPowerTools.PowerTools;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace DataPowerTools.Tests;
 
 [TestClass]
-public class InsertSqlBuilderTests
+public class JsonDataReaderExtensionsTests
 {
     [TestMethod]
-    public void TestCreateInserts()
+    public void TestGenerateJson()
     {
         var csv = @"Col1	Col2	Col 3
-AAA	AA'C	''
-AAB	AA""C	''
-AAC	AB""D""'	''
+AAA	AA	1
+AAB	AA	2
+AAC	AB	3
 ";
 
 
         var dd = csv.ReadCsvString('\t', true);
 
-        var r = dd.AsSqlInsertStatements("MyTable", DatabaseEngine.SqlServer);
+        var r = dd.ToJson(true);
+
+
 
     }
 

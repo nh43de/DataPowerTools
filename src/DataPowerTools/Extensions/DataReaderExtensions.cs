@@ -5,6 +5,7 @@ using System.Data;
 using System.Data.Common;
 using Microsoft.Data.SqlClient;
 using System.Diagnostics;
+using System.Dynamic;
 using System.Linq;
 using DataPowerTools.Connectivity.Helpers;
 using DataPowerTools.DataConnectivity;
@@ -36,6 +37,18 @@ namespace DataPowerTools.Extensions
             return Csv.WriteString(reader, writeHeaders, useTabFormat);
         }
 
+        //public static object[] AsObjectArray(this IDataReader reader)
+        //{
+        //    var props = reader.GetFieldNames();
+
+        //    var objectArray = reader
+        //        .SelectStrict<dynamic>(() => new object(), props)
+        //        .Select(p => (object) p)
+        //        .ToArray();
+
+        //    return objectArray;
+        //}
+
         /// <summary>
         /// UnPivots an IDataReader. Result column names are "DimensionA", "DimensionB", and "Value"
         /// </summary>
@@ -55,7 +68,7 @@ namespace DataPowerTools.Extensions
         /// <param name="reader"></param>
         /// <param name="columnActionsByOrdinal"></param>
         /// <returns></returns>
-        public static IDataReader Select(this IDataReader reader, Dictionary<int, RowProjection<object>> columnActionsByOrdinal)
+        public static IDataReader SelectRows(this IDataReader reader, Dictionary<int, RowProjection<object>> columnActionsByOrdinal)
         {
             var rr = new ColumnTransformingDataReader<object, IDataReader>(reader, columnActionsByOrdinal);
 
@@ -68,7 +81,7 @@ namespace DataPowerTools.Extensions
         /// <param name="reader"></param>
         /// <param name="columnActionsByName"></param>
         /// <returns></returns>
-        public static IDataReader Select(this IDataReader reader, Dictionary<string, RowProjection<object>> columnActionsByName)
+        public static IDataReader SelectRows(this IDataReader reader, Dictionary<string, RowProjection<object>> columnActionsByName)
         {
             var rr = new ColumnTransformingDataReader<object, IDataReader>(reader, columnActionsByName);
 
@@ -82,7 +95,7 @@ namespace DataPowerTools.Extensions
         /// <param name="tableName"></param>
         /// <param name="engine"></param>
         /// <returns></returns>
-        public static string AsInsertStatements(this IDataReader reader, string tableName, DatabaseEngine engine = DatabaseEngine.SqlServer)
+        public static string AsSqlInsertStatements(this IDataReader reader, string tableName, DatabaseEngine engine = DatabaseEngine.SqlServer)
         {
             var sb = new StringBuilder();
 
