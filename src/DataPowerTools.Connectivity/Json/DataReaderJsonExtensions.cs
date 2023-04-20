@@ -45,7 +45,9 @@ namespace DataPowerTools.Connectivity.Json
 
             var sw = new StringWriter(sb);
 
-            using var csvWriter = useTabFormat ? new CSVWriter(sw, '\t', CSVWriter.NoQuoteCharacter, CSVWriter.DefaultEscapeCharacter, "\r\n") : new CSVWriter(sw);
+            using var csvWriter = useTabFormat
+                ? new CSVWriter(sw, '\t', CSVWriter.DefaultQuoteCharacter, CSVWriter.DefaultEscapeCharacter, "\r\n") 
+                : new CSVWriter(sw,',', CSVWriter.DefaultQuoteCharacter, CSVWriter.DefaultEscapeCharacter, "\r\n");
 
             var hashSetHeaders = new HashSet<string>();
 

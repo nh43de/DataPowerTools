@@ -96,15 +96,15 @@ INSERT INTO MyTable ([Col1],[Col2],[Col 3],[Col4]) SELECT 'AAC' as [Col1],'AB' a
         var dd = json.FromJsonToCsv(true);
 
         Assert.AreEqual(@"""Col1"",""Col2"",""Col 3"",""Col4""
-""AAA"",""AA"",""1""
-""AAB"",""AA"",""2""
+""AAA"",""AA"",""1"",
+""AAB"",""AA"",""2"",
 ""AAC"",""AB"",""3"",""Z""
-", dd );
+", dd);
         
         var dd2 = json.FromJsonToCsv(false);
 
-        Assert.AreEqual(@"""AAA"",""AA"",""1""
-""AAB"",""AA"",""2""
+        Assert.AreEqual(@"""AAA"",""AA"",""1"",
+""AAB"",""AA"",""2"",
 ""AAC"",""AB"",""3"",""Z""
 ", dd2);
 
