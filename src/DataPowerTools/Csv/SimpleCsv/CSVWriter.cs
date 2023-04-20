@@ -62,7 +62,7 @@ namespace SimpleCSV
         /// <summary>
         /// Default line terminator.
         /// </summary>
-        public static readonly String DefaultLineEnd = "\r\n";
+        public static readonly String DefaultLineEnd = "\n";
         /// <summary>
         /// RFC 4180 compliant line terminator.
         /// </summary>

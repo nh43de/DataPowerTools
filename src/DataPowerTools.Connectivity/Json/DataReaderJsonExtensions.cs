@@ -45,7 +45,7 @@ namespace DataPowerTools.Connectivity.Json
 
             var sw = new StringWriter(sb);
 
-            using var csvWriter = new CSVWriter(sw);
+            using var csvWriter = new CSVWriter(sw, CSVWriter.DefaultSeparator, CSVWriter.DefaultQuoteCharacter, CSVWriter.DefaultEscapeCharacter, "\r\n");
             
             var hasWrittenHeaders = !writeHeaders;
             void WriteHeaders(JsonElement jsonElement)
@@ -109,7 +109,7 @@ namespace DataPowerTools.Connectivity.Json
                     .ToDictionary<JsonProperty, string, object>(jsonProperty => jsonProperty.Name,
                         jsonProperty => jsonProperty.Value.ToString());
 
-                isb.AppendInsertCommand(sb, dd, tableName);
+                isb.AppendFromValuesDictionary(sb, dd, tableName);
             }
             
             return sb.ToString();

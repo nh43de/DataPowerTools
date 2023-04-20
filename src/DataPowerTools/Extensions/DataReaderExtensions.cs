@@ -101,7 +101,7 @@ namespace DataPowerTools.Extensions
 
             var isb = new InsertSqlBuilder(engine);
 
-            reader.Each(p => isb.AppendInsert(sb, p, tableName));
+            reader.Each(p => isb.AppendDataRecord(sb, p, tableName));
 
             return sb.ToString();
         }
