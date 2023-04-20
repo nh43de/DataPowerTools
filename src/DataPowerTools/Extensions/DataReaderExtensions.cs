@@ -39,12 +39,12 @@ namespace DataPowerTools.Extensions
         /// <summary>
         /// UnPivots an IDataReader. Result column names are "DimensionA", "DimensionB", and "Value"
         /// </summary>
-        /// <typeparam name="T"></typeparam>
+        /// <typeparam name="TDataReader"></typeparam>
         /// <param name="reader"></param>
         /// <returns></returns>
-        public static UnPivotingDataReader<T> UnPivot<T>(this T reader) where T : IDataReader
+        public static UnPivotingDataReader<TDataReader> UnPivot<TDataReader>(this TDataReader reader) where TDataReader : IDataReader
         {
-            var rr = new UnPivotingDataReader<T>(reader);
+            var rr = new UnPivotingDataReader<TDataReader>(reader);
 
             return rr;
         }
