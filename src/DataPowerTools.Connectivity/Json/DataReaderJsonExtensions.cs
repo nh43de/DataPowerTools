@@ -46,21 +46,29 @@ namespace DataPowerTools.Connectivity.Json
             var sw = new StringWriter(sb);
 
             using var csvWriter = new CSVWriter(sw, delimiter, CSVWriter.DefaultQuoteCharacter, CSVWriter.DefaultEscapeCharacter, "\r\n");
+
+            var hashSetHeaders = new HashSet<string>();
+
+            foreach (var jsonElement in el.EnumerateArray())
+            {
+                var thisHeaders = jsonElement.EnumerateObject().Select(p => p.Name).ToArray();
+
+                hashSetHeaders.UnionWith(thisHeaders);
+            }
+
+            var headers = hashSetHeaders.ToArray();
             
             var hasWrittenHeaders = !writeHeaders;
             void WriteHeaders(JsonElement jsonElement)
             {
                 hasWrittenHeaders = true;
-
-                var headers = jsonElement.EnumerateObject().Select(p => p.Name).ToArray();
-
+                
                 csvWriter.WriteNext(headers);
             }
 
             using (csvWriter)
             using (sw)
             {
-                
                 //enumerate array
                 foreach (var jsonElement in el.EnumerateArray())
                 {
@@ -69,6 +77,18 @@ namespace DataPowerTools.Connectivity.Json
                     
                     if(hasWrittenHeaders == false)
                         WriteHeaders(jsonElement);
+
+                    var dd = new object[headers.Length];
+
+                    for (var i = headers.Length - 1; i >= 0; i--)
+                    {
+                        var header = headers[i];
+
+                        if (jsonElement.TryGetProperty(header, out var value))
+                        {
+                            dd[i] = value;
+                        }
+                    }
 
                     //write values
                     var values = jsonElement.EnumerateObject()

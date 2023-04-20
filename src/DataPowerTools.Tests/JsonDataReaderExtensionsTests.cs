@@ -57,7 +57,8 @@ AAC	AB	3
   {
     ""Col1"": ""AAC"",
     ""Col2"": ""AB"",
-    ""Col 3"": ""3""
+    ""Col 3"": ""3"",
+    ""Col4"": ""Z""
   }
 ]";
         
@@ -65,7 +66,7 @@ AAC	AB	3
 
         Assert.AreEqual(@"INSERT INTO MyTable ([Col1],[Col2],[Col 3]) SELECT 'AAA' as [Col1],'AA' as [Col2],'1' as [Col 3];
 INSERT INTO MyTable ([Col1],[Col2],[Col 3]) SELECT 'AAB' as [Col1],'AA' as [Col2],'2' as [Col 3];
-INSERT INTO MyTable ([Col1],[Col2],[Col 3]) SELECT 'AAC' as [Col1],'AB' as [Col2],'3' as [Col 3];
+INSERT INTO MyTable ([Col1],[Col2],[Col 3],[Col4]) SELECT 'AAC' as [Col1],'AB' as [Col2],'3' as [Col 3],'Z' as [Col4];
 ", dd);
     }
 
@@ -87,23 +88,24 @@ INSERT INTO MyTable ([Col1],[Col2],[Col 3]) SELECT 'AAC' as [Col1],'AB' as [Col2
   {
     ""Col1"": ""AAC"",
     ""Col2"": ""AB"",
-    ""Col 3"": ""3""
-  }
+    ""Col 3"": ""3"",
+    ""Col4"": ""Z""
+    }
 ]";
 
         var dd = json.FromJsonToCsv(true);
 
-        Assert.AreEqual(@"""Col1"",""Col2"",""Col 3""
+        Assert.AreEqual(@"""Col1"",""Col2"",""Col 3"",""Col4""
 ""AAA"",""AA"",""1""
 ""AAB"",""AA"",""2""
-""AAC"",""AB"",""3""
+""AAC"",""AB"",""3"",""Z""
 ", dd );
         
         var dd2 = json.FromJsonToCsv(false);
 
         Assert.AreEqual(@"""AAA"",""AA"",""1""
 ""AAB"",""AA"",""2""
-""AAC"",""AB"",""3""
+""AAC"",""AB"",""3"",""Z""
 ", dd2);
 
     }
