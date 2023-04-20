@@ -1,12 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using DataPowerTools.Extensions;
 using DataPowerTools.PowerTools;
+using SimpleCSV;
 
 namespace DataPowerTools.Connectivity.Json
 {
@@ -32,6 +34,53 @@ namespace DataPowerTools.Connectivity.Json
             return objectArray.ToJson(indent);
         }
 
+        /// <summary>
+        /// Creates insert statements from an array of json objects.
+        /// </summary>
+        public static string FromJsonToCsv(this string jsonString, bool writeHeaders = true)
+        {
+            var sb = new StringBuilder();
+            
+            var el = JsonDocument.Parse(jsonString).RootElement;
+
+            var sw = new StringWriter(sb);
+
+            using var csvWriter = new CSVWriter(sw);
+            
+            var hasWrittenHeaders = !writeHeaders;
+            void WriteHeaders(JsonElement jsonElement)
+            {
+                hasWrittenHeaders = true;
+
+                var headers = jsonElement.EnumerateObject().Select(p => p.Name).ToArray();
+
+                csvWriter.WriteNext(headers);
+            }
+
+            using (csvWriter)
+            using (sw)
+            {
+                
+                //enumerate array
+                foreach (var jsonElement in el.EnumerateArray())
+                {
+                    if (jsonElement.ValueKind != JsonValueKind.Object)
+                        continue;
+                    
+                    if(hasWrittenHeaders == false)
+                        WriteHeaders(jsonElement);
+
+                    //write values
+                    var values = jsonElement.EnumerateObject()
+                        .Select(p => p.Value.ToString())
+                        .ToArray();
+
+                    csvWriter.WriteNext(values);
+                }
+            }
+
+            return sb.ToString();
+        }
 
         /// <summary>
         /// Creates insert statements from an array of json objects.

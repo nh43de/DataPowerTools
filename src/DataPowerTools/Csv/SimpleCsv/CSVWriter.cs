@@ -31,6 +31,9 @@ using System.Text;
 
 namespace SimpleCSV
 {
+    //TODO: modified so that default line endings are \r\n not just \n
+
+
     /// <summary>
     /// A simple CSV writer.
     /// </summary>
@@ -59,7 +62,7 @@ namespace SimpleCSV
         /// <summary>
         /// Default line terminator.
         /// </summary>
-        public static readonly String DefaultLineEnd = "\n";
+        public static readonly String DefaultLineEnd = "\r\n";
         /// <summary>
         /// RFC 4180 compliant line terminator.
         /// </summary>
