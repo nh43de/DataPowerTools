@@ -78,7 +78,7 @@ namespace DataPowerTools.Connectivity.Json
                     if(hasWrittenHeaders == false)
                         WriteHeaders(jsonElement);
 
-                    var dd = new object[headers.Length];
+                    var values = new string[headers.Length];
 
                     for (var i = headers.Length - 1; i >= 0; i--)
                     {
@@ -86,14 +86,9 @@ namespace DataPowerTools.Connectivity.Json
 
                         if (jsonElement.TryGetProperty(header, out var value))
                         {
-                            dd[i] = value;
+                            values[i] = value.ToString();
                         }
                     }
-
-                    //write values
-                    var values = jsonElement.EnumerateObject()
-                        .Select(p => p.Value.ToString())
-                        .ToArray();
 
                     csvWriter.WriteNext(values);
                 }
