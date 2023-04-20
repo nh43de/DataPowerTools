@@ -37,7 +37,7 @@ namespace DataPowerTools.Connectivity.Json
         /// <summary>
         /// Creates insert statements from an array of json objects.
         /// </summary>
-        public static string FromJsonToCsv(this string jsonString, bool writeHeaders = true)
+        public static string FromJsonToCsv(this string jsonString, char delimiter = ',', bool writeHeaders = true)
         {
             var sb = new StringBuilder();
             
@@ -45,7 +45,7 @@ namespace DataPowerTools.Connectivity.Json
 
             var sw = new StringWriter(sb);
 
-            using var csvWriter = new CSVWriter(sw, CSVWriter.DefaultSeparator, CSVWriter.DefaultQuoteCharacter, CSVWriter.DefaultEscapeCharacter, "\r\n");
+            using var csvWriter = new CSVWriter(sw, delimiter, CSVWriter.DefaultQuoteCharacter, CSVWriter.DefaultEscapeCharacter, "\r\n");
             
             var hasWrittenHeaders = !writeHeaders;
             void WriteHeaders(JsonElement jsonElement)
