@@ -768,18 +768,6 @@ namespace DataPowerTools.Extensions
             return dr;
         }
 
-        /// <summary>
-        /// Fast-forwards to the end of the data reader by repeatedly calling .Read()
-        /// </summary>
-        /// <param name="dr"></param>
-        /// <param name="rowAction"></param>
-        public static void ReadToEnd(this IDataReader dr, Action<IDataReader> rowAction)
-        {
-            while (dr.Read())
-            {
-                rowAction(dr);
-            }
-        }
 
         /// <summary>
         /// Reads a set number of times by calling .Read()
@@ -1045,18 +1033,34 @@ namespace DataPowerTools.Extensions
         {
             return new ActionDataReader<TDataReader>(reader, action);
         }
-        
+
         /// <summary>
-        /// Executes an action on the datareader.
+        /// Get data reader as en IEnumerable of IDataRecord.
         /// </summary>
         /// <param name="reader"></param>
-        /// <param name="action"></param>
-        public static void Each(this IDataReader reader,
-            Action<IDataReader> action)
+        /// <returns></returns>
+        public static IEnumerable<IDataRecord> AsEnumerable(this IDataReader reader)
         {
-            reader.ReadToEnd(action);
+            while (reader.Read())
+            {
+                yield return (IDataRecord) reader;
+            }
         }
         
+        /// <summary>
+        /// Executes an action on the IDataReader for each row.
+        /// </summary>
+        /// <param name="dr">The source data reader.</param>
+        /// <param name="rowAction">The action to perform on each row.</param>
+        public static void Each(this IDataReader dr,
+            Action<IDataReader> rowAction)
+        {
+            while (dr.Read())
+            {
+                rowAction(dr);
+            }
+        }
+
         /// <summary>
         /// Executes reader to DataSet.
         /// </summary>
