@@ -19,11 +19,15 @@ namespace DataPowerTools.PowerTools
         public TypeAccessorCache TypeAccessorCache { get; } = new TypeAccessorCache();
 
 
+        private readonly SqlInsertInfo _i;
+
         public InsertSqlBuilder(DatabaseEngine databaseEngine, bool insertNewLines = false, bool appendInsertedCols = false)
         {
             _insertNewLines = insertNewLines;
             _appendInsertedCols = appendInsertedCols;
             DatabaseEngine = databaseEngine;
+            
+            _i = GetInsertTemplate2(DatabaseEngine, _appendInsertedCols);
         }
         
         /// <summary>
@@ -34,9 +38,7 @@ namespace DataPowerTools.PowerTools
         /// <param name="destinationTableName"></param>
         public StringBuilder AppendInsert(StringBuilder dbCommand, object obj, string destinationTableName)
         {
-            var i = GetInsertTemplate(DatabaseEngine, _appendInsertedCols);
-
-            return AppendInsertCommand(dbCommand, obj, i.InsertTemplate, destinationTableName, i.KeywordEscapeMethod);
+            return AppendInsertCommand(dbCommand, obj,  destinationTableName);
         }
 
         /// <summary>
@@ -47,16 +49,14 @@ namespace DataPowerTools.PowerTools
         /// <param name="destinationTableName"></param>
         public StringBuilder AppendInsert(StringBuilder dbCommand, IDataRecord dataRecord, string destinationTableName)
         {
-            var i = GetInsertTemplate(DatabaseEngine, _appendInsertedCols);
-
-            return AppendInsertCommand(dbCommand, dataRecord, i.InsertTemplate, destinationTableName, i.KeywordEscapeMethod);
+            return AppendInsertCommand(dbCommand, dataRecord, destinationTableName);
         }
 
         /// <summary>
         /// Generates a parameterized SQL INSERT statement from the given object and adds it to the
         /// <see cref="DbCommand" />.
         /// </summary>
-        private StringBuilder AppendInsertCommand(StringBuilder dbCommand, object obj, string sqlInsertStatementTemplate, string tableName, KeywordEscapeMethod keywordEscapeMethod = KeywordEscapeMethod.None)
+        private StringBuilder AppendInsertCommand(StringBuilder dbCommand, object obj, string tableName)
         {
             if (obj == null)
             {
@@ -67,8 +67,7 @@ namespace DataPowerTools.PowerTools
 
             var namesAndValues = obj.GetPropertyAndFieldNamesAndValuesDictionary(typeAccessor);
 
-            return AppendInsertCommand(dbCommand, namesAndValues, sqlInsertStatementTemplate, tableName,
-                keywordEscapeMethod);
+            return AppendInsertCommand(dbCommand, namesAndValues, tableName);
         }
 
         private string EscapeValueString(string valueString)
@@ -80,8 +79,11 @@ namespace DataPowerTools.PowerTools
         /// Generates a parameterized SQL INSERT statement from the given object and adds it to the
         /// <see cref="DbCommand" />.
         /// </summary>
-        private StringBuilder AppendInsertCommand(StringBuilder dbCommand, IDictionary<string, object> columnNamesAndValues, string sqlInsertStatementTemplate, string tableName, KeywordEscapeMethod keywordEscapeMethod = KeywordEscapeMethod.None)
+        public StringBuilder AppendInsertCommand(StringBuilder dbCommand, IDictionary<string, object> columnNamesAndValues, string tableName)
         {
+            var sqlInsertStatementTemplate = _i.InsertTemplate;
+            var keywordEscapeMethod = _i.KeywordEscapeMethod;
+
             //TODO: performance optimization: would have better performance if parameter values were changed instead of rebuilding the command every time (https://docs.microsoft.com/en-us/dotnet/standard/data/sqlite/bulk-insert)
             //TODO: do we really want this a dictionary?? seems like a waste to do all that hashing when building it
 
@@ -186,7 +188,7 @@ namespace DataPowerTools.PowerTools
             return dbCommand;
         }
         
-        private static SqlInsertInfo GetInsertTemplate(DatabaseEngine databaseEngine, bool appendLastInserted)
+        private static SqlInsertInfo GetInsertTemplate2(DatabaseEngine databaseEngine, bool appendLastInserted)
         {
             switch (databaseEngine)
             {

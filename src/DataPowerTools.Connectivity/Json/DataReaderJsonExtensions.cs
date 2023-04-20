@@ -1,8 +1,12 @@
-﻿using System.Data;
+﻿using System;
+using System.Collections.Generic;
+using System.Data;
 using System.Linq;
+using System.Text;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using DataPowerTools.Extensions;
+using DataPowerTools.PowerTools;
 
 namespace DataPowerTools.Connectivity.Json
 {
@@ -27,6 +31,71 @@ namespace DataPowerTools.Connectivity.Json
 
             return objectArray.ToJson(indent);
         }
-        
+
+
+        /// <summary>
+        /// Creates insert statements from an array of json objects.
+        /// </summary>
+        public static string FromJsonToSqlInsertStatements(this string jsonString, string tableName, DatabaseEngine engine = DatabaseEngine.SqlServer)
+        {
+            var sb = new StringBuilder();
+
+            var isb = new InsertSqlBuilder(engine);
+            
+            //var el = ParseJsonAsArray(jsonString);
+            var el = JsonDocument.Parse(jsonString).RootElement;
+            
+
+            //enumerate array
+            foreach (var jsonElement in el.EnumerateArray())
+            {
+                //enumerate object
+                if (jsonElement.ValueKind != JsonValueKind.Object)
+                    continue;
+
+
+                var objEnumerator = jsonElement.EnumerateObject();
+
+                var dd = objEnumerator
+                    .ToDictionary<JsonProperty, string, object>(jsonProperty => jsonProperty.Name,
+                        jsonProperty => jsonProperty.Value.ToString());
+
+                isb.AppendInsertCommand(sb, dd, tableName);
+            }
+            
+            return sb.ToString();
+        }
+
+        ///// <summary>
+        ///// Parses json and wraps in array if not already.
+        ///// </summary>
+        ///// <param name="json"></param>
+        ///// <returns></returns>
+        ///// <exception cref="ArgumentNullException"></exception>
+        //private static JsonElement ParseJsonAsArray(string json)
+        //{
+        //    if (json == null)
+        //    {
+        //        throw new ArgumentNullException(nameof(json));
+        //    }
+
+        //    var rootElement = JsonDocument.Parse(json).RootElement;
+
+        //    if (rootElement.ValueKind == JsonValueKind.Array)
+        //    {
+        //        // The JSON string is already an array
+        //        return rootElement;
+        //    }
+        //    else
+        //    {
+        //        // The JSON string is not an array, so we need to wrap it in a new array
+        //        var jsonArray = new JsonArray
+        //        {
+        //            rootElement
+        //        };
+
+        //        return jsonArray.AsArray();
+        //    }
+        //}
     }
 }
