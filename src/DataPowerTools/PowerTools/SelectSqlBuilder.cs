@@ -13,14 +13,13 @@ namespace DataPowerTools.PowerTools
     {
         private readonly string _joinString;
         private readonly bool _colNamesFirstRowOnly;
-        private readonly bool _insertNewLines;
         
-        private readonly string preKeywordEscapeCharacter;
-        private readonly string postKeywordEscapeCharacter;
+        private readonly string _preKeywordEscapeCharacter;
+        private readonly string _postKeywordEscapeCharacter;
         private readonly List<string> _selectStatements = new List<string>();
 
-        private readonly string linePrefix;
-        private bool firstRow = true;
+        private readonly string _linePrefix;
+        private bool _firstRow = true;
 
         public DatabaseEngine DatabaseEngine { get; }
 
@@ -30,19 +29,18 @@ namespace DataPowerTools.PowerTools
         {
             _joinString = joinString;
             _colNamesFirstRowOnly = colNamesFirstRowOnly;
-            _insertNewLines = insertNewLines;
             DatabaseEngine = databaseEngine;
 
-            linePrefix = _insertNewLines ? Environment.NewLine : string.Empty;
+            _linePrefix = insertNewLines ? Environment.NewLine : string.Empty;
 
             _i = GetInsertTemplate(DatabaseEngine);
             
-            InsertCommandSqlBuilder.GetEscapeStrings(_i.KeywordEscapeMethod, out preKeywordEscapeCharacter, out postKeywordEscapeCharacter);
+            InsertCommandSqlBuilder.GetEscapeStrings(_i.KeywordEscapeMethod, out _preKeywordEscapeCharacter, out _postKeywordEscapeCharacter);
         }
 
         public string WriteString()
         {
-            var r = _selectStatements.JoinStr(_joinString + linePrefix);
+            var r = _selectStatements.JoinStr(_joinString + _linePrefix);
 
             return r;
         }
@@ -101,7 +99,7 @@ namespace DataPowerTools.PowerTools
                     continue;
 
                 var columnValue = nameAndValue.Value;
-                var columnName = preKeywordEscapeCharacter + nameAndValue.Key + postKeywordEscapeCharacter;
+                var columnName = _preKeywordEscapeCharacter + nameAndValue.Key + _postKeywordEscapeCharacter;
 
                 values.Add(BuildValue(columnName, columnValue));
             }
@@ -148,19 +146,19 @@ namespace DataPowerTools.PowerTools
 
         private void AddRow(string value)
         {
-            if (firstRow)
-                firstRow = false;
+            if (_firstRow)
+                _firstRow = false;
 
             _selectStatements.Add(value);
         }
 
         private string BuildValue(string columnName, object columnValue)
         {
-            var colName = preKeywordEscapeCharacter + columnName + postKeywordEscapeCharacter;
+            var colName = _preKeywordEscapeCharacter + columnName + _postKeywordEscapeCharacter;
             
             var escapedValue = EscapeValueString(columnValue.ToString());
 
-            if (!_colNamesFirstRowOnly || (firstRow && _colNamesFirstRowOnly))
+            if (!_colNamesFirstRowOnly || (_firstRow && _colNamesFirstRowOnly))
             {
                 return $"'{escapedValue}' as {colName}";
             }
