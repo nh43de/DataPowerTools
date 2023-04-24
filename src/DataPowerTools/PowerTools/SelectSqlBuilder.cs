@@ -20,6 +20,7 @@ namespace DataPowerTools.PowerTools
         private readonly List<string> _selectStatements = new List<string>();
 
         private readonly string linePrefix;
+        private bool firstRow = true;
 
         public DatabaseEngine DatabaseEngine { get; }
 
@@ -107,7 +108,7 @@ namespace DataPowerTools.PowerTools
 
             var ss = string.Format(sqlInsertStatementTemplate, values.JoinStr(", "));
 
-            _selectStatements.Add(ss);
+            AddRow(ss);
         }
 
         public void AppendDataRecord(IDataRecord dataRecord)
@@ -141,11 +142,17 @@ namespace DataPowerTools.PowerTools
 
             var ss = string.Format(sqlInsertStatementTemplate, values.JoinStr(", "));
 
-            _selectStatements.Add(ss);
+            AddRow(ss);
         }
 
-        private bool firstRow = true;
 
+        private void AddRow(string value)
+        {
+            if (firstRow)
+                firstRow = false;
+
+            _selectStatements.Add(value);
+        }
 
         private string BuildValue(string columnName, object columnValue)
         {
@@ -155,7 +162,6 @@ namespace DataPowerTools.PowerTools
 
             if (!_colNamesFirstRowOnly || (firstRow && _colNamesFirstRowOnly))
             {
-                firstRow = false;
                 return $"'{escapedValue}' as {colName}";
             }
             else

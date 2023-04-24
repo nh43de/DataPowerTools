@@ -41,7 +41,7 @@ AAC	AB""D""'	''
         var dd = csv.ReadCsvString('\t', true);
         var r = dd.AsSqlSelectStatements( DatabaseEngine.SqlServer, "UNION ALL", true);
 
-        Assert.AreEqual(@"SELECT 'AAA' as [Col1], 'AA''C', ''''''
+        Assert.AreEqual(@"SELECT 'AAA' as [Col1], 'AA''C' as [Col2], ''''''  as [Col3]
 UNION ALL
 SELECT 'AAB', 'AA""C', ''''''
 UNION ALL
