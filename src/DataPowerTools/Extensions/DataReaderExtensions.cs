@@ -107,6 +107,23 @@ namespace DataPowerTools.Extensions
         }
 
         /// <summary>
+        /// Generates select statements from IDataReader.
+        /// </summary>
+        /// <param name="reader"></param>
+        /// <param name="joinString">Separator between SELECT statements e.g. "UNION" or "UNION ALL"</param>
+        /// <param name="colNamesFirstRowOnly">Add column aliases for first row only.</param>
+        /// <param name="engine"></param>
+        /// <returns></returns>
+        public static string AsSqlSelectStatements(this IDataReader reader, DatabaseEngine engine = DatabaseEngine.SqlServer, string joinString = "UNION ALL", bool colNamesFirstRowOnly = true)
+        {
+            var isb = new SelectSqlBuilder(engine, joinString, colNamesFirstRowOnly);
+
+            reader.Each(p => isb.AppendDataRecord(p));
+
+            return isb.WriteString();
+        }
+
+        /// <summary>
         /// returns a datareader that will read the object as a single row.
         /// </summary>
         /// <typeparam name="T"></typeparam>
