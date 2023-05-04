@@ -7,5 +7,7 @@
         public string DataType { get; set; }
 
         public bool IsNullable { get; set; } = true;
+
+        public CreateTableSqlInternal.AtomicDataType? BestFitDataType { get; set; }
     }
 }

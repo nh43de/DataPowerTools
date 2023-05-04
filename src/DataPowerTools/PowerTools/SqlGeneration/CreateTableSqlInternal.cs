@@ -69,8 +69,52 @@ namespace DataPowerTools.PowerTools
             {typeof(Guid), "UNIQUEIDENTIFIER"}
         };
 
-        
+        public static Dictionary<AtomicDataType, string> AtomicTypeToCsharpMapper => new Dictionary<AtomicDataType, string>
+        {
+            /*
+            from debaser
 
+                {typeof(bool), new ColumnInfo(SqlDbType.Bit)},
+                {typeof(byte), new ColumnInfo(SqlDbType.TinyInt)},
+                {typeof(short), new ColumnInfo(SqlDbType.SmallInt)},
+                {typeof(int), new ColumnInfo(SqlDbType.Int)},
+                {typeof(long), new ColumnInfo(SqlDbType.BigInt)},
+
+                {typeof(decimal), new ColumnInfo(SqlDbType.Decimal)},
+                {typeof(double), new ColumnInfo(SqlDbType.Float)},
+                {typeof(float), new ColumnInfo(SqlDbType.Real)},
+
+                {typeof(string), new ColumnInfo(SqlDbType.NVarChar)},
+
+                {typeof(DateTime), new ColumnInfo(SqlDbType.DateTime2)},
+                {typeof(DateTimeOffset), new ColumnInfo(SqlDbType.DateTimeOffset)},
+
+                {typeof(Guid), new ColumnInfo(SqlDbType.UniqueIdentifier)},
+
+             */
+            { AtomicDataType.Int, "int" },
+            { AtomicDataType.Decimal, "decimal" },
+            { AtomicDataType.Float, "double" },
+            { AtomicDataType.String, "string" },
+            { AtomicDataType.Date, "DateTime" },
+            { AtomicDataType.DateTime, "DateTime" },
+            { AtomicDataType.Bool, "bool" },
+            { AtomicDataType.Guid, "Guid" },
+        };
+
+        public static string GetCsharpType(AtomicDataType? atomicDataType)
+        {
+            if(atomicDataType == null)
+                return "UNKNOWN_TYPE";
+            
+            if (AtomicTypeToCsharpMapper.TryGetValue(atomicDataType.Value, out string value))
+            {
+                return value;
+            }
+
+            return $"UNKNOWN_TYPE_{atomicDataType.Value.ToString()}";
+        }
+        
 
         /// <summary>
         /// Creates a create table script from basic table definition.
@@ -110,6 +154,8 @@ namespace DataPowerTools.PowerTools
             vals.RemoveWhere(string.IsNullOrWhiteSpace);
 
             var bestFitType = GetBestFitType(vals, colName);
+
+            sqlCol.BestFitDataType = bestFitType;
 
             var sqlType = "dtype";
 

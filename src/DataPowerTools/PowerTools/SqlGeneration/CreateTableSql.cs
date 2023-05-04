@@ -3,7 +3,9 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using CsvDataReader;
 using DataPowerTools.DataReaderExtensibility.Columns;
 using DataPowerTools.DataStructures;
 using DataPowerTools.Extensions;
@@ -20,7 +22,6 @@ namespace DataPowerTools.PowerTools
 
     public static class CreateTableSql
     {
-
         /// <summary>
         ///     Gets schema from a data table using a datareader, but parses the data to determine what datatype is best fit.
         /// </summary>
@@ -37,6 +38,14 @@ namespace DataPowerTools.PowerTools
                 outputTableName, new[] { drFac }, numberOfRowsToExamine);
         }
 
+        public static string CsharpClassFromDataReader_Smart(string outputTableName, IDataReader dataReader, int? numberOfRowsToExamine = null)
+        {          
+            var drFac =
+                new Func<DataReaderInfo>(() => new DataReaderInfo { DataReader = dataReader });
+
+            return CsharpClassFromDataReader_Smart(
+                outputTableName, new[] { drFac }, numberOfRowsToExamine);
+        }
 
         /// <summary>
         ///     Gets schema from a data table, but parses the data to determine what datatype is best fit.
@@ -208,6 +217,31 @@ namespace DataPowerTools.PowerTools
         public static string FromDataReader_Smart(string outputTableName, IEnumerable<Func<DataReaderInfo>> dataReaders,
             int? numberOfRowsToExamine = null)
         {
+            var sqlTable = GetTableDefinitionFromDataReader_Smart(outputTableName, dataReaders, numberOfRowsToExamine);
+
+            return CreateTableSqlInternal.FromSqlTableDefinition(sqlTable);
+        }
+        
+        public static string CsharpClassFromDataReader_Smart(string outputClassName, IEnumerable<Func<DataReaderInfo>> dataReaders,
+            int? numberOfRowsToExamine = null)
+        {
+            var sqlTable = GetTableDefinitionFromDataReader_Smart(outputClassName, dataReaders, numberOfRowsToExamine);
+
+            var body = sqlTable.ColumnDefinitions
+                .Select(p => $"public {CreateTableSqlInternal.GetCsharpType(p.BestFitDataType)}{(p.IsNullable ? "?" : "")} {Regex.Replace(p.ColumnName, "[^a-zA-Z0-9_]", "")} {{ get; set; }}")
+                .JoinStr("\r\n");
+            
+            var template = @$"public class {outputClassName} {{
+{body.Indent(1)}
+}}";
+
+            return template;
+        }
+
+
+        public static SqlTableDefinition GetTableDefinitionFromDataReader_Smart(string outputTableName, IEnumerable<Func<DataReaderInfo>> dataReaders,
+            int? numberOfRowsToExamine = null)
+        {
             //maps column names to hashset of unique values present for those columns
             var uniqueValList = new ConcurrentDictionary<string, ConcurrentHashSet<string>>();
 
@@ -287,7 +321,7 @@ namespace DataPowerTools.PowerTools
             foreach (var col in masterListOfFieldNames.ToArray())
                 sqlTable.ColumnDefinitions.Add(CreateTableSqlInternal.GetBestFitSqlColumnType(uniqueValList[col].Hashset, col));
 
-            return CreateTableSqlInternal.FromSqlTableDefinition(sqlTable);
+            return sqlTable;
         }
 
     }

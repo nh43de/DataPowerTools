@@ -127,6 +127,14 @@ namespace DataPowerTools.Extensions
             return CreateTableSql.FromDataReader_Smart(outputTableName, reader, numberOfRowsToExamine);
         }
 
+        public static string FitToCsharpClass(this IDataReader reader, string outputClassName, int? numberOfRowsToExamine = null)
+        {
+            return CreateTableSql.CsharpClassFromDataReader_Smart(outputClassName, reader, numberOfRowsToExamine);
+        }
+
+        //GetTableDefinitionFromDataReader_Smart
+
+
         #region Data reader operations
 
         /// <summary>

@@ -21,3 +21,8 @@ It also provides a powerful API for filtering and object materialization.
 - SQLite Bulk operations
 - Minimal dependencies
 - Easily convert between IEnumerable <-> IDataReader <-> DataTable
+
+
+#### TODO:
+
+- CSV to C# class
