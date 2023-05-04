@@ -188,7 +188,9 @@ namespace DataPowerTools
         {
             using var sw = new StringWriter();
 
-            using var csvWriter = useTabFormat ? new CSVWriter(sw, '\t', CSVWriter.NoQuoteCharacter) : new CSVWriter(sw);
+            using var csvWriter = useTabFormat 
+                ? new CSVWriter(sw, '\t', CSVWriter.NoQuoteCharacter, CSVWriter.DefaultEscapeCharacter, "\r\n") 
+                : new CSVWriter(sw);
 
             Write(reader, sw, csvWriter, writeHeaders);
 

@@ -5,6 +5,7 @@ using System.Data;
 using System.Data.Common;
 using Microsoft.Data.SqlClient;
 using System.Diagnostics;
+using System.Dynamic;
 using System.Linq;
 using DataPowerTools.Connectivity.Helpers;
 using DataPowerTools.DataConnectivity;
@@ -36,15 +37,27 @@ namespace DataPowerTools.Extensions
             return Csv.WriteString(reader, writeHeaders, useTabFormat);
         }
 
+        //public static object[] AsObjectArray(this IDataReader reader)
+        //{
+        //    var props = reader.GetFieldNames();
+
+        //    var objectArray = reader
+        //        .SelectStrict<dynamic>(() => new object(), props)
+        //        .Select(p => (object) p)
+        //        .ToArray();
+
+        //    return objectArray;
+        //}
+
         /// <summary>
         /// UnPivots an IDataReader. Result column names are "DimensionA", "DimensionB", and "Value"
         /// </summary>
-        /// <typeparam name="T"></typeparam>
+        /// <typeparam name="TDataReader"></typeparam>
         /// <param name="reader"></param>
         /// <returns></returns>
-        public static UnPivotingDataReader<T> UnPivot<T>(this T reader) where T : IDataReader
+        public static UnPivotingDataReader<TDataReader> UnPivot<TDataReader>(this TDataReader reader) where TDataReader : IDataReader
         {
-            var rr = new UnPivotingDataReader<T>(reader);
+            var rr = new UnPivotingDataReader<TDataReader>(reader);
 
             return rr;
         }
@@ -55,7 +68,7 @@ namespace DataPowerTools.Extensions
         /// <param name="reader"></param>
         /// <param name="columnActionsByOrdinal"></param>
         /// <returns></returns>
-        public static IDataReader Select(this IDataReader reader, Dictionary<int, RowProjection<object>> columnActionsByOrdinal)
+        public static IDataReader SelectRows(this IDataReader reader, Dictionary<int, RowProjection<object>> columnActionsByOrdinal)
         {
             var rr = new ColumnTransformingDataReader<object, IDataReader>(reader, columnActionsByOrdinal);
 
@@ -68,7 +81,7 @@ namespace DataPowerTools.Extensions
         /// <param name="reader"></param>
         /// <param name="columnActionsByName"></param>
         /// <returns></returns>
-        public static IDataReader Select(this IDataReader reader, Dictionary<string, RowProjection<object>> columnActionsByName)
+        public static IDataReader SelectRows(this IDataReader reader, Dictionary<string, RowProjection<object>> columnActionsByName)
         {
             var rr = new ColumnTransformingDataReader<object, IDataReader>(reader, columnActionsByName);
 
@@ -82,15 +95,32 @@ namespace DataPowerTools.Extensions
         /// <param name="tableName"></param>
         /// <param name="engine"></param>
         /// <returns></returns>
-        public static string AsInsertStatements(this IDataReader reader, string tableName, DatabaseEngine engine = DatabaseEngine.SqlServer)
+        public static string AsSqlInsertStatements(this IDataReader reader, string tableName, DatabaseEngine engine = DatabaseEngine.SqlServer)
         {
             var sb = new StringBuilder();
 
             var isb = new InsertSqlBuilder(engine);
 
-            reader.Each(p => isb.AppendInsert(sb, p, tableName));
+            reader.Each(p => isb.AppendDataRecord(sb, p, tableName));
 
             return sb.ToString();
+        }
+
+        /// <summary>
+        /// Generates select statements from IDataReader.
+        /// </summary>
+        /// <param name="reader"></param>
+        /// <param name="joinString">Separator between SELECT statements e.g. "UNION" or "UNION ALL"</param>
+        /// <param name="colNamesFirstRowOnly">Add column aliases for first row only.</param>
+        /// <param name="engine"></param>
+        /// <returns></returns>
+        public static string AsSqlSelectStatements(this IDataReader reader, DatabaseEngine engine = DatabaseEngine.SqlServer, string joinString = "UNION ALL", bool colNamesFirstRowOnly = true)
+        {
+            var isb = new SelectSqlBuilder(engine, joinString, colNamesFirstRowOnly);
+
+            reader.Each(p => isb.AppendDataRecord(p));
+
+            return isb.WriteString();
         }
 
         /// <summary>
@@ -786,18 +816,6 @@ namespace DataPowerTools.Extensions
             return dr;
         }
 
-        /// <summary>
-        /// Fast-forwards to the end of the data reader by repeatedly calling .Read()
-        /// </summary>
-        /// <param name="dr"></param>
-        /// <param name="rowAction"></param>
-        public static void ReadToEnd(this IDataReader dr, Action<IDataReader> rowAction)
-        {
-            while (dr.Read())
-            {
-                rowAction(dr);
-            }
-        }
 
         /// <summary>
         /// Reads a set number of times by calling .Read()
@@ -1102,18 +1120,34 @@ namespace DataPowerTools.Extensions
         {
             return new ActionDataReader<TDataReader>(reader, action);
         }
-        
+
         /// <summary>
-        /// Executes an action on the datareader.
+        /// Get data reader as en IEnumerable of IDataRecord.
         /// </summary>
         /// <param name="reader"></param>
-        /// <param name="action"></param>
-        public static void Each(this IDataReader reader,
-            Action<IDataReader> action)
+        /// <returns></returns>
+        public static IEnumerable<IDataRecord> AsEnumerable(this IDataReader reader)
         {
-            reader.ReadToEnd(action);
+            while (reader.Read())
+            {
+                yield return (IDataRecord) reader;
+            }
         }
         
+        /// <summary>
+        /// Executes an action on the IDataReader for each row.
+        /// </summary>
+        /// <param name="dr">The source data reader.</param>
+        /// <param name="rowAction">The action to perform on each row.</param>
+        public static void Each(this IDataReader dr,
+            Action<IDataReader> rowAction)
+        {
+            while (dr.Read())
+            {
+                rowAction(dr);
+            }
+        }
+
         /// <summary>
         /// Executes reader to DataSet.
         /// </summary>

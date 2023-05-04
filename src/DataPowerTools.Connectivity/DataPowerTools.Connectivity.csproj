@@ -48,6 +48,5 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Helpers\" />
-    <Folder Include="Json\" />
   </ItemGroup>
 </Project>

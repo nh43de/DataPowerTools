@@ -31,6 +31,9 @@ using System.Text;
 
 namespace SimpleCSV
 {
+    //TODO: modified so that default line endings are \r\n not just \n
+
+
     /// <summary>
     /// A simple CSV writer.
     /// </summary>

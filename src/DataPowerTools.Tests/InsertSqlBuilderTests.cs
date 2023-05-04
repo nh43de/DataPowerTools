@@ -1,7 +1,7 @@
-﻿using System.Text.RegularExpressions;
-using DataPowerTools.Extensions;
+﻿using DataPowerTools.Extensions;
 using DataPowerTools.PowerTools;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System.Text.RegularExpressions;
 
 namespace DataPowerTools.Tests;
 
@@ -20,7 +20,7 @@ AAC	AB""D""'	''
 
         var dd = csv.ReadCsvString('\t', true);
 
-        var r = dd.AsInsertStatements("MyTable", DatabaseEngine.SqlServer);
+        var r = dd.AsSqlInsertStatements("MyTable", DatabaseEngine.SqlServer);
 
         Assert.AreEqual(@"INSERT INTO MyTable ([Col1],[Col2],[Col 3]) SELECT 'AAA' as [Col1],'AA''C' as [Col2],'''''' as [Col 3];
 INSERT INTO MyTable ([Col1],[Col2],[Col 3]) SELECT 'AAB' as [Col1],'AA""C' as [Col2],'''''' as [Col 3];
@@ -28,6 +28,39 @@ INSERT INTO MyTable ([Col1],[Col2],[Col 3]) SELECT 'AAC' as [Col1],'AB""D""''' a
 ", r);
 
     }
+
+
+    [TestMethod]
+    public void TestCreateSelects()
+    {
+        var csv = @"Col1	Col2	Col 3
+AAA	AA'C	''
+AAB	AA""C	''
+AAC	AB""D""'	''
+";
+        
+        var dd = csv.ReadCsvString('\t', true);
+        var r = dd.AsSqlSelectStatements( DatabaseEngine.SqlServer, "UNION ALL", true);
+
+        Assert.AreEqual(@"SELECT 'AAA' as [Col1], 'AA''C' as [Col2], '''''' as [Col 3]
+UNION ALL
+SELECT 'AAB', 'AA""C', ''''''
+UNION ALL
+SELECT 'AAC', 'AB""D""''', ''''''
+", r);
+
+        var dd2 = csv.ReadCsvString('\t', true);
+        var r2 = dd2.AsSqlSelectStatements(DatabaseEngine.SqlServer, "UNION ALL", false);
+
+        Assert.AreEqual(@"SELECT 'AAA' as [Col1], 'AA''C' as [Col2], '''''' as [Col 3]
+UNION ALL
+SELECT 'AAB' as [Col1], 'AA""C' as [Col2], '''''' as [Col 3]
+UNION ALL
+SELECT 'AAC' as [Col1], 'AB""D""''' as [Col2], '''''' as [Col 3]
+", r2);
+
+    }
+
 
     [TestMethod]
     public void TestFitToCsharpClass()
@@ -41,7 +74,7 @@ AAC	AB""D""'	''
         var dd = csv.ReadCsvString('\t', true);
 
         var r = dd.FitToCsharpClass("MyClass");
-        
+
         Assert.AreEqual(Regex.Unescape(@"public\ class\ MyClass\ \{\n\tpublic\ string\ Col1\ \{\ get;\ set;\ }\r\n\tpublic\ string\ Col2\ \{\ get;\ set;\ }\r\n\tpublic\ string\ Col3\ \{\ get;\ set;\ }\n}"), r);
     }
 }

@@ -17,46 +17,24 @@ namespace DataPowerTools.PowerTools
 
         public DatabaseEngine DatabaseEngine { get; }
         public TypeAccessorCache TypeAccessorCache { get; } = new TypeAccessorCache();
-
+        
+        private readonly SqlInsertInfo _i;
 
         public InsertSqlBuilder(DatabaseEngine databaseEngine, bool insertNewLines = false, bool appendInsertedCols = false)
         {
             _insertNewLines = insertNewLines;
             _appendInsertedCols = appendInsertedCols;
             DatabaseEngine = databaseEngine;
+            
+            _i = GetInsertTemplate(DatabaseEngine, _appendInsertedCols);
         }
+
         
         /// <summary>
-        /// Generates a parameterized MySQL INSERT statement from the given object and adds it to the <see cref="DbCommand" />
-        /// </summary>
-        /// <param name="dbCommand"><see cref="DbCommand" /> instance to append inserts to.</param>
-        /// <param name="obj">Object to generate the SQL INSERT statement from.</param>
-        /// <param name="destinationTableName"></param>
-        public StringBuilder AppendInsert(StringBuilder dbCommand, object obj, string destinationTableName)
-        {
-            var i = GetInsertTemplate(DatabaseEngine, _appendInsertedCols);
-
-            return AppendInsertCommand(dbCommand, obj, i.InsertTemplate, destinationTableName, i.KeywordEscapeMethod);
-        }
-
-        /// <summary>
-        /// Generates a parameterized MySQL INSERT statement from the given object and adds it to the <see cref="DbCommand" />
-        /// </summary>
-        /// <param name="dbCommand"><see cref="DbCommand" /> instance to append inserts to.</param>
-        /// <param name="dataRecord">Record to generate the SQL INSERT statement from.</param>
-        /// <param name="destinationTableName"></param>
-        public StringBuilder AppendInsert(StringBuilder dbCommand, IDataRecord dataRecord, string destinationTableName)
-        {
-            var i = GetInsertTemplate(DatabaseEngine, _appendInsertedCols);
-
-            return AppendInsertCommand(dbCommand, dataRecord, i.InsertTemplate, destinationTableName, i.KeywordEscapeMethod);
-        }
-
-        /// <summary>
-        /// Generates a parameterized SQL INSERT statement from the given object and adds it to the
+        /// Generates a parameterized SQL INSERT statement for the given object and it's properties.
         /// <see cref="DbCommand" />.
         /// </summary>
-        private StringBuilder AppendInsertCommand(StringBuilder dbCommand, object obj, string sqlInsertStatementTemplate, string tableName, KeywordEscapeMethod keywordEscapeMethod = KeywordEscapeMethod.None)
+        public StringBuilder AppendObject(StringBuilder dbCommand, object obj, string tableName)
         {
             if (obj == null)
             {
@@ -67,8 +45,7 @@ namespace DataPowerTools.PowerTools
 
             var namesAndValues = obj.GetPropertyAndFieldNamesAndValuesDictionary(typeAccessor);
 
-            return AppendInsertCommand(dbCommand, namesAndValues, sqlInsertStatementTemplate, tableName,
-                keywordEscapeMethod);
+            return AppendFromValuesDictionary(dbCommand, namesAndValues, tableName);
         }
 
         private string EscapeValueString(string valueString)
@@ -80,8 +57,11 @@ namespace DataPowerTools.PowerTools
         /// Generates a parameterized SQL INSERT statement from the given object and adds it to the
         /// <see cref="DbCommand" />.
         /// </summary>
-        private StringBuilder AppendInsertCommand(StringBuilder dbCommand, IDictionary<string, object> columnNamesAndValues, string sqlInsertStatementTemplate, string tableName, KeywordEscapeMethod keywordEscapeMethod = KeywordEscapeMethod.None)
+        public StringBuilder AppendFromValuesDictionary(StringBuilder dbCommand, IDictionary<string, object> columnNamesAndValues, string tableName)
         {
+            var sqlInsertStatementTemplate = _i.InsertTemplate;
+            var keywordEscapeMethod = _i.KeywordEscapeMethod;
+
             //TODO: performance optimization: would have better performance if parameter values were changed instead of rebuilding the command every time (https://docs.microsoft.com/en-us/dotnet/standard/data/sqlite/bulk-insert)
             //TODO: do we really want this a dictionary?? seems like a waste to do all that hashing when building it
 
@@ -133,11 +113,17 @@ namespace DataPowerTools.PowerTools
 
         //TODO: needs to support mapping columns
         /// <summary>
-        /// Generates a parameterized SQL INSERT statement from the given object and adds it to the
-        /// <see cref="DbCommand" />.
+        /// Generates a parameterized MySQL INSERT statement from the given object and adds it to the <see cref="StringBuilder" />
         /// </summary>
-        private StringBuilder AppendInsertCommand(StringBuilder dbCommand, IDataRecord dataRecord, string sqlInsertStatementTemplate, string tableName, KeywordEscapeMethod keywordEscapeMethod = KeywordEscapeMethod.None)
+        /// <param name="dbCommand"><see cref="DbCommand" /> instance to append inserts to.</param>
+        /// <param name="dataRecord">Record to generate the SQL INSERT statement from.</param>
+        /// <param name="destinationTableName"></param>
+        public StringBuilder AppendDataRecord(StringBuilder dbCommand, IDataRecord dataRecord, string destinationTableName)
         {
+            var keywordEscapeMethod = _i.KeywordEscapeMethod;
+            var sqlInsertStatementTemplate = _i.InsertTemplate;
+
+
             if (dataRecord == null)
             {
                 throw new ArgumentNullException(nameof(dataRecord));
@@ -179,7 +165,7 @@ namespace DataPowerTools.PowerTools
                 values += $"'{escapedValue}' as {colName},";
             }
 
-            var ss = string.Format(sqlInsertStatementTemplate, tableName, columns.TrimEnd(','), values.TrimEnd(','));
+            var ss = string.Format(sqlInsertStatementTemplate, destinationTableName, columns.TrimEnd(','), values.TrimEnd(','));
 
             dbCommand.Append(ss);
 
