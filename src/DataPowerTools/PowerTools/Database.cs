@@ -861,7 +861,7 @@ FROM    [#dropcode] AS [d];";
         /// <param name="destinationTableName"></param>
         /// <param name="connection"></param>
         /// <returns></returns>
-        private static IEnumerable<DataColumn> GetDataSchemaColumns(string destinationTableName, DbConnection connection)
+        public static IEnumerable<DataColumn> GetDataSchemaColumns(string destinationTableName, DbConnection connection)
         {
             return GetDataSchema(destinationTableName, connection).GetDataColumns();
         }
@@ -872,7 +872,7 @@ FROM    [#dropcode] AS [d];";
         /// <param name="destinationTableName"></param>
         /// <param name="connString"></param>
         /// <returns></returns>
-        private static IEnumerable<DataColumn> GetDataSchemaColumns(string destinationTableName, string connString)
+        public static IEnumerable<DataColumn> GetDataSchemaColumns(string destinationTableName, string connString)
         {
             return GetDataSchema(destinationTableName, connString).GetDataColumns();
         }
