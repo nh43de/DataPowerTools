@@ -57,12 +57,11 @@ namespace DataPowerTools.Connectivity.Json
 
             sBuilder.AppendLine(@"new MyClass[] {");
 
-            foreach (var instance in instances)
-            {
-                sBuilder.AppendLine(instance);
-            }
+            var instancesString = instances.JoinStr(",\r\n");
 
-            sBuilder.AppendLine(@"}");
+            sBuilder.AppendLine(instancesString);
+
+            sBuilder.Append(@"}");
 
             return sBuilder.ToString();
         }

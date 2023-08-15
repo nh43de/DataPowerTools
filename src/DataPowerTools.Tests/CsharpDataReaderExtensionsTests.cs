@@ -26,19 +26,18 @@ AAC	AB	3
 		Col1 = ""AAA"",
 		Col2 = ""AA"",
 		Col3 = 1
-	}
+	},
 	new() { 
 		Col1 = ""AAB"",
 		Col2 = ""AA"",
 		Col3 = 2
-	}
+	},
 	new() { 
 		Col1 = ""AAC"",
 		Col2 = ""AB"",
 		Col3 = 3
 	}
-}
-", r);
+}", r);
     }
     
 }
