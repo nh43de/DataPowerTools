@@ -1,0 +1,70 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Data;
+using System.IO;
+using System.Linq;
+using System.Text;
+using System.Text.Json;
+using System.Text.Json.Nodes;
+using DataPowerTools.Extensions;
+using DataPowerTools.Extensions.Objects;
+using DataPowerTools.PowerTools;
+using SimpleCSV;
+
+namespace DataPowerTools.Connectivity.Json
+{
+    public static class DataReaderCsharpExtensions
+    {
+        public static string ReadToCSharpArray(this IDataReader reader)
+        {
+            var props = reader.GetFieldNames();
+            
+            var instances = reader.SelectRows<string>(dr =>
+                {
+                    var properties = new List<string>();
+                    
+                    foreach (var prop in props)
+                    {
+                        var val = dr[prop];
+
+                        string s;
+                        if (val == null)
+                        {
+                            s = $"{prop} = null".Indent(1);
+                        }
+                        else if (val.IsNumeric())
+                        {
+                            s = $"{prop} = {val}".Indent(1);
+                        }
+                        else
+                        {
+                            s = $"{prop} = \"{val}\"".Indent(1);
+                        }
+
+                        properties.Add(s);
+                    }
+
+                    var propsString = properties.JoinStr(",\r\n");
+
+                    var instanceDeclaration = @$"new() {{ 
+{propsString}
+}}".Indent(1);
+                    return instanceDeclaration;
+                })
+                .ToArray();
+
+            var sBuilder = new StringBuilder();
+
+            sBuilder.AppendLine(@"new MyClass[] {");
+
+            foreach (var instance in instances)
+            {
+                sBuilder.AppendLine(instance);
+            }
+
+            sBuilder.AppendLine(@"}");
+
+            return sBuilder.ToString();
+        }
+    }
+}

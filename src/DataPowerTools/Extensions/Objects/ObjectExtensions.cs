@@ -300,7 +300,31 @@ namespace DataPowerTools.Extensions.Objects
                     $"An error occurred while attempting to convert the value '{value}' to type '{underlyingType}'", exception);
             }
         }
-        
+
+        /// <summary>
+        /// Checks whether it's a numeric type
+        /// </summary>
+        /// <param name="obj"></param>
+        /// <returns></returns>
+        public static bool IsNumeric(this object obj)
+        {
+            if (obj == null)
+                return false;
+
+            var objectType = obj.GetType();
+
+            if (objectType.IsPrimitive && objectType != typeof(bool) && objectType != typeof(char))
+                return true;
+
+            if (obj is string strValue)
+            {
+                return double.TryParse(strValue, out _); // Change this to the appropriate numeric type if needed
+            }
+
+            return false;
+        }
+
+
         /// <summary>Converts the given object to an <see cref="int" />.</summary>
         /// <param name="obj">Object to convert.</param>
         /// <returns>Int representation of the object.</returns>
