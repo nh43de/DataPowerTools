@@ -27,7 +27,7 @@ namespace DataPowerTools.DataReaderExtensibility.TransformingReaders
 
         public override int GetOrdinal(string name)
         {
-            var r = ColumnMappingInfo.DestinationColumns.FirstOrDefault(p => p.ColumnName == name)?.Ordinal;
+            var r = ColumnMappingInfo.SourceColumns.FirstOrDefault(p => p.ColumnName == name)?.Ordinal;
 
             if (r == null)
                 throw new Exception($"Column {name} not available");
