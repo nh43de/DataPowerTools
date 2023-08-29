@@ -23,11 +23,11 @@ namespace DataPowerTools.Extensions
         }
 
         /// <summary>
-        /// 
+        /// Print SmartReader diagnostics.
         /// </summary>
         /// <typeparam name="TDataReader"></typeparam>
         /// <param name="smartDataReader"></param>
-        /// <param name="printNonStringDestinations"></param>
+        /// <param name="printNonStringDestinations">Prints non-string, non-value type destination.</param>
         /// <returns></returns>
         public static string PrintDiagnostics<TDataReader>(this SmartDataReader<TDataReader> smartDataReader, bool printNonStringDestinations = false)
             where TDataReader : IDataReader

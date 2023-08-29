@@ -152,6 +152,8 @@ namespace DataPowerTools.Extensions
             {
                 try
                 {
+                    sqlServerBulkInsertOptions.ConfigureBulkCopy?.Invoke(bulkCopy);
+
                     await bulkCopy.WriteToServerAsync(dataReader, sqlServerBulkInsertOptions.CancellationToken);
                 }
                 catch (SqlException ex)
@@ -200,6 +202,8 @@ namespace DataPowerTools.Extensions
             {
                 try
                 {
+                    sqlServerBulkInsertOptions.ConfigureBulkCopy?.Invoke(bulkCopy);
+
                     bulkCopy.WriteToServer(dataReader);
                 }
                 catch (SqlException ex)
