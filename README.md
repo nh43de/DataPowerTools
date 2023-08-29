@@ -16,7 +16,7 @@ It also provides a powerful API for filtering and object materialization.
 
 - Date string parsing
 - Shallow comparisons
-- Bulk inserts
+- Generate SqlBulkCopy automatically for high-performance bulk inserts
 - Fit table/CSV to SQL table
 - SQLite Bulk operations
 - Minimal dependencies

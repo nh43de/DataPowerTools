@@ -4,6 +4,7 @@ using System.Data;
 using System.Data.Common;
 using Microsoft.Data.SqlClient;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using DataPowerTools.DataReaderExtensibility.Columns;
@@ -721,6 +722,19 @@ FROM    [#dropcode] AS [d];";
             }
         }
 
+        static bool IsTempTableName(string tableName)
+        { 
+            // Regex pattern to match temporary table names starting with '#'
+            var pattern = @"^\[?#(\w+)";
+
+            // Create a regex object and match the input tableName
+            var regex = new Regex(pattern);
+            var match = regex.Match(tableName);
+
+            // Return true if the input matches the pattern, indicating it's a temp table name
+            return match.Success;
+        }
+
         /// <summary>
         /// Gets the columns of a table that are not computed columns.
         /// </summary>
@@ -732,16 +746,22 @@ FROM    [#dropcode] AS [d];";
             //TODO: this is duplicated in MsSqlDatabaseConnection and sqlocity.database
             var dt = new DataTable();
 
+            var isTempTable = IsTempTableName(tableName);
+
+            var table = isTempTable ? "tempdb.." + tableName : tableName;
+
+            var tempDbQualifier = isTempTable ? "tempdb." : "";
+
             try
             {
-                using (var sc = new SqlCommand(@"select name, column_id from sys.all_columns a
+                using (var sc = new SqlCommand(@$"select name, column_id from {tempDbQualifier}sys.all_columns a
                                                     where a.object_id = OBJECT_ID(@table_name)
                                                     except
-                                                    select name, column_id from sys.computed_columns a
+                                                    select name, column_id from {tempDbQualifier}sys.computed_columns a
                                                     where a.object_id = OBJECT_ID(@table_name)
                                                     order by column_id", connection))
                 {
-                    sc.Parameters.Add(new SqlParameter("@table_name", tableName));
+                    sc.Parameters.Add(new SqlParameter("@table_name", table));
 
                     using (var sa = new SqlDataAdapter(sc))
                     {
