@@ -16,6 +16,7 @@ using DataPowerTools.FastMember;
 using DataPowerTools.PowerTools;
 using DataPowerTools.Strings;
 using System.Text;
+using Microsoft.Identity.Client;
 
 namespace DataPowerTools.Extensions
 {

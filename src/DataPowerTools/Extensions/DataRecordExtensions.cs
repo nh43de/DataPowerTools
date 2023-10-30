@@ -45,6 +45,18 @@ namespace DataPowerTools.Extensions
     /// </summary>
     public static class DataRecordExtensions
     {
+        public static string[] GetFieldNames(this IDataRecord record)
+        {
+            var dd = new List<string>(record.FieldCount);
 
+            for (var i = 0; i < record.FieldCount; i++)
+            {
+                var name = record.GetName(i);
+
+                dd.Add(name);
+            }
+
+            return dd.ToArray();
+        }
     }
 }

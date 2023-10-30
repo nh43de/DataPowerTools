@@ -8,6 +8,7 @@ using System.Text.Json;
 using System.Text.Json.Nodes;
 using DataPowerTools.Extensions;
 using DataPowerTools.PowerTools;
+using Microsoft.Identity.Client;
 using SimpleCSV;
 
 namespace DataPowerTools.Connectivity.Json
@@ -20,6 +21,7 @@ namespace DataPowerTools.Connectivity.Json
 
             var objectArray = reader.SelectRows<JsonObject>(dr =>
                 {
+                    //duplicated code
                     var jsonObject = new JsonObject();
 
                     foreach (var prop in props)
@@ -32,6 +34,36 @@ namespace DataPowerTools.Connectivity.Json
                 .ToArray();
 
             return objectArray.ToJson(indent);
+        }
+
+        public static string ToJsonCurrentRecord(this IDataReader reader, bool indent = false)
+        {
+            var props = reader.GetFieldNames();
+
+            //duplicated code
+            var jsonObject = new JsonObject();
+
+            foreach (var prop in props)
+            {
+                jsonObject[prop] = reader[prop].ToString();
+            }
+
+            return jsonObject.ToJson(indent);
+        }
+
+        public static string ToJsonCurrentRecord(this IDataRecord record, bool indent = false)
+        {
+            var props = record.GetFieldNames();
+
+            //duplicated code
+            var jsonObject = new JsonObject();
+
+            foreach (var prop in props)
+            {
+                jsonObject[prop] = record[prop].ToString();
+            }
+
+            return jsonObject.ToJson(indent);
         }
 
         /// <summary>
