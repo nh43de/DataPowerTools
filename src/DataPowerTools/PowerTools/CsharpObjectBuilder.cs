@@ -51,6 +51,7 @@ namespace DataPowerTools.PowerTools
                     return $@"""{val}""";
                     break;
                 case CSharpObjInitType.Numeric:
+                case CSharpObjInitType.Bool:
                     return val;
                     break;
                 default:
@@ -102,7 +103,8 @@ namespace DataPowerTools.PowerTools
         {
             Default,
             String,
-            Numeric
+            Numeric,
+            Bool
         }
     }
 }

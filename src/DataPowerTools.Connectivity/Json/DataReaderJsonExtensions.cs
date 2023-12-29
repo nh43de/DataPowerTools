@@ -148,13 +148,27 @@ namespace DataPowerTools.Connectivity.Json
                 var objEnumerator = jsonElement.EnumerateObject();
 
                 var inits = objEnumerator
-                    .Select(jsonProperty => new CSharpObjectBuilder.CSharpObjectInit()
+                    .Select(jsonProperty =>
                         {
-                            DataType = jsonProperty.Value.ValueKind == JsonValueKind.Number
-                                ? CSharpObjectBuilder.CSharpObjInitType.Numeric
-                                : CSharpObjectBuilder.CSharpObjInitType.String,
-                            Name = jsonProperty.Name,
-                            Value = jsonProperty.Value.ToString()
+                            if (jsonProperty.Value.ValueKind is JsonValueKind.True or JsonValueKind.False)
+                            {
+                                return
+                                    new CSharpObjectBuilder.CSharpObjectInit()
+                                    {
+                                        DataType = CSharpObjectBuilder.CSharpObjInitType.Bool,
+                                        Name = jsonProperty.Name,
+                                        Value = jsonProperty.Value.ValueKind == JsonValueKind.True ? "true" : "false"
+                                    };
+                            }
+
+                            return new CSharpObjectBuilder.CSharpObjectInit()
+                            {
+                                DataType = jsonProperty.Value.ValueKind == JsonValueKind.Number
+                                    ? CSharpObjectBuilder.CSharpObjInitType.Numeric
+                                    : CSharpObjectBuilder.CSharpObjInitType.String,
+                                Name = jsonProperty.Name,
+                                Value = jsonProperty.Value.ToString()
+                            };
                         }
                     ).ToArray();
 

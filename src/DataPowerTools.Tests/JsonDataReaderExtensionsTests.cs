@@ -53,7 +53,7 @@ AAC	AB	3
   {
     ""Col1"": ""AAB"",
     ""Col2"": ""AA"",
-    ""Col 3"": ""2""
+    ""Col 3"": true
   },
   {
     ""Col1"": ""AAC"",
@@ -74,7 +74,7 @@ AAC	AB	3
 	new() {
 		Col1 = ""AAB"",
 		Col2 = ""AA"",
-		Col3 = ""2""
+		Col3 = true
 	},
 	new() {
 		Col1 = ""AAC"",
