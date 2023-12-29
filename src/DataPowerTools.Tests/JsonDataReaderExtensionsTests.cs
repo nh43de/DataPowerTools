@@ -40,6 +40,51 @@ AAC	AB	3
 ]", r);
     }
 
+    //
+    [TestMethod]
+    public void TestGenerateCSharpObjectInitFromJson()
+    {
+        var json = @"[
+  {
+    ""Col1"": ""AAA"",
+    ""Col2"": ""AA"",
+    ""Col 3"": 1
+  },
+  {
+    ""Col1"": ""AAB"",
+    ""Col2"": ""AA"",
+    ""Col 3"": ""2""
+  },
+  {
+    ""Col1"": ""AAC"",
+    ""Col2"": ""AB"",
+    ""Col 3"": ""3"",
+    ""Col4"": ""Z""
+  }
+]";
+
+        var dd = json.FromJsonToCsharpObjectInit();
+        
+        Assert.AreEqual(@"new[] {
+	new() {
+		Col1 = ""AAA"",
+		Col2 = ""AA"",
+		Col3 = 1
+	},
+	new() {
+		Col1 = ""AAB"",
+		Col2 = ""AA"",
+		Col3 = ""2""
+	},
+	new() {
+		Col1 = ""AAC"",
+		Col2 = ""AB"",
+		Col3 = ""3"",
+		Col4 = ""Z""
+	}
+}", dd);
+    }
+
     [TestMethod]
     public void TestGenerateSqlInsertsFromJson()
     {

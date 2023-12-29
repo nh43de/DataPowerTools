@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Data;
 using System.IO;
 using System.Linq;
@@ -8,7 +7,6 @@ using System.Text.Json;
 using System.Text.Json.Nodes;
 using DataPowerTools.Extensions;
 using DataPowerTools.PowerTools;
-using Microsoft.Identity.Client;
 using SimpleCSV;
 
 namespace DataPowerTools.Connectivity.Json
@@ -134,6 +132,47 @@ namespace DataPowerTools.Connectivity.Json
         /// <summary>
         /// Creates insert statements from an array of json objects.
         /// </summary>
+        public static string FromJsonToCsharpObjectInit(this string jsonString)
+        {
+            var isb = new CSharpObjectBuilder();
+
+            var el = JsonDocument.Parse(jsonString).RootElement;
+
+            //enumerate array
+            foreach (var jsonElement in el.EnumerateArray())
+            {
+                //enumerate object
+                if (jsonElement.ValueKind != JsonValueKind.Object)
+                    continue;
+
+                var objEnumerator = jsonElement.EnumerateObject();
+
+                var inits = objEnumerator
+                    .Select(jsonProperty => new CSharpObjectBuilder.CSharpObjectInit()
+                        {
+                            DataType = jsonProperty.Value.ValueKind == JsonValueKind.Number
+                                ? CSharpObjectBuilder.CSharpObjInitType.Numeric
+                                : CSharpObjectBuilder.CSharpObjInitType.String,
+                            Name = jsonProperty.Name,
+                            Value = jsonProperty.Value.ToString()
+                        }
+                    ).ToArray();
+
+                var def = new CSharpObjectBuilder.CSharpObjectInitDef()
+                {
+                    Inits = inits
+                };
+
+                isb.AddCSharpObjectDef(def);
+            }
+
+            return isb.ToString();
+        }
+
+
+        /// <summary>
+        /// Creates insert statements from an array of json objects.
+        /// </summary>
         public static string FromJsonToSqlInsertStatements(this string jsonString, string tableName, DatabaseEngine engine = DatabaseEngine.SqlServer)
         {
             var sb = new StringBuilder();
@@ -143,7 +182,6 @@ namespace DataPowerTools.Connectivity.Json
             //var el = ParseJsonAsArray(jsonString);
             var el = JsonDocument.Parse(jsonString).RootElement;
             
-
             //enumerate array
             foreach (var jsonElement in el.EnumerateArray())
             {
