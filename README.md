@@ -1,11 +1,11 @@
 # DataPowerTools
 ADO.NET Power Tools for In-Memory Data Processing with minimal dependencies
 
-### Overview
+## Take a chainsaw to your data!
 
 <img src="assets/DptLogo1.png" width="240">
 
-Take a chainsaw to your data!
+### Overview
 
 DataPowerTools are tools for dealing with changing between IEnumerable, IDataReader, and ADO.NET DataTable/DataSet. 
 
