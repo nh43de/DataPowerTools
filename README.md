@@ -1,5 +1,5 @@
 # DataPowerTools
-ADO.NET Power Tools for In-Memory Data Processing with minimal dependencies
+ADO.NET Power Tools for In-Memory Data Processing with minimal dependencies.
 
 ## Take a chainsaw to your data!
 
