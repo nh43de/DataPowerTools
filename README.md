@@ -3,7 +3,7 @@ ADO.NET Power Tools for In-Memory Data Processing with minimal dependencies
 
 ### Overview
 
-![DataPowerTools Logo](assets/DptLogo1.png)
+<img src="assets/DptLogo1.png" width="240">
 
 Take a chainsaw to your data!
 
