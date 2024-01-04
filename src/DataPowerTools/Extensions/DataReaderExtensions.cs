@@ -353,7 +353,7 @@ namespace DataPowerTools.Extensions
         }
 
         /// <summary>
-        /// Adds a column that is a row projection of the source.
+        /// TODO: should be renamed Concat
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <typeparam name="TDataReader"></typeparam>
@@ -393,6 +393,16 @@ namespace DataPowerTools.Extensions
         /// <param name="dataReader"></param>
         /// <returns></returns>
         public static IDataReader LimitRows<TDataReader>(this TDataReader dataReader, int maxRows) where TDataReader : IDataReader
+        {
+            return new RowLimitingDataReader<TDataReader>(dataReader, maxRows);
+        }
+
+        /// <summary>
+        /// Limits rows returned by the data reader.
+        /// </summary>
+        /// <param name="dataReader"></param>
+        /// <returns></returns>
+        public static IDataReader Take<TDataReader>(this TDataReader dataReader, int maxRows) where TDataReader : IDataReader
         {
             return new RowLimitingDataReader<TDataReader>(dataReader, maxRows);
         }
