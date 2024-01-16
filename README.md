@@ -98,6 +98,7 @@ DataPowerTools has been used to load tens of terabytes worth of unstructured dat
 -- read all csv files in a directory, union them, and upload to a sql database
 -- stream results of SQL statement into another table
 -- stream results of SQL statement to a csv file
+-- Warehousing - copy data from one database to another
 
 ### Other Features
 
