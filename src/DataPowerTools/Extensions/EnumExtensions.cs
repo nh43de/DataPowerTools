@@ -11,7 +11,7 @@ namespace DataPowerTools.Extensions
         {
             return (T) Enum.Parse(typeof(T), enumString);
         }
-        
+
         //public static string WriteEnumAsString<TEnum>(TEnum tEnum) where TEnum : Enum
         //{
         //    return tEnum.ToString();
@@ -20,6 +20,11 @@ namespace DataPowerTools.Extensions
         //public static string[] GetEnumOptionsAsStringArray<TEnum>(this TEnum t) where TEnum : Enum
         //{
         //    return Enum.GetNames(typeof(TEnum));
+        //}
+        
+        //public static string[] GetEnumOptionsAsStringArray(this Type t) //where TEnum : Enum
+        //{
+        //    return Enum.GetNames(t);
         //}
     }
 }
