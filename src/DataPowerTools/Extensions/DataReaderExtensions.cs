@@ -55,10 +55,11 @@ namespace DataPowerTools.Extensions
         /// </summary>
         /// <typeparam name="TDataReader"></typeparam>
         /// <param name="reader"></param>
+        /// <param name="leftDimCount">Number of left dimensions</param>
         /// <returns></returns>
-        public static UnPivotingDataReader<TDataReader> UnPivot<TDataReader>(this TDataReader reader) where TDataReader : IDataReader
+        public static UnPivotingDataReader<TDataReader> UnPivot<TDataReader>(this TDataReader reader, int leftDimCount = 1) where TDataReader : IDataReader
         {
-            var rr = new UnPivotingDataReader<TDataReader>(reader);
+            var rr = new UnPivotingDataReader<TDataReader>(reader, leftDimCount);
 
             return rr;
         }

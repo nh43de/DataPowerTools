@@ -23,7 +23,7 @@ public class UnPivotDataReaderTests
 
         var rr = ddr.AsCsv(true);
 
-        var checkCsv = @"""DimensionA"",""DimensionB"",""Value""
+        var checkCsv = @"""Dimension1"",""Dimension2"",""Value""
 ""10"",""0.01"",""1""
 ""10"",""0.03"",""2""
 ""10"",""0.05"",""3""
@@ -38,9 +38,40 @@ public class UnPivotDataReaderTests
 ""40"",""0.05"",""12""
 ";
 
+        Assert.AreEqual(checkCsv.Trim(), rr.Trim());
+    }
+
+
+
+
+    [TestMethod]
+    public void TestUnPivotMulti()
+    {
+        var csv = @"sku	item	count	t096	t144	t192
+sk1	sk	1	x	x	x
+sk2	sk	2	x	x	x
+sk3	sk	3		x	x";
+
+        var dr = csv.ReadCsvString('\t', true);
+
+        var ddr = dr.UnPivot(3);
+
+        var rr = ddr.AsCsv(true);
+
+        var checkCsv = @"""Dimension1"",""Dimension2"",""Dimension3"",""Dimension4"",""Value""
+""sk1"",""sk"",""1"",""t096"",""x""
+""sk1"",""sk"",""1"",""t144"",""x""
+""sk1"",""sk"",""1"",""t192"",""x""
+""sk2"",""sk"",""2"",""t096"",""x""
+""sk2"",""sk"",""2"",""t144"",""x""
+""sk2"",""sk"",""2"",""t192"",""x""
+""sk3"",""sk"",""3"",""t096"",""""
+""sk3"",""sk"",""3"",""t144"",""x""
+""sk3"",""sk"",""3"",""t192"",""x""
+";
+
         Assert.AreEqual(checkCsv, rr);
     }
-    
 
 
 
