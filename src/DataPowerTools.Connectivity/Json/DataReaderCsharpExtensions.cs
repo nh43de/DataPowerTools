@@ -15,7 +15,7 @@ namespace DataPowerTools.Connectivity.Json
 {
     public static class DataReaderCsharpExtensions
     {
-        public static string ReadToCSharpArray(this IDataReader reader)
+        public static string ReadToCSharpArray(this IDataReader reader, bool useAnonymousType = false)
         {
             var props = reader.GetFieldNames();
             
@@ -46,16 +46,28 @@ namespace DataPowerTools.Connectivity.Json
 
                     var propsString = properties.JoinStr(",\r\n");
 
-                    var instanceDeclaration = @$"new() {{ 
+                    var instanceDeclaration = useAnonymousType
+                        ? @$"new {{ 
+{propsString}
+}}".Indent(1)
+                        : @$"new() {{ 
 {propsString}
 }}".Indent(1);
+
                     return instanceDeclaration;
                 })
                 .ToArray();
 
             var sBuilder = new StringBuilder();
 
-            sBuilder.AppendLine(@"new MyClass[] {");
+            if (useAnonymousType)
+            {
+                sBuilder.AppendLine(@"new[] {");
+            }
+            else
+            {
+                sBuilder.AppendLine(@"new MyClass[] {");
+            }
 
             var instancesString = instances.JoinStr(",\r\n");
 
