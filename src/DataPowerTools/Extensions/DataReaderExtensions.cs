@@ -540,6 +540,50 @@ namespace DataPowerTools.Extensions
         }
 
         /// <summary>
+        /// Limits rows returned by the data reader.
+        /// </summary>
+        /// <param name="dataReader"></param>
+        /// <returns></returns>
+        public static IDataReader AddWarmStart<TDataReader>(this TDataReader dataReader, bool firstReadValue) where TDataReader : IDataReader
+        {
+            return new WarmStartDataReader<TDataReader>(dataReader, firstReadValue);
+        }
+
+        public static IEnumerable<IDataReader> Batch(this IDataReader reader, int batchSize)
+        {
+            var rowsConsumed = 0;
+            var dataReaderInstance = 0;
+
+            var newReader = reader.Do(r2 =>
+            {
+                rowsConsumed++;
+            });
+            
+            while (true)
+            {
+                var readValue = newReader.Read();
+
+                if (readValue == false)
+                    yield break;
+
+                var batchReader = newReader.AddWarmStart(true)
+                    .LimitRows(batchSize);
+
+                dataReaderInstance++;
+
+                yield return batchReader;
+
+                // Fast-forward the outer reader if the consumer didn't read all rows in the batch
+                var rowsToSkip = dataReaderInstance * batchSize - rowsConsumed;
+                for (var i = 0; i < rowsToSkip; i++)
+                {
+                    if (newReader.Read() == false)
+                        yield break; // End of original reader
+                }
+            }
+        }
+        
+        /// <summary>
         /// Returns mappings to destination columns given a data reader.
         /// </summary>
         /// <param name="reader"></param>

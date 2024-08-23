@@ -6,6 +6,8 @@ namespace DataPowerTools.DataReaderExtensibility.TransformingReaders
     {
         private readonly int _maxRows;
 
+        private int _i = 0;
+
         public RowLimitingDataReader(TDataReader dataReader, int maxRows) : base(dataReader)
         {
             _maxRows = maxRows;
@@ -13,7 +15,12 @@ namespace DataPowerTools.DataReaderExtensibility.TransformingReaders
 
         public override bool Read()
         {
-            return Depth < _maxRows && base.Read();
+            if (_i >= _maxRows)
+                return false;
+
+            _i++;
+
+            return base.Read();
         }
     }
 }
