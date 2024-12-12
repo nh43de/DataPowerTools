@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection.PortableExecutable;
 using DataPowerTools.DataReaderExtensibility.TransformingReaders;
 using DataPowerTools.Extensions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
