@@ -29,8 +29,8 @@ jobs:
         NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
       run: ./Push.ps1
       shell: pwsh
-    - name: Artifacts
-      uses: actions/upload-artifact@v2
+    - name: Upload Artifacts
+      uses: actions/upload-artifact@v4
       with:
         name: artifacts
         path: artifacts/**/*
