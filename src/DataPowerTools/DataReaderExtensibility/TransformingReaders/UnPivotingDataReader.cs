@@ -105,7 +105,7 @@ namespace DataPowerTools.DataReaderExtensibility.TransformingReaders
 
         public override int GetOrdinal(string name)
         {
-            throw new NotImplementedException("Unpivoting data reader doesn't support getting by col name.");
+            throw new NotImplementedException("Unpivoting data reader doesn't support getting ordinal by col name.");
 
             //return name switch
             //{
