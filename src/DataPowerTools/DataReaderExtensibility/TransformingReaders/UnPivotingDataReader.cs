@@ -18,11 +18,17 @@ namespace DataPowerTools.DataReaderExtensibility.TransformingReaders
         private readonly int _leftDimensionColumns;
         //these need to be lazy because of the way data readers work (field names may not be available until first read)
 
-        private Lazy<BasicDataColumnInfo[]> _fieldInfo;
+        /// <summary>
+        /// Info from the underlying data reader.
+        /// </summary>
+        private Lazy<BasicDataColumnInfo[]> _underlyingFieldInfo;
 
         private int _index = 0; //the current pivot value index (starts at 1, range between 1 and field count - 1). Starts at zero and if zero then will do the initial read.
 
-        private readonly int _fieldCount;
+        private readonly int _thisFieldCount;
+
+        private readonly string[] FieldNames;
+        private readonly Dictionary<string, int> FieldOrdinals;
 
         /// <summary>
         /// 
@@ -32,8 +38,34 @@ namespace DataPowerTools.DataReaderExtensibility.TransformingReaders
         public UnPivotingDataReader(TDataReader reader, int leftDimensionColumns = 1) : base(reader)
         {
             _leftDimensionColumns = leftDimensionColumns;
-            _fieldInfo = new Lazy<BasicDataColumnInfo[]>(() => DataReader.GetFieldInfo());
-            _fieldCount = 2 + _leftDimensionColumns;
+            _underlyingFieldInfo = new Lazy<BasicDataColumnInfo[]>(() => DataReader.GetFieldInfo());
+            _thisFieldCount = 2 + _leftDimensionColumns;
+
+            FieldNames = new string[_thisFieldCount];
+            FieldOrdinals = new Dictionary<string, int>(_thisFieldCount);
+
+            for (int i = 0; i < _thisFieldCount; i++)
+            {
+                var name = GetColName(i); 
+
+                FieldNames[i] = name;
+                FieldOrdinals.Add(name, i);
+            }
+        }
+
+        public string GetColName(int i)
+        {
+            if (i < _leftDimensionColumns + 1)
+            {
+                return $"Dimension{i + 1}";
+            }
+
+            return (i - _leftDimensionColumns + 1) switch
+            {
+                //use _index
+                2 => "Value",
+                _ => throw new ArgumentOutOfRangeException(nameof(i), "UnPivoting data reader only has 3 columns")
+            };
         }
 
         public override object this[int index] //by field index
@@ -42,9 +74,9 @@ namespace DataPowerTools.DataReaderExtensibility.TransformingReaders
         public override object this[string fieldname] //by field name
             => GetValue(GetOrdinal(fieldname));
 
-        public override int FieldCount => _fieldCount;
+        public override int FieldCount => _thisFieldCount;
 
-        public override int Depth => DataReader.Depth * _fieldCount;
+        public override int Depth => DataReader.Depth * _thisFieldCount;
 
         public override bool IsClosed => DataReader.IsClosed;
 
@@ -61,7 +93,7 @@ namespace DataPowerTools.DataReaderExtensibility.TransformingReaders
             return (i - _leftDimensionColumns + 1) switch
             {
                 //dimension B - from header
-                1 => _fieldInfo.Value[_index].ColumnName,
+                1 => _underlyingFieldInfo.Value[_index].ColumnName,
                 //use _index
                 2 => DataReader.GetValue(_index),
                 _ => throw new ArgumentOutOfRangeException(nameof(i), "UnPivoting data reader only has 3 columns")
@@ -90,33 +122,12 @@ namespace DataPowerTools.DataReaderExtensibility.TransformingReaders
 
         public override string GetName(int i)
         {
-            if (i < _leftDimensionColumns + 1)
-            {
-                return $"Dimension{i + 1}";
-            }
-
-            return (i - _leftDimensionColumns + 1) switch
-            {
-                //use _index
-                2 => "Value",
-                _ => throw new ArgumentOutOfRangeException(nameof(i), "UnPivoting data reader only has 3 columns")
-            };
+            return FieldNames[i];
         }
 
         public override int GetOrdinal(string name)
         {
-            throw new NotImplementedException("Unpivoting data reader doesn't support getting by col name.");
-
-            //return name switch
-            //{
-            //    //dimension A - from data reader first col
-            //    "DimensionA" => 0,
-            //    //dimension B - from header
-            //    "DimensionB" => 1,
-            //    //use _index
-            //    "Value" => 2,
-            //    _ => throw new ArgumentOutOfRangeException(nameof(name), "UnPivoting data reader only has 3 columns")
-            //};
+            return FieldOrdinals[name];
         }
 
         public override void Close() => DataReader.Close();
@@ -129,7 +140,7 @@ namespace DataPowerTools.DataReaderExtensibility.TransformingReaders
                 return DataReader.Read();
             }
 
-            var fieldCount = _fieldInfo.Value.Length - 1;
+            var fieldCount = _underlyingFieldInfo.Value.Length - 1;
 
             var nextIndex = _index + 1;
 
