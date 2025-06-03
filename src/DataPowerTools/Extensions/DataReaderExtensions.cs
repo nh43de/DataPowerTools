@@ -4,11 +4,8 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
 using Microsoft.Data.SqlClient;
-using System.Diagnostics;
-using System.Dynamic;
 using System.Linq;
 using DataPowerTools.Connectivity.Helpers;
-using DataPowerTools.DataConnectivity;
 using DataPowerTools.DataReaderExtensibility.Columns;
 using DataPowerTools.DataReaderExtensibility.TransformingReaders;
 using DataPowerTools.Extensions.Objects;
@@ -16,7 +13,6 @@ using DataPowerTools.FastMember;
 using DataPowerTools.PowerTools;
 using DataPowerTools.Strings;
 using System.Text;
-using Microsoft.Identity.Client;
 
 namespace DataPowerTools.Extensions
 {
