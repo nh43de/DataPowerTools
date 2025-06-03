@@ -14,6 +14,12 @@ namespace DataPowerTools
 {
     public static class Csv
     {
+        private static StreamWriter CreateBomAwareStreamWriter(string filePath, Encoding encoding = null)
+        {
+            encoding ??= new UTF8Encoding(true); // UTF-8 with BOM by default
+            return new StreamWriter(filePath, false, encoding);
+        }
+
         //TODO: missing this implementation args: public static void Write<T>(IEnumerable<T> rowObjects, IEnumerable<string> headers, string outputFile) { //not implemented }
         
         /// <summary>
@@ -94,26 +100,19 @@ namespace DataPowerTools
         /// <param name="outputFile"></param>
         public static void Write(IEnumerable<object[]> rowObjects, IEnumerable<string> headers, string outputFile)
         {
-            var ts = File.Open(outputFile, FileMode.Create);
-            
-            var sw = new StreamWriter(ts);
-
+            using var sw = CreateBomAwareStreamWriter(outputFile);
             using var csvWriter = new CSVWriter(sw);
-            
-            using (ts)
-            using (sw)
-            {
-                csvWriter.WriteNext(headers.ToArray());
-                
-                foreach (var row in rowObjects)
-                {
-                    var vals = row.Select(i => i?.ToString()).ToArray();
 
-                    csvWriter.WriteNext(vals);
-                }
+
+            csvWriter.WriteNext(headers.ToArray());
+
+            foreach (var row in rowObjects)
+            {
+                var vals = row.Select(i => i?.ToString()).ToArray();
+                csvWriter.WriteNext(vals);
             }
         }
-        
+
         /// <summary>
         /// Writes an IDataReader to a CSV file onto disk (streaming operation).
         /// </summary>
@@ -122,8 +121,7 @@ namespace DataPowerTools
         /// <param name="writeHeaders"></param>
         public static void Write(IDataReader reader, string outputFile, bool writeHeaders = true)
         {
-            using var ts = File.Open(outputFile, FileMode.Create);
-            using var sw = new StreamWriter(ts);
+            using var sw = CreateBomAwareStreamWriter(outputFile);
             using var csvWriter = new CSVWriter(sw);
             
             Write(reader, sw, csvWriter, writeHeaders);
