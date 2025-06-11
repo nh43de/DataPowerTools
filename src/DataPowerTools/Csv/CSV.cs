@@ -101,7 +101,7 @@ namespace DataPowerTools
         public static void Write(IEnumerable<object[]> rowObjects, IEnumerable<string> headers, string outputFile)
         {
             using var sw = CreateBomAwareStreamWriter(outputFile);
-            using var csvWriter = new CSVWriter(sw);
+            using var csvWriter = new CSVWriter(sw, CSVWriter.DefaultSeparator, CSVWriter.DefaultQuoteCharacter, CSVWriter.DefaultEscapeCharacter, CSVWriter.Rfc4180LineEnd);
 
 
             csvWriter.WriteNext(headers.ToArray());
@@ -122,7 +122,7 @@ namespace DataPowerTools
         public static void Write(IDataReader reader, string outputFile, bool writeHeaders = true)
         {
             using var sw = CreateBomAwareStreamWriter(outputFile);
-            using var csvWriter = new CSVWriter(sw);
+            using var csvWriter = new CSVWriter(sw, CSVWriter.DefaultSeparator, CSVWriter.DefaultQuoteCharacter, CSVWriter.DefaultEscapeCharacter, CSVWriter.Rfc4180LineEnd);
             
             Write(reader, sw, csvWriter, writeHeaders);
         }
@@ -187,8 +187,8 @@ namespace DataPowerTools
             using var sw = new StringWriter();
 
             using var csvWriter = useTabFormat 
-                ? new CSVWriter(sw, '\t', CSVWriter.NoQuoteCharacter, CSVWriter.DefaultEscapeCharacter, "\r\n") 
-                : new CSVWriter(sw);
+                ? new CSVWriter(sw, '\t', CSVWriter.NoQuoteCharacter, CSVWriter.DefaultEscapeCharacter, CSVWriter.Rfc4180LineEnd) 
+                : new CSVWriter(sw, CSVWriter.DefaultSeparator, CSVWriter.DefaultQuoteCharacter, CSVWriter.DefaultEscapeCharacter, CSVWriter.Rfc4180LineEnd);
 
             Write(reader, sw, csvWriter, writeHeaders);
 
