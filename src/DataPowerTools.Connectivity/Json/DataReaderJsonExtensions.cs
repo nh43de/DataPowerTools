@@ -95,7 +95,7 @@ namespace DataPowerTools.Connectivity.Json
             {
                 hasWrittenHeaders = true;
                 
-                csvWriter.WriteNext(headers);
+                csvWriter.WriteNext(headers, false);
             }
 
             using (csvWriter)
@@ -122,7 +122,7 @@ namespace DataPowerTools.Connectivity.Json
                         }
                     }
 
-                    csvWriter.WriteNext(values);
+                    csvWriter.WriteNext(values, false);
                 }
             }
 

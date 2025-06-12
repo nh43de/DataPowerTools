@@ -104,12 +104,12 @@ namespace DataPowerTools
             using var csvWriter = new CSVWriter(sw, CSVWriter.DefaultSeparator, CSVWriter.DefaultQuoteCharacter, CSVWriter.DefaultEscapeCharacter, CSVWriter.Rfc4180LineEnd);
 
 
-            csvWriter.WriteNext(headers.ToArray());
+            csvWriter.WriteNext(headers.ToArray(), false);
 
             foreach (var row in rowObjects)
             {
                 var vals = row.Select(i => i?.ToString()).ToArray();
-                csvWriter.WriteNext(vals);
+                csvWriter.WriteNext(vals, false);
             }
         }
 
@@ -145,7 +145,7 @@ namespace DataPowerTools
 
                 if (writeHeaders)
                 {
-                    csvWriter.WriteNext(fieldHeaders);
+                    csvWriter.WriteNext(fieldHeaders, false);
                 }
 
                 fieldCount = reader.FieldCount;
@@ -164,7 +164,7 @@ namespace DataPowerTools
                         var row = new object[fieldCount];
                         reader.GetValues(row);
 
-                        csvWriter.WriteNext(row.Select(o => o?.ToString()).ToArray());
+                        csvWriter.WriteNext(row.Select(o => o?.ToString()).ToArray(), false);
                     }
                 }
                 finally
