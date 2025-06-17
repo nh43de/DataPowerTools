@@ -21,17 +21,25 @@ namespace DataPowerTools.Extensions
         /// <summary>
         /// Writes datareader to CSV.
         /// </summary>
-        public static void WriteCsv(this IDataReader reader, string outputFile)
+        /// <param name="reader">The data reader to write</param>
+        /// <param name="outputFile">The output file path</param>
+        /// <param name="format">The format to use for the CSV output</param>
+        public static void WriteCsv(this IDataReader reader, string outputFile, CSVFormat format = CSVFormat.ANSI)
         {
-            Csv.Write(reader, outputFile);
+            Csv.Write(reader, outputFile, format: format);
         }
 
         /// <summary>
         /// Writes datareader to CSV.
         /// </summary>
-        public static string AsCsv(this IDataReader reader, bool writeHeaders = true, bool useTabFormat = false)
+        /// <param name="reader">The data reader to write</param>
+        /// <param name="writeHeaders">Whether to write headers</param>
+        /// <param name="useTabFormat">Whether to use tab format</param>
+        /// <param name="format">The format to use for the CSV output</param>
+        /// <returns>The CSV string</returns>
+        public static string AsCsv(this IDataReader reader, bool writeHeaders = true, bool useTabFormat = false, CSVFormat format = CSVFormat.ANSI)
         {
-            return Csv.WriteString(reader, writeHeaders, useTabFormat);
+            return Csv.WriteString(reader, writeHeaders, useTabFormat, format);
         }
 
         //public static object[] AsObjectArray(this IDataReader reader)

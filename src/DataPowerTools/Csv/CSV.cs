@@ -14,10 +14,9 @@ namespace DataPowerTools
 {
     public static class Csv
     {
-        private static StreamWriter CreateBomAwareStreamWriter(string filePath, Encoding encoding = null)
+        private static StreamWriter CreateBomAwareStreamWriter(string filePath, CSVFormat format = CSVFormat.ANSI)
         {
-            encoding ??= new UTF8Encoding(true); // UTF-8 with BOM by default
-            return new StreamWriter(filePath, false, encoding);
+            return new StreamWriter(filePath, false, format.GetEncoding());
         }
 
         //TODO: missing this implementation args: public static void Write<T>(IEnumerable<T> rowObjects, IEnumerable<string> headers, string outputFile) { //not implemented }
@@ -29,10 +28,9 @@ namespace DataPowerTools
         /// <param name="csvDelimiter"></param>
         /// <param name="fileHasHeaders"></param>
         /// <returns></returns>
-        public static IDataReader CreateDataReader(string filePath, char csvDelimiter = ',', bool fileHasHeaders = true) // int headerOffsetRows = 1)
+        public static IDataReader CreateDataReader(string filePath, char csvDelimiter = ',', bool fileHasHeaders = true)
         {
             var dr = new CsvReader(new StreamReader(filePath), fileHasHeaders, csvDelimiter);
-            
             return dr;
         }
 
@@ -43,8 +41,7 @@ namespace DataPowerTools
         /// <param name="csvDelimiter"></param>
         /// <param name="fileHasHeaders"></param>
         /// <returns></returns>
-        /// <returns></returns>
-        public static IDataReader CreateDataReader(Stream fileStream, char csvDelimiter = ',', bool fileHasHeaders = true) // int headerOffsetRows = 1)
+        public static IDataReader CreateDataReader(Stream fileStream, char csvDelimiter = ',', bool fileHasHeaders = true)
         {
             var dr = new CsvReader(new StreamReader(fileStream), fileHasHeaders, csvDelimiter);
             return dr;
@@ -60,7 +57,6 @@ namespace DataPowerTools
         public static IDataReader CreateDataReader(string filePath, bool hasHeaders = true, char delimiter = ',')
         {
             var dr = new CsvReader(File.OpenText(filePath), hasHeaders, delimiter);
-
             return dr;
         }
         
@@ -71,10 +67,9 @@ namespace DataPowerTools
         /// <param name="csvDelimiter"></param>
         /// <param name="fileHasHeaders"></param>
         /// <returns></returns>
-        public static DataSet GetDataSet(string filePath, char csvDelimiter = ',', bool fileHasHeaders = true) // int headerOffsetRows = 1)
+        public static DataSet GetDataSet(string filePath, char csvDelimiter = ',', bool fileHasHeaders = true)
         {
             using var a = new CsvReader(new StreamReader(filePath), fileHasHeaders, csvDelimiter);
-
             return a.ToDataSet(null, a.GetFieldHeaders());
         }
 
@@ -85,10 +80,9 @@ namespace DataPowerTools
         /// <param name="csvDelimiter"></param>
         /// <param name="fileHasHeaders"></param>
         /// <returns></returns>
-        public static DataSet GetDataSet(Stream fileStream, char csvDelimiter = ',', bool fileHasHeaders = true) // int headerOffsetRows = 1)
+        public static DataSet GetDataSet(Stream fileStream, char csvDelimiter = ',', bool fileHasHeaders = true)
         {
             using var a = new CsvReader(new StreamReader(fileStream), fileHasHeaders, csvDelimiter);
-
             return a.ToDataSet(null, a.GetFieldHeaders());
         }
 
@@ -98,11 +92,11 @@ namespace DataPowerTools
         /// <param name="rowObjects"></param>
         /// <param name="headers"></param>
         /// <param name="outputFile"></param>
-        public static void Write(IEnumerable<object[]> rowObjects, IEnumerable<string> headers, string outputFile)
+        /// <param name="format">The format to use for the CSV output</param>
+        public static void Write(IEnumerable<object[]> rowObjects, IEnumerable<string> headers, string outputFile, CSVFormat format = CSVFormat.ANSI)
         {
-            using var sw = CreateBomAwareStreamWriter(outputFile);
+            using var sw = CreateBomAwareStreamWriter(outputFile, format);
             using var csvWriter = new CSVWriter(sw, CSVWriter.DefaultSeparator, CSVWriter.DefaultQuoteCharacter, CSVWriter.DefaultEscapeCharacter, CSVWriter.Rfc4180LineEnd);
-
 
             csvWriter.WriteNext(headers.ToArray(), false);
 
@@ -119,9 +113,10 @@ namespace DataPowerTools
         /// <param name="reader"></param>
         /// <param name="outputFile"></param>
         /// <param name="writeHeaders"></param>
-        public static void Write(IDataReader reader, string outputFile, bool writeHeaders = true)
+        /// <param name="format">The format to use for the CSV output</param>
+        public static void Write(IDataReader reader, string outputFile, bool writeHeaders = true, CSVFormat format = CSVFormat.ANSI)
         {
-            using var sw = CreateBomAwareStreamWriter(outputFile);
+            using var sw = CreateBomAwareStreamWriter(outputFile, format);
             using var csvWriter = new CSVWriter(sw, CSVWriter.DefaultSeparator, CSVWriter.DefaultQuoteCharacter, CSVWriter.DefaultEscapeCharacter, CSVWriter.Rfc4180LineEnd);
             
             Write(reader, sw, csvWriter, writeHeaders);
@@ -181,8 +176,9 @@ namespace DataPowerTools
         /// <param name="reader"></param>
         /// <param name="writeHeaders"></param>
         /// <param name="useTabFormat">Outputs CSV in tab format</param>
+        /// <param name="format">The format to use for the CSV output</param>
         /// <returns></returns>
-        public static string WriteString(IDataReader reader, bool writeHeaders = true, bool useTabFormat = false)
+        public static string WriteString(IDataReader reader, bool writeHeaders = true, bool useTabFormat = false, CSVFormat format = CSVFormat.ANSI)
         {
             using var sw = new StringWriter();
 
@@ -205,7 +201,6 @@ namespace DataPowerTools
         public static IDataReader ReadString(string data, bool hasHeaders = true, char delimiter = ',')
         {
             var dr = new CsvReader(new StringReader(data), hasHeaders, delimiter);
-            
             return dr;
         }
         
