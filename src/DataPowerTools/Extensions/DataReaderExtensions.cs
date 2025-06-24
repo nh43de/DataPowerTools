@@ -19,25 +19,33 @@ namespace DataPowerTools.Extensions
     public static class DataReaderExtensions
     {
         /// <summary>
-        /// Writes datareader to CSV.
+        /// Writes datareader to CSV file with Excel-friendly formatting.
+        /// 
+        /// Excel Compatibility:
+        /// - Uses UTF-8 with BOM by default for emoji and international character support
+        /// - RFC 4180 compliant with CRLF line endings
+        /// - If Excel shows one column, use Data > From Text/CSV and select UTF-8 encoding
         /// </summary>
         /// <param name="reader">The data reader to write</param>
         /// <param name="outputFile">The output file path</param>
-        /// <param name="format">The format to use for the CSV output</param>
-        public static void WriteCsv(this IDataReader reader, string outputFile, CSVFormat format = CSVFormat.ANSI)
+        /// <param name="format">The format to use for the CSV output (UTF8 with BOM recommended for Excel)</param>
+        public static void WriteCsv(this IDataReader reader, string outputFile, CSVFormat format = CSVFormat.UTF8)
         {
             Csv.Write(reader, outputFile, format: format);
         }
 
         /// <summary>
-        /// Writes datareader to CSV.
+        /// Converts datareader to CSV string with Excel-friendly formatting.
+        /// 
+        /// Note: String output doesn't include BOM. For Excel compatibility with emojis/international characters,
+        /// use WriteCsv() method to write directly to file which includes proper BOM.
         /// </summary>
-        /// <param name="reader">The data reader to write</param>
+        /// <param name="reader">The data reader to convert</param>
         /// <param name="writeHeaders">Whether to write headers</param>
-        /// <param name="useTabFormat">Whether to use tab format</param>
+        /// <param name="useTabFormat">Whether to use tab format (TSV)</param>
         /// <param name="format">The format to use for the CSV output</param>
         /// <returns>The CSV string</returns>
-        public static string AsCsv(this IDataReader reader, bool writeHeaders = true, bool useTabFormat = false, CSVFormat format = CSVFormat.ANSI)
+        public static string AsCsv(this IDataReader reader, bool writeHeaders = true, bool useTabFormat = false, CSVFormat format = CSVFormat.UTF8)
         {
             return Csv.WriteString(reader, writeHeaders, useTabFormat, format);
         }

@@ -56,17 +56,22 @@ namespace DataPowerTools.Extensions
         }
 
         /// <summary>
-        /// Writes a DataTable to CSV.
+        /// Writes a DataTable to CSV file with Excel-friendly formatting.
+        /// 
+        /// Excel Compatibility:
+        /// - Uses UTF-8 with BOM by default for emoji and international character support
+        /// - RFC 4180 compliant with CRLF line endings
+        /// - If Excel shows one column, use Data > From Text/CSV and select UTF-8 encoding
         /// </summary>
-        /// <param name="dt"></param>
-        /// <param name="outputFile"></param>
-        public static void WriteCsv(this DataTable dt, string outputFile)
+        /// <param name="dataTable">The DataTable to export</param>
+        /// <param name="outputFile">The output file path</param>
+        /// <param name="format">The format to use for the CSV output (UTF8 with BOM recommended for Excel)</param>
+        public static void WriteCsv(this DataTable dataTable, string outputFile, CSVFormat format = CSVFormat.UTF8)
         {
-            var headers = dt.Columns.OfType<DataColumn>().Select(p => p.ColumnName).ToArray();
-
-            var objects = dt.Rows.OfType<DataRow>().Select(r => r.ItemArray);
-
-            Csv.Write(objects, headers, outputFile);
+            using (var reader = dataTable.CreateDataReader())
+            {
+                reader.WriteCsv(outputFile, format);
+            }
         }
         
         /// <summary>

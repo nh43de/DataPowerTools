@@ -14,7 +14,7 @@ namespace DataPowerTools
 {
     public static class Csv
     {
-        private static StreamWriter CreateBomAwareStreamWriter(string filePath, CSVFormat format = CSVFormat.ANSI)
+        private static StreamWriter CreateBomAwareStreamWriter(string filePath, CSVFormat format = CSVFormat.UTF8)
         {
             return new StreamWriter(filePath, false, format.GetEncoding());
         }
@@ -88,12 +88,17 @@ namespace DataPowerTools
 
         /// <summary>
         /// Writes an enumerable of object arrays into a file.
+        /// 
+        /// Excel Compatibility Notes:
+        /// - Default UTF-8 with BOM format ensures emoji and international character support
+        /// - Uses RFC 4180 compliant formatting with CRLF line endings for Windows compatibility
+        /// - If Excel shows one column, use Data > From Text/CSV and select UTF-8 encoding
         /// </summary>
-        /// <param name="rowObjects"></param>
-        /// <param name="headers"></param>
-        /// <param name="outputFile"></param>
-        /// <param name="format">The format to use for the CSV output</param>
-        public static void Write(IEnumerable<object[]> rowObjects, IEnumerable<string> headers, string outputFile, CSVFormat format = CSVFormat.ANSI)
+        /// <param name="rowObjects">The data rows to write</param>
+        /// <param name="headers">Column headers</param>
+        /// <param name="outputFile">Output file path</param>
+        /// <param name="format">The format to use for the CSV output (UTF8 with BOM recommended for Excel)</param>
+        public static void Write(IEnumerable<object[]> rowObjects, IEnumerable<string> headers, string outputFile, CSVFormat format = CSVFormat.UTF8)
         {
             using var sw = CreateBomAwareStreamWriter(outputFile, format);
             using var csvWriter = new CSVWriter(sw, CSVWriter.DefaultSeparator, CSVWriter.DefaultQuoteCharacter, CSVWriter.DefaultEscapeCharacter, CSVWriter.Rfc4180LineEnd);
@@ -109,12 +114,17 @@ namespace DataPowerTools
 
         /// <summary>
         /// Writes an IDataReader to a CSV file onto disk (streaming operation).
+        /// 
+        /// Excel Compatibility Notes:
+        /// - Default UTF-8 with BOM format ensures emoji and international character support
+        /// - Uses RFC 4180 compliant formatting with CRLF line endings for Windows compatibility
+        /// - If Excel shows one column, use Data > From Text/CSV and select UTF-8 encoding
         /// </summary>
-        /// <param name="reader"></param>
-        /// <param name="outputFile"></param>
-        /// <param name="writeHeaders"></param>
-        /// <param name="format">The format to use for the CSV output</param>
-        public static void Write(IDataReader reader, string outputFile, bool writeHeaders = true, CSVFormat format = CSVFormat.ANSI)
+        /// <param name="reader">The data reader to write</param>
+        /// <param name="outputFile">Output file path</param>
+        /// <param name="writeHeaders">Whether to include column headers</param>
+        /// <param name="format">The format to use for the CSV output (UTF8 with BOM recommended for Excel)</param>
+        public static void Write(IDataReader reader, string outputFile, bool writeHeaders = true, CSVFormat format = CSVFormat.UTF8)
         {
             using var sw = CreateBomAwareStreamWriter(outputFile, format);
             using var csvWriter = new CSVWriter(sw, CSVWriter.DefaultSeparator, CSVWriter.DefaultQuoteCharacter, CSVWriter.DefaultEscapeCharacter, CSVWriter.Rfc4180LineEnd);
@@ -172,13 +182,18 @@ namespace DataPowerTools
 
         /// <summary>
         /// Writes an IDataReader to a CSV string.
+        /// 
+        /// Excel Compatibility Notes:
+        /// - Default UTF-8 with BOM format ensures emoji and international character support
+        /// - Uses RFC 4180 compliant formatting with CRLF line endings for Windows compatibility
+        /// - String output doesn't include BOM - use file output methods for Excel compatibility
         /// </summary>
-        /// <param name="reader"></param>
-        /// <param name="writeHeaders"></param>
-        /// <param name="useTabFormat">Outputs CSV in tab format</param>
-        /// <param name="format">The format to use for the CSV output</param>
-        /// <returns></returns>
-        public static string WriteString(IDataReader reader, bool writeHeaders = true, bool useTabFormat = false, CSVFormat format = CSVFormat.ANSI)
+        /// <param name="reader">The data reader to convert</param>
+        /// <param name="writeHeaders">Whether to include column headers</param>
+        /// <param name="useTabFormat">Outputs CSV in tab format (TSV)</param>
+        /// <param name="format">The format to use for the CSV output (affects character encoding for file writes)</param>
+        /// <returns>CSV formatted string</returns>
+        public static string WriteString(IDataReader reader, bool writeHeaders = true, bool useTabFormat = false, CSVFormat format = CSVFormat.UTF8)
         {
             using var sw = new StringWriter();
 

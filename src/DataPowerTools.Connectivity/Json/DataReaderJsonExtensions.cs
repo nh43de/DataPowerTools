@@ -65,19 +65,28 @@ namespace DataPowerTools.Connectivity.Json
         }
 
         /// <summary>
-        /// Creates insert statements from an array of json objects.
+        /// Converts JSON array to CSV string with Excel-friendly formatting.
+        /// 
+        /// Excel Compatibility Notes:
+        /// - Uses UTF-8 compatible formatting with RFC 4180 compliance
+        /// - String output doesn't include BOM - for Excel with emojis, save string to file with UTF-8 BOM
         /// </summary>
-        public static string FromJsonToCsv(this string jsonString, bool writeHeaders = true, bool useTabFormat = false)
+        /// <param name="jsonString">The JSON array string to convert</param>
+        /// <param name="writeHeaders">Whether to write headers</param>
+        /// <param name="useTabFormat">Whether to use tab format (TSV)</param>
+        /// <param name="format">The format to use for the CSV output</param>
+        /// <returns>CSV formatted string</returns>
+        public static string FromJsonToCsv(this string jsonString, bool writeHeaders = true, bool useTabFormat = false, CSVFormat format = CSVFormat.UTF8)
         {
             var sb = new StringBuilder();
-            
+
             var el = JsonDocument.Parse(jsonString).RootElement;
 
             var sw = new StringWriter(sb);
 
             using var csvWriter = useTabFormat
-                ? new CSVWriter(sw, '\t', CSVWriter.DefaultQuoteCharacter, CSVWriter.DefaultEscapeCharacter, "\r\n") 
-                : new CSVWriter(sw,',', CSVWriter.DefaultQuoteCharacter, CSVWriter.DefaultEscapeCharacter, "\r\n");
+                ? new CSVWriter(sw, '\t', CSVWriter.DefaultQuoteCharacter, CSVWriter.DefaultEscapeCharacter, CSVWriter.Rfc4180LineEnd) 
+                : new CSVWriter(sw,',', CSVWriter.DefaultQuoteCharacter, CSVWriter.DefaultEscapeCharacter, CSVWriter.Rfc4180LineEnd);
 
             var hashSetHeaders = new HashSet<string>();
 

@@ -334,30 +334,40 @@ namespace DataPowerTools.Extensions
         //}
 
         /// <summary>
-        /// Writes an enumerable to CSV.
+        /// Writes an enumerable to CSV file with Excel-friendly formatting.
+        /// 
+        /// Excel Compatibility:
+        /// - Uses UTF-8 with BOM by default for emoji and international character support
+        /// - RFC 4180 compliant with CRLF line endings
+        /// - If Excel shows one column, use Data > From Text/CSV and select UTF-8 encoding
         /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="enumerable"></param>
-        /// <param name="outputFile"></param>
+        /// <typeparam name="T">The type of objects in the enumerable</typeparam>
+        /// <param name="enumerable">The enumerable to write</param>
+        /// <param name="outputFile">Output file path</param>
         /// <param name="fieldNames">Field names to include, in that order. By default all are included.</param>
-        public static void WriteCsv<T>(this IEnumerable<T> enumerable, string outputFile, string[] fieldNames = null)
+        /// <param name="format">The format to use for the CSV output (UTF8 with BOM recommended for Excel)</param>
+        public static void WriteCsv<T>(this IEnumerable<T> enumerable, string outputFile, string[] fieldNames = null, CSVFormat format = CSVFormat.UTF8)
         {
-            enumerable.ToDataReader(fieldNames).WriteCsv(outputFile);
+            enumerable.ToDataReader(fieldNames).WriteCsv(outputFile, format);
         }
 
         /// <summary>
-        /// Writes an enumerable to CSV.
+        /// Converts an enumerable to CSV string with Excel-friendly formatting.
+        /// 
+        /// Note: String output doesn't include BOM. For Excel compatibility with emojis/international characters,
+        /// use WriteCsv() method to write directly to file which includes proper BOM.
         /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="enumerable"></param>
+        /// <typeparam name="T">The type of objects in the enumerable</typeparam>
+        /// <param name="enumerable">The enumerable to convert</param>
         /// <param name="fieldNames">Field names to include, in that order. By default all are included.</param>
-        public static string ToCsvString<T>(this IEnumerable<T> enumerable, string[] fieldNames = null)
+        /// <param name="format">The format to use for the CSV output</param>
+        public static string ToCsvString<T>(this IEnumerable<T> enumerable, string[] fieldNames = null, CSVFormat format = CSVFormat.UTF8)
         {
             var dr = enumerable.ToDataReader(fieldNames);
 
             using (dr)
             {
-                return dr.AsCsv();
+                return dr.AsCsv(format: format);
             }
         }
         
