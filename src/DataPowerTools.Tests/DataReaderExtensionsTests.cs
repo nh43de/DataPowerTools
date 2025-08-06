@@ -166,5 +166,34 @@ namespace DataPowerTools.Tests
         {
             
         }
+        public class ItemResult
+        {
+            public string? SearchTerm { get; set; }
+            public string? VendorItemId { get; set; }
+            public decimal? Price { get; set; }
+        }
+
+        [TestMethod]
+        public void TestSelectRowsFromCsvWithSkipUnmatchedProperties()
+        {
+            // Tab-delimited CSV string with missing SearchTerm column
+            string csvData = "VendorItemId\tPrice\n123\t10.5\n456\t20.0";
+
+            // Convert DataTable to IDataReader
+            var reader = csvData.ReadCsvString('\t');
+
+            // Map to ItemResult class
+            var results = reader.SelectRows<ItemResult>(null, true).ToArray();
+
+            // Assertions
+            Assert.AreEqual(2, results.Length);
+            Assert.IsNull(results[0].SearchTerm);
+            Assert.AreEqual("123", results[0].VendorItemId);
+            Assert.AreEqual(10.5m, results[0].Price);
+            Assert.IsNull(results[1].SearchTerm);
+            Assert.AreEqual("456", results[1].VendorItemId);
+            Assert.AreEqual(20.0m, results[1].Price);
+        }
+
     }
 }

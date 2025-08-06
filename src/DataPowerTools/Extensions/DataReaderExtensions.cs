@@ -1115,15 +1115,25 @@ namespace DataPowerTools.Extensions
         /// <typeparam name="T">Data type.</typeparam>
         /// <param name="dr">Source data reader.</param>
         /// <param name="transformGroup">The transform group to apply.</param>
+        /// <param name="skipUnmatchedProperties">If true, properties in the target type that do not have a corresponding column in the data reader will be skipped, and their values will be set to null.</param>
         /// <returns></returns>
-        public static IEnumerable<T> SelectRows<T>(this IDataReader dr, DataTransformGroup transformGroup = null) where T : class
+        public static IEnumerable<T> SelectRows<T>(this IDataReader dr, DataTransformGroup transformGroup = null, bool skipUnmatchedProperties = false) where T : class
         {
             var d = dr
                 .MapToType(typeof(T), transformGroup ?? DataTransformGroups.Default);
-            
+
+            if (skipUnmatchedProperties)
+            {
+                var availableColumns = dr.GetFieldNames();
+                var accessor = TypeAccessor.Create(typeof(T));
+                var props = accessor.GetMembers().Select(p => p.Name).ToArray();
+                props = props.Intersect(availableColumns).ToArray();
+                return d.SelectNonStrict<T>(props);
+            }
+
             return d.SelectNonStrict<T>(true);
         }
-        
+
         //TODO: warning: some duplicated code to above.
         /// <summary>
         /// Strict select function. Yields an IDataReader as an enumerable. Property names must match column names exactly.
